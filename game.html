@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IleRise - NASA Space Apps Challenge 2025</title>
+    <link rel="stylesheet" href="/src/styles/game.css">
+    <link rel="stylesheet" href="/src/styles/cursors.css">
+</head>
+<body>
+    <!-- ========== ÉCRAN D'ACCUEIL ========== -->
+    <div id="screen-home" class="screen active">
+        <div class="home-container">
+            <div class="logo-container">
+                <div class="logo-icon">🌍</div>
+                <h1 class="logo-title">IleRise</h1>
+                <p class="logo-subtitle">AgroData Explorer</p>
+            </div>
+
+            <div class="hero-text">
+                <p class="hero-message">
+                    Sauvez AgriVerse avec les données NASA
+                </p>
+            </div>
+
+            <div class="player-stats">
+                <div class="stat-item">
+                    <span class="stat-icon">❤️</span>
+                    <span class="stat-value" id="home-lives">5</span>
+                    <span class="stat-label">Vies</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">💰</span>
+                    <span class="stat-value" id="home-coins">0</span>
+                    <span class="stat-label">Pièces</span>
+                </div>
+            </div>
+
+            <button class="btn-primary btn-large" id="btn-start">
+                🚀 Commencer
+            </button>
+
+            <div class="nasa-credit">
+                <img src="/public/nasa-logo.png" alt="NASA" class="nasa-logo" onerror="this.style.display='none'">
+                <p>Powered by NASA Earth Data</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SÉLECTION CULTURE ========== -->
+    <div id="screen-crop-select" class="screen">
+        <div class="screen-header">
+            <button class="btn-back" id="btn-back-crop">← Retour</button>
+            <h2>Choisissez votre culture</h2>
+            <div class="player-coins">
+                💰 <span id="crop-coins">0</span>
+            </div>
+        </div>
+
+        <div class="crop-grid" id="crop-grid">
+            <!-- Généré dynamiquement -->
+        </div>
+    </div>
+
+    <!-- ========== SÉLECTION NIVEAU ========== -->
+    <div id="screen-level-select" class="screen">
+        <div class="screen-header">
+            <button class="btn-back" id="btn-back-level">← Retour</button>
+            <h2 id="level-crop-title">🌽 Maïs</h2>
+            <div class="player-coins">
+                💰 <span id="level-coins">0</span>
+            </div>
+        </div>
+
+        <div class="level-info">
+            <p class="level-description" id="level-crop-description">
+                Progressez à travers 3 niveaux de difficulté croissante
+            </p>
+        </div>
+
+        <div class="level-grid" id="level-grid">
+            <!-- Généré dynamiquement -->
+        </div>
+    </div>
+
+    <!-- ========== ÉCRAN DE JEU ========== -->
+    <div id="screen-game" class="screen">
+        <!-- En-tête jeu -->
+        <div class="game-header">
+            <button class="btn-back" id="btn-back-game">← Quitter</button>
+
+            <div class="game-info">
+                <div class="crop-badge">
+                    <span id="game-crop-emoji">🌽</span>
+                    <span id="game-crop-name">Maïs</span>
+                    <span class="level-badge" id="game-level-badge">Niveau 1</span>
+                </div>
+            </div>
+
+            <div class="game-stats">
+                <div class="stat">❤️ <span id="game-lives">5</span></div>
+                <div class="stat">💰 <span id="game-coins">0</span></div>
+            </div>
+        </div>
+
+        <!-- Zone 3D -->
+        <div id="game-canvas-container">
+            <!-- Canvas Three.js injecté ici -->
+        </div>
+
+        <!-- État Initial du Champ -->
+        <div class="initial-state-panel">
+            <h3>📸 État Initial du Champ</h3>
+            <div class="state-snapshot">
+                <div class="snapshot-data">
+                    <div class="snapshot-item">
+                        <span class="label">NDVI:</span>
+                        <span class="value" id="initial-ndvi">0.15</span>
+                        <span class="status" id="initial-ndvi-status">Faible</span>
+                    </div>
+                    <div class="snapshot-item">
+                        <span class="label">Humidité Sol:</span>
+                        <span class="value" id="initial-moisture">18%</span>
+                        <span class="status" id="initial-moisture-status">Sec</span>
+                    </div>
+                    <div class="snapshot-item">
+                        <span class="label">Température:</span>
+                        <span class="value" id="initial-temp">30°C</span>
+                        <span class="status" id="initial-temp-status">Élevée</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panneau NASA Data Éducatif -->
+        <div class="nasa-panel-enhanced">
+            <h3>📡 Données NASA - Guide d'Utilisation</h3>
+
+            <div class="nasa-item-explained">
+                <div class="nasa-data-row">
+                    <span class="nasa-icon">🌡️</span>
+                    <span class="nasa-label">Température:</span>
+                    <strong class="nasa-value" id="nasa-temp">--°C</strong>
+                    <span class="status-badge" id="temp-status">--</span>
+                </div>
+                <div class="nasa-explanation" id="temp-explanation">
+                    💡 Analyse en cours...
+                </div>
+                <div class="nasa-source">Source : MODIS Terra</div>
+            </div>
+
+            <div class="nasa-item-explained">
+                <div class="nasa-data-row">
+                    <span class="nasa-icon">💧</span>
+                    <span class="nasa-label">Humidité Sol:</span>
+                    <strong class="nasa-value" id="nasa-moisture">--%</strong>
+                    <span class="status-badge" id="moisture-status">--</span>
+                </div>
+                <div class="nasa-explanation" id="moisture-explanation">
+                    💡 Analyse en cours...
+                </div>
+                <div class="nasa-source">Source : SMAP L4</div>
+            </div>
+
+            <div class="nasa-item-explained">
+                <div class="nasa-data-row">
+                    <span class="nasa-icon">🌾</span>
+                    <span class="nasa-label">NDVI (Santé):</span>
+                    <strong class="nasa-value" id="nasa-ndvi">--</strong>
+                    <span class="status-badge" id="ndvi-status">--</span>
+                </div>
+                <div class="nasa-explanation" id="ndvi-explanation">
+                    💡 Analyse en cours...
+                </div>
+                <div class="nasa-source">Source : MODIS NDVI</div>
+            </div>
+        </div>
+
+        <!-- Objectif -->
+        <div class="objective-panel">
+            <h3>🎯 Objectif</h3>
+            <p class="objective-text" id="game-objective">
+                Atteindre <strong id="target-yield">3.0 t/ha</strong>
+            </p>
+            <p class="constraint-text" id="game-constraints"></p>
+        </div>
+
+        <!-- Curseurs de contrôle -->
+        <div class="controls-panel">
+            <h3>🎛️ Contrôles</h3>
+            <div id="cursor-container"></div>
+
+            <div class="action-buttons">
+                <button class="btn-secondary" id="btn-recommendations">
+                    💡 Recommandations NASA
+                </button>
+                <button class="btn-primary btn-large" id="btn-simulate">
+                    🚀 Lancer Simulation
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== ÉCRAN RÉSULTATS ========== -->
+    <div id="screen-results" class="screen">
+        <div class="results-container">
+            <div class="results-header">
+                <h2 id="results-title">🎉 Niveau Réussi !</h2>
+            </div>
+
+            <div class="results-stars" id="results-stars">
+                ⭐⭐⭐
+            </div>
+
+            <div class="results-score">
+                <div class="score-main">
+                    <span id="results-score-value">850</span>
+                    <span class="score-max">/1000</span>
+                </div>
+                <p class="score-label">Score</p>
+            </div>
+
+            <!-- Comparaison Avant/Après -->
+            <div class="comparison-view">
+                <h3>📊 Évolution du Champ</h3>
+                <div class="before-after">
+                    <div class="comparison-col before">
+                        <h4>AVANT</h4>
+                        <div class="comparison-icon">🌱</div>
+                        <div class="comparison-stats">
+                            <div class="stat-row">
+                                <span class="label">NDVI:</span>
+                                <span class="value" id="before-ndvi">0.15</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="label">Humidité:</span>
+                                <span class="value" id="before-moisture">18%</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="label">Hauteur:</span>
+                                <span class="value" id="before-height">5cm</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="comparison-arrow">
+                        <div class="arrow-icon">→</div>
+                        <div class="days-label"><span id="simulation-days">90</span> jours</div>
+                    </div>
+
+                    <div class="comparison-col after">
+                        <h4>APRÈS</h4>
+                        <div class="comparison-icon">🌽</div>
+                        <div class="comparison-stats">
+                            <div class="stat-row">
+                                <span class="label">NDVI:</span>
+                                <span class="value" id="after-ndvi">0.78</span>
+                                <span class="change positive" id="ndvi-change">+420%</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="label">Humidité:</span>
+                                <span class="value" id="after-moisture">32%</span>
+                                <span class="change positive" id="moisture-change">+78%</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="label">Hauteur:</span>
+                                <span class="value" id="after-height">155cm</span>
+                                <span class="change positive" id="height-change">+3000%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Timeline de Simulation -->
+            <div class="simulation-timeline">
+                <h3>📅 Évolution sur <span id="timeline-duration">90</span> jours</h3>
+                <div class="timeline-chart">
+                    <canvas id="timeline-canvas" width="600" height="200"></canvas>
+                </div>
+                <div class="timeline-legend">
+                    <div class="legend-item">
+                        <span class="legend-color ndvi"></span>
+                        <span>NDVI (Santé)</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color moisture"></span>
+                        <span>Humidité Sol</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color npk"></span>
+                        <span>NPK</span>
+                    </div>
+                </div>
+                <div class="timeline-events" id="timeline-events">
+                    <!-- Événements injectés dynamiquement -->
+                </div>
+            </div>
+
+            <div class="results-details">
+                <div class="result-item">
+                    <span class="result-label">🌾 Rendement</span>
+                    <span class="result-value">
+                        <span id="results-yield">4.2</span> t/ha
+                    </span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">🎯 Objectif</span>
+                    <span class="result-value">
+                        <span id="results-target">3.0</span> t/ha
+                    </span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">💰 Pièces gagnées</span>
+                    <span class="result-value" id="results-coins">+100</span>
+                </div>
+            </div>
+
+            <div class="results-diagnosis">
+                <h3>📊 Diagnostic</h3>
+                <div id="diagnosis-summary" class="diagnosis-summary"></div>
+                <div id="diagnosis-details" class="diagnosis-details"></div>
+            </div>
+
+            <div class="results-actions">
+                <button class="btn-secondary" id="btn-retry">
+                    🔄 Rejouer
+                </button>
+                <button class="btn-primary" id="btn-next-level">
+                    ➡️ Niveau Suivant
+                </button>
+                <button class="btn-secondary" id="btn-main-menu">
+                    🏠 Menu Principal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL DÉBLOCAGE ========== -->
+    <div id="modal-unlock" class="modal">
+        <div class="modal-content">
+            <h2>🔒 Culture Verrouillée</h2>
+            <div class="unlock-info">
+                <div class="unlock-icon" id="unlock-crop-emoji">🌽</div>
+                <h3 id="unlock-crop-name">Maïs</h3>
+                <p class="unlock-cost">
+                    Coût: <strong id="unlock-cost">100</strong> 💰
+                </p>
+                <p class="unlock-balance">
+                    Vos pièces: <strong id="unlock-balance">50</strong> 💰
+                </p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-secondary" id="btn-cancel-unlock">Annuler</button>
+                <button class="btn-primary" id="btn-confirm-unlock">Débloquer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODAL RECOMMANDATIONS NASA ========== -->
+    <div id="modal-recommendations" class="modal">
+        <div class="modal-content large">
+            <button class="modal-close" id="btn-close-recommendations">✕</button>
+            <h2>💡 Recommandations Basées sur NASA</h2>
+            <p class="modal-subtitle">Ajustez vos paramètres selon les données satellites</p>
+
+            <div class="recommendation-cards">
+                <div class="recommendation-card">
+                    <div class="card-header">
+                        <span class="card-icon">🌡️</span>
+                        <h3>Analyse Température (MODIS)</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="data-row">
+                            <span class="label">Température actuelle:</span>
+                            <span class="value" id="rec-temp-current">--°C</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="label">Optimal pour cette culture:</span>
+                            <span class="value" id="rec-temp-optimal">--°C</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="label">Écart:</span>
+                            <span class="value status" id="rec-temp-gap">--°C</span>
+                        </div>
+                        <div class="action-box" id="rec-temp-action">
+                            ✅ Action recommandée : Analyse en cours...
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recommendation-card">
+                    <div class="card-header">
+                        <span class="card-icon">💧</span>
+                        <h3>Analyse Humidité Sol (SMAP)</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="data-row">
+                            <span class="label">Humidité actuelle:</span>
+                            <span class="value" id="rec-moisture-current">--%</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="label">Besoin de la culture:</span>
+                            <span class="value" id="rec-moisture-optimal">--%</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="label">Écart:</span>
+                            <span class="value status" id="rec-moisture-gap">--%</span>
+                        </div>
+                        <div class="action-box" id="rec-moisture-action">
+                            ✅ Action recommandée : Analyse en cours...
+                        </div>
+                        <div class="recommended-slider">
+                            <label>Irrigation recommandée:</label>
+                            <div class="slider-value" id="rec-irrigation-value">--</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recommendation-card">
+                    <div class="card-header">
+                        <span class="card-icon">🌾</span>
+                        <h3>Analyse Végétation (NDVI)</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="data-row">
+                            <span class="label">NDVI actuel:</span>
+                            <span class="value" id="rec-ndvi-current">--</span>
+                        </div>
+                        <div class="data-row">
+                            <span class="label">Statut:</span>
+                            <span class="value status" id="rec-ndvi-status">--</span>
+                        </div>
+                        <div class="action-box" id="rec-ndvi-action">
+                            ✅ Interprétation : Analyse en cours...
+                        </div>
+                    </div>
+                </div>
+
+                <div class="recommendation-card">
+                    <div class="card-header">
+                        <span class="card-icon">🌿</span>
+                        <h3>Recommandation NPK</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="data-row">
+                            <span class="label">NPK optimal:</span>
+                            <span class="value" id="rec-npk-optimal">-- kg/ha</span>
+                        </div>
+                        <div class="action-box" id="rec-npk-action">
+                            ✅ Basé sur le stade de croissance et NDVI
+                        </div>
+                        <div class="recommended-slider">
+                            <label>NPK recommandé:</label>
+                            <div class="slider-value" id="rec-npk-value">--</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-secondary" id="btn-ignore-recommendations">
+                    Ignorer
+                </button>
+                <button class="btn-primary" id="btn-apply-recommendations">
+                    ✨ Appliquer Recommandations Auto
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== CHARGEMENT ========== -->
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Chargement données NASA...</p>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="/src/app.js"></script>
+</body>
+</html>

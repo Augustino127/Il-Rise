@@ -1,0 +1,1116 @@
+{
+  "source": "NASA POWER API",
+  "product": "Precipitation Corrected (PRECTOTCORR)",
+  "region": "Benin",
+  "dateRange": {
+    "start": "2025-01-01",
+    "end": "2025-01-31"
+  },
+  "lastUpdate": "2025-10-04",
+  "locations": [
+    {
+      "city": "Cotonou",
+      "country": "Benin",
+      "latitude": 6.3667,
+      "longitude": 2.3833,
+      "precipitation": {
+        "total_mm": 7.25,
+        "average_daily_mm": 0.23,
+        "max_daily_mm": 2.35,
+        "rainy_days": 14
+      },
+      "timeseries": [
+        {
+          "date": "2025-01-01",
+          "precipitation_mm": 0.03
+        },
+        {
+          "date": "2025-01-02",
+          "precipitation_mm": 0.1
+        },
+        {
+          "date": "2025-01-03",
+          "precipitation_mm": 0.15
+        },
+        {
+          "date": "2025-01-04",
+          "precipitation_mm": 0.19
+        },
+        {
+          "date": "2025-01-05",
+          "precipitation_mm": 0.12
+        },
+        {
+          "date": "2025-01-06",
+          "precipitation_mm": 0.02
+        },
+        {
+          "date": "2025-01-07",
+          "precipitation_mm": 0.02
+        },
+        {
+          "date": "2025-01-08",
+          "precipitation_mm": 0.01
+        },
+        {
+          "date": "2025-01-09",
+          "precipitation_mm": 0.01
+        },
+        {
+          "date": "2025-01-10",
+          "precipitation_mm": 0.01
+        },
+        {
+          "date": "2025-01-11",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-12",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-13",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-14",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-15",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-16",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-17",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-18",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-19",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-20",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-21",
+          "precipitation_mm": 0.27
+        },
+        {
+          "date": "2025-01-22",
+          "precipitation_mm": 0.22
+        },
+        {
+          "date": "2025-01-23",
+          "precipitation_mm": 0.7
+        },
+        {
+          "date": "2025-01-24",
+          "precipitation_mm": 0.13
+        },
+        {
+          "date": "2025-01-25",
+          "precipitation_mm": 0.19
+        },
+        {
+          "date": "2025-01-26",
+          "precipitation_mm": 0.56
+        },
+        {
+          "date": "2025-01-27",
+          "precipitation_mm": 0.27
+        },
+        {
+          "date": "2025-01-28",
+          "precipitation_mm": 0.5
+        },
+        {
+          "date": "2025-01-29",
+          "precipitation_mm": 1.21
+        },
+        {
+          "date": "2025-01-30",
+          "precipitation_mm": 0.19
+        },
+        {
+          "date": "2025-01-31",
+          "precipitation_mm": 2.35
+        }
+      ]
+    },
+    {
+      "city": "Porto-Novo",
+      "country": "Benin",
+      "latitude": 6.4969,
+      "longitude": 2.6289,
+      "precipitation": {
+        "total_mm": 7.25,
+        "average_daily_mm": 0.23,
+        "max_daily_mm": 2.35,
+        "rainy_days": 14
+      },
+      "timeseries": [
+        {
+          "date": "2025-01-01",
+          "precipitation_mm": 0.03
+        },
+        {
+          "date": "2025-01-02",
+          "precipitation_mm": 0.1
+        },
+        {
+          "date": "2025-01-03",
+          "precipitation_mm": 0.15
+        },
+        {
+          "date": "2025-01-04",
+          "precipitation_mm": 0.19
+        },
+        {
+          "date": "2025-01-05",
+          "precipitation_mm": 0.12
+        },
+        {
+          "date": "2025-01-06",
+          "precipitation_mm": 0.02
+        },
+        {
+          "date": "2025-01-07",
+          "precipitation_mm": 0.02
+        },
+        {
+          "date": "2025-01-08",
+          "precipitation_mm": 0.01
+        },
+        {
+          "date": "2025-01-09",
+          "precipitation_mm": 0.01
+        },
+        {
+          "date": "2025-01-10",
+          "precipitation_mm": 0.01
+        },
+        {
+          "date": "2025-01-11",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-12",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-13",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-14",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-15",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-16",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-17",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-18",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-19",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-20",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-21",
+          "precipitation_mm": 0.27
+        },
+        {
+          "date": "2025-01-22",
+          "precipitation_mm": 0.22
+        },
+        {
+          "date": "2025-01-23",
+          "precipitation_mm": 0.7
+        },
+        {
+          "date": "2025-01-24",
+          "precipitation_mm": 0.13
+        },
+        {
+          "date": "2025-01-25",
+          "precipitation_mm": 0.19
+        },
+        {
+          "date": "2025-01-26",
+          "precipitation_mm": 0.56
+        },
+        {
+          "date": "2025-01-27",
+          "precipitation_mm": 0.27
+        },
+        {
+          "date": "2025-01-28",
+          "precipitation_mm": 0.5
+        },
+        {
+          "date": "2025-01-29",
+          "precipitation_mm": 1.21
+        },
+        {
+          "date": "2025-01-30",
+          "precipitation_mm": 0.19
+        },
+        {
+          "date": "2025-01-31",
+          "precipitation_mm": 2.35
+        }
+      ]
+    },
+    {
+      "city": "Parakou",
+      "country": "Benin",
+      "latitude": 9.3372,
+      "longitude": 2.6103,
+      "precipitation": {
+        "total_mm": 0.0,
+        "average_daily_mm": 0.0,
+        "max_daily_mm": 0,
+        "rainy_days": 0
+      },
+      "timeseries": [
+        {
+          "date": "2025-01-01",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-02",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-03",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-04",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-05",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-06",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-07",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-08",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-09",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-10",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-11",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-12",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-13",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-14",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-15",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-16",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-17",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-18",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-19",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-20",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-21",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-22",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-23",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-24",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-25",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-26",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-27",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-28",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-29",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-30",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-31",
+          "precipitation_mm": 0.0
+        }
+      ]
+    },
+    {
+      "city": "Djougou",
+      "country": "Benin",
+      "latitude": 9.7084,
+      "longitude": 1.666,
+      "precipitation": {
+        "total_mm": 0.0,
+        "average_daily_mm": 0.0,
+        "max_daily_mm": 0,
+        "rainy_days": 0
+      },
+      "timeseries": [
+        {
+          "date": "2025-01-01",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-02",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-03",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-04",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-05",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-06",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-07",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-08",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-09",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-10",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-11",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-12",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-13",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-14",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-15",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-16",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-17",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-18",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-19",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-20",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-21",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-22",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-23",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-24",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-25",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-26",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-27",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-28",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-29",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-30",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-31",
+          "precipitation_mm": 0.0
+        }
+      ]
+    },
+    {
+      "city": "Bohicon",
+      "country": "Benin",
+      "latitude": 7.1782,
+      "longitude": 2.0667,
+      "precipitation": {
+        "total_mm": 3.67,
+        "average_daily_mm": 0.12,
+        "max_daily_mm": 1.75,
+        "rainy_days": 8
+      },
+      "timeseries": [
+        {
+          "date": "2025-01-01",
+          "precipitation_mm": 0.03
+        },
+        {
+          "date": "2025-01-02",
+          "precipitation_mm": 0.1
+        },
+        {
+          "date": "2025-01-03",
+          "precipitation_mm": 0.17
+        },
+        {
+          "date": "2025-01-04",
+          "precipitation_mm": 0.12
+        },
+        {
+          "date": "2025-01-05",
+          "precipitation_mm": 0.08
+        },
+        {
+          "date": "2025-01-06",
+          "precipitation_mm": 0.01
+        },
+        {
+          "date": "2025-01-07",
+          "precipitation_mm": 0.01
+        },
+        {
+          "date": "2025-01-08",
+          "precipitation_mm": 0.01
+        },
+        {
+          "date": "2025-01-09",
+          "precipitation_mm": 0.01
+        },
+        {
+          "date": "2025-01-10",
+          "precipitation_mm": 0.01
+        },
+        {
+          "date": "2025-01-11",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-12",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-13",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-14",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-15",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-16",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-17",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-18",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-19",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-20",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-21",
+          "precipitation_mm": 0.2
+        },
+        {
+          "date": "2025-01-22",
+          "precipitation_mm": 0.13
+        },
+        {
+          "date": "2025-01-23",
+          "precipitation_mm": 0.33
+        },
+        {
+          "date": "2025-01-24",
+          "precipitation_mm": 0.06
+        },
+        {
+          "date": "2025-01-25",
+          "precipitation_mm": 0.1
+        },
+        {
+          "date": "2025-01-26",
+          "precipitation_mm": 0.17
+        },
+        {
+          "date": "2025-01-27",
+          "precipitation_mm": 0.03
+        },
+        {
+          "date": "2025-01-28",
+          "precipitation_mm": 0.08
+        },
+        {
+          "date": "2025-01-29",
+          "precipitation_mm": 0.2
+        },
+        {
+          "date": "2025-01-30",
+          "precipitation_mm": 0.07
+        },
+        {
+          "date": "2025-01-31",
+          "precipitation_mm": 1.75
+        }
+      ]
+    },
+    {
+      "city": "Natitingou",
+      "country": "Benin",
+      "latitude": 10.3045,
+      "longitude": 1.3797,
+      "precipitation": {
+        "total_mm": 0.0,
+        "average_daily_mm": 0.0,
+        "max_daily_mm": 0,
+        "rainy_days": 0
+      },
+      "timeseries": [
+        {
+          "date": "2025-01-01",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-02",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-03",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-04",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-05",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-06",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-07",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-08",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-09",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-10",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-11",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-12",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-13",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-14",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-15",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-16",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-17",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-18",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-19",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-20",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-21",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-22",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-23",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-24",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-25",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-26",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-27",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-28",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-29",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-30",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-31",
+          "precipitation_mm": 0.0
+        }
+      ]
+    },
+    {
+      "city": "Abomey-Calavi",
+      "country": "Benin",
+      "latitude": 6.4489,
+      "longitude": 2.3553,
+      "precipitation": {
+        "total_mm": 7.25,
+        "average_daily_mm": 0.23,
+        "max_daily_mm": 2.35,
+        "rainy_days": 14
+      },
+      "timeseries": [
+        {
+          "date": "2025-01-01",
+          "precipitation_mm": 0.03
+        },
+        {
+          "date": "2025-01-02",
+          "precipitation_mm": 0.1
+        },
+        {
+          "date": "2025-01-03",
+          "precipitation_mm": 0.15
+        },
+        {
+          "date": "2025-01-04",
+          "precipitation_mm": 0.19
+        },
+        {
+          "date": "2025-01-05",
+          "precipitation_mm": 0.12
+        },
+        {
+          "date": "2025-01-06",
+          "precipitation_mm": 0.02
+        },
+        {
+          "date": "2025-01-07",
+          "precipitation_mm": 0.02
+        },
+        {
+          "date": "2025-01-08",
+          "precipitation_mm": 0.01
+        },
+        {
+          "date": "2025-01-09",
+          "precipitation_mm": 0.01
+        },
+        {
+          "date": "2025-01-10",
+          "precipitation_mm": 0.01
+        },
+        {
+          "date": "2025-01-11",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-12",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-13",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-14",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-15",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-16",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-17",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-18",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-19",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-20",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-21",
+          "precipitation_mm": 0.27
+        },
+        {
+          "date": "2025-01-22",
+          "precipitation_mm": 0.22
+        },
+        {
+          "date": "2025-01-23",
+          "precipitation_mm": 0.7
+        },
+        {
+          "date": "2025-01-24",
+          "precipitation_mm": 0.13
+        },
+        {
+          "date": "2025-01-25",
+          "precipitation_mm": 0.19
+        },
+        {
+          "date": "2025-01-26",
+          "precipitation_mm": 0.56
+        },
+        {
+          "date": "2025-01-27",
+          "precipitation_mm": 0.27
+        },
+        {
+          "date": "2025-01-28",
+          "precipitation_mm": 0.5
+        },
+        {
+          "date": "2025-01-29",
+          "precipitation_mm": 1.21
+        },
+        {
+          "date": "2025-01-30",
+          "precipitation_mm": 0.19
+        },
+        {
+          "date": "2025-01-31",
+          "precipitation_mm": 2.35
+        }
+      ]
+    },
+    {
+      "city": "Kandi",
+      "country": "Benin",
+      "latitude": 11.1342,
+      "longitude": 2.9386,
+      "precipitation": {
+        "total_mm": 0.0,
+        "average_daily_mm": 0.0,
+        "max_daily_mm": 0,
+        "rainy_days": 0
+      },
+      "timeseries": [
+        {
+          "date": "2025-01-01",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-02",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-03",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-04",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-05",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-06",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-07",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-08",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-09",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-10",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-11",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-12",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-13",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-14",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-15",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-16",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-17",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-18",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-19",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-20",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-21",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-22",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-23",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-24",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-25",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-26",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-27",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-28",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-29",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-30",
+          "precipitation_mm": 0.0
+        },
+        {
+          "date": "2025-01-31",
+          "precipitation_mm": 0.0
+        }
+      ]
+    }
+  ]
+}

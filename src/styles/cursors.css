@@ -1,0 +1,236 @@
+/**
+ * Styles pour curseurs de contrôle
+ * IleRise - NASA Space Apps Challenge 2025
+ */
+
+.cursor-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.cursor-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+  transition: all 0.3s ease;
+}
+
+.cursor-container:hover {
+  border-color: #82CC68;
+  box-shadow: 0 2px 8px rgba(130, 204, 104, 0.2);
+}
+
+/* En-tête curseur */
+.cursor-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+}
+
+.cursor-icon {
+  font-size: 1.75rem;
+}
+
+.cursor-label {
+  flex: 1;
+  font-size: 1.125rem;
+  color: #2E1F03;
+}
+
+.cursor-value {
+  font-size: 1.25rem;
+  color: #82CC68;
+  font-weight: 700;
+  background: #e8f5e9;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+}
+
+/* Slider */
+.cursor-slider {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 5px;
+  background: linear-gradient(to right, #F00000, #FEC103, #82CC68, #FEC103, #F00000);
+  outline: none;
+  opacity: 0.9;
+  transition: opacity 0.2s;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Thumb (bouton du slider) */
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #82CC68;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+.slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #82CC68;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.slider::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Plage de valeurs */
+.cursor-range {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.range-min {
+  color: #999;
+}
+
+.range-optimal {
+  color: #82CC68;
+  font-weight: 600;
+  background: #e8f5e9;
+  padding: 0.125rem 0.5rem;
+  border-radius: 10px;
+}
+
+.range-max {
+  color: #999;
+}
+
+/* Indicateur visuel */
+.cursor-indicator {
+  width: 100%;
+  height: 12px;
+  background: #e0e0e0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.indicator-bar {
+  height: 100%;
+  background: #82CC68;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 8px rgba(130, 204, 104, 0.5);
+}
+
+/* Aide contextuelle */
+.cursor-help {
+  font-size: 0.875rem;
+  color: #666;
+  padding: 0.5rem;
+  background: #fff;
+  border-radius: 6px;
+  border-left: 3px solid #59A7EB;
+  font-style: italic;
+}
+
+/* Responsive mobile */
+@media (max-width: 768px) {
+  .cursor-controls {
+    padding: 1rem;
+    gap: 1.5rem;
+  }
+
+  .cursor-container {
+    padding: 0.75rem;
+  }
+
+  .cursor-icon {
+    font-size: 1.5rem;
+  }
+
+  .cursor-label {
+    font-size: 1rem;
+  }
+
+  .cursor-value {
+    font-size: 1rem;
+  }
+
+  .cursor-range {
+    font-size: 0.625rem;
+  }
+
+  .cursor-help {
+    font-size: 0.75rem;
+  }
+}
+
+/* Animation d'entrée */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cursor-container {
+  animation: slideIn 0.4s ease-out;
+}
+
+.cursor-container:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.cursor-container:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.cursor-container:nth-child(3) {
+  animation-delay: 0.3s;
+}

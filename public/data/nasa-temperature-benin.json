@@ -1,0 +1,208 @@
+{
+  "source": "NASA MODIS MOD11A2.061",
+  "product": "Land Surface Temperature (8-Day)",
+  "resolution": "1km",
+  "region": "Benin",
+  "dateRange": {
+    "start": "2025-01-01",
+    "end": "2025-01-31"
+  },
+  "lastUpdate": "2025-10-04",
+  "locations": [
+    {
+      "city": "Parakou",
+      "country": "Benin",
+      "latitude": 9.3372,
+      "longitude": 2.6103,
+      "temperature": {
+        "average_c": 31.96,
+        "min_c": 30.51,
+        "max_c": 33.25,
+        "current_c": 30.51
+      },
+      "timeseries": [
+        {
+          "date": "2024-12-26",
+          "temperature_c": 32.45,
+          "raw_value": 15280
+        },
+        {
+          "date": "2025-01-01",
+          "temperature_c": 32.63,
+          "raw_value": 15289
+        },
+        {
+          "date": "2025-01-09",
+          "temperature_c": 30.97,
+          "raw_value": 15206
+        },
+        {
+          "date": "2025-01-17",
+          "temperature_c": 33.25,
+          "raw_value": 15320
+        },
+        {
+          "date": "2025-01-25",
+          "temperature_c": 30.51,
+          "raw_value": 15183
+        }
+      ]
+    },
+    {
+      "city": "Djougou",
+      "country": "Benin",
+      "latitude": 9.7084,
+      "longitude": 1.666,
+      "temperature": {
+        "average_c": 32.04,
+        "min_c": 30.97,
+        "max_c": 33.57,
+        "current_c": 31.59
+      },
+      "timeseries": [
+        {
+          "date": "2024-12-26",
+          "temperature_c": 32.43,
+          "raw_value": 15279
+        },
+        {
+          "date": "2025-01-01",
+          "temperature_c": 31.65,
+          "raw_value": 15240
+        },
+        {
+          "date": "2025-01-09",
+          "temperature_c": 30.97,
+          "raw_value": 15206
+        },
+        {
+          "date": "2025-01-17",
+          "temperature_c": 33.57,
+          "raw_value": 15336
+        },
+        {
+          "date": "2025-01-25",
+          "temperature_c": 31.59,
+          "raw_value": 15237
+        }
+      ]
+    },
+    {
+      "city": "Bohicon",
+      "country": "Benin",
+      "latitude": 7.1782,
+      "longitude": 2.0667,
+      "temperature": {
+        "average_c": 34.47,
+        "min_c": 32.87,
+        "max_c": 35.25,
+        "current_c": 34.51
+      },
+      "timeseries": [
+        {
+          "date": "2024-12-26",
+          "temperature_c": 35.09,
+          "raw_value": 15412
+        },
+        {
+          "date": "2025-01-01",
+          "temperature_c": 34.63,
+          "raw_value": 15389
+        },
+        {
+          "date": "2025-01-09",
+          "temperature_c": 32.87,
+          "raw_value": 15301
+        },
+        {
+          "date": "2025-01-17",
+          "temperature_c": 35.25,
+          "raw_value": 15420
+        },
+        {
+          "date": "2025-01-25",
+          "temperature_c": 34.51,
+          "raw_value": 15383
+        }
+      ]
+    },
+    {
+      "city": "Natitingou",
+      "country": "Benin",
+      "latitude": 10.3045,
+      "longitude": 1.3797,
+      "temperature": {
+        "average_c": 33.42,
+        "min_c": 32.29,
+        "max_c": 34.89,
+        "current_c": 32.37
+      },
+      "timeseries": [
+        {
+          "date": "2024-12-26",
+          "temperature_c": 34.33,
+          "raw_value": 15374
+        },
+        {
+          "date": "2025-01-01",
+          "temperature_c": 33.21,
+          "raw_value": 15318
+        },
+        {
+          "date": "2025-01-09",
+          "temperature_c": 32.29,
+          "raw_value": 15272
+        },
+        {
+          "date": "2025-01-17",
+          "temperature_c": 34.89,
+          "raw_value": 15402
+        },
+        {
+          "date": "2025-01-25",
+          "temperature_c": 32.37,
+          "raw_value": 15276
+        }
+      ]
+    },
+    {
+      "city": "Kandi",
+      "country": "Benin",
+      "latitude": 11.1342,
+      "longitude": 2.9386,
+      "temperature": {
+        "average_c": 31.44,
+        "min_c": 30.83,
+        "max_c": 32.95,
+        "current_c": 31.07
+      },
+      "timeseries": [
+        {
+          "date": "2024-12-26",
+          "temperature_c": 31.17,
+          "raw_value": 15216
+        },
+        {
+          "date": "2025-01-01",
+          "temperature_c": 31.17,
+          "raw_value": 15216
+        },
+        {
+          "date": "2025-01-09",
+          "temperature_c": 30.83,
+          "raw_value": 15199
+        },
+        {
+          "date": "2025-01-17",
+          "temperature_c": 32.95,
+          "raw_value": 15305
+        },
+        {
+          "date": "2025-01-25",
+          "temperature_c": 31.07,
+          "raw_value": 15211
+        }
+      ]
+    }
+  ]
+}

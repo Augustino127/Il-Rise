@@ -1,0 +1,209 @@
+{
+  "source": "NASA MODIS NDVI",
+  "product": "Vegetation Health Index",
+  "resolution": "250m or 500m",
+  "region": "Benin",
+  "lastUpdate": "2025-10-04",
+  "locations": [
+    {
+      "city": "Parakou",
+      "country": "Benin",
+      "latitude": 9.3372,
+      "longitude": 2.6103,
+      "vegetation_health": {
+        "current_ndvi": 0.3102,
+        "average_ndvi": 0.3084,
+        "min_ndvi": 0.2495,
+        "max_ndvi": 0.3654,
+        "status": "poor",
+        "health_description": "Végétation faible",
+        "color": "orange"
+      },
+      "timeseries": [
+        {
+          "date": "2024-12-18",
+          "ndvi": 0.2495,
+          "health": "Végétation faible",
+          "status": "poor",
+          "raw_value": 2495
+        },
+        {
+          "date": "2025-01-01",
+          "ndvi": 0.3654,
+          "health": "Végétation faible",
+          "status": "poor",
+          "raw_value": 3654
+        },
+        {
+          "date": "2025-01-17",
+          "ndvi": 0.3102,
+          "health": "Végétation faible",
+          "status": "poor",
+          "raw_value": 3102
+        }
+      ]
+    },
+    {
+      "city": "Djougou",
+      "country": "Benin",
+      "latitude": 9.7084,
+      "longitude": 1.666,
+      "vegetation_health": {
+        "current_ndvi": 0.1234,
+        "average_ndvi": 0.1258,
+        "min_ndvi": 0.1234,
+        "max_ndvi": 0.1275,
+        "status": "bare",
+        "health_description": "Sol nu / Très mauvaise",
+        "color": "brown"
+      },
+      "timeseries": [
+        {
+          "date": "2024-12-18",
+          "ndvi": 0.1265,
+          "health": "Sol nu / Très mauvaise",
+          "status": "bare",
+          "raw_value": 1265
+        },
+        {
+          "date": "2025-01-01",
+          "ndvi": 0.1275,
+          "health": "Sol nu / Très mauvaise",
+          "status": "bare",
+          "raw_value": 1275
+        },
+        {
+          "date": "2025-01-17",
+          "ndvi": 0.1234,
+          "health": "Sol nu / Très mauvaise",
+          "status": "bare",
+          "raw_value": 1234
+        }
+      ]
+    },
+    {
+      "city": "Bohicon",
+      "country": "Benin",
+      "latitude": 7.1782,
+      "longitude": 2.0667,
+      "vegetation_health": {
+        "current_ndvi": 0.1596,
+        "average_ndvi": 0.1597,
+        "min_ndvi": 0.158,
+        "max_ndvi": 0.1614,
+        "status": "bare",
+        "health_description": "Sol nu / Très mauvaise",
+        "color": "brown"
+      },
+      "timeseries": [
+        {
+          "date": "2024-12-18",
+          "ndvi": 0.1614,
+          "health": "Sol nu / Très mauvaise",
+          "status": "bare",
+          "raw_value": 1614
+        },
+        {
+          "date": "2025-01-01",
+          "ndvi": 0.158,
+          "health": "Sol nu / Très mauvaise",
+          "status": "bare",
+          "raw_value": 1580
+        },
+        {
+          "date": "2025-01-17",
+          "ndvi": 0.1596,
+          "health": "Sol nu / Très mauvaise",
+          "status": "bare",
+          "raw_value": 1596
+        }
+      ]
+    },
+    {
+      "city": "Natitingou",
+      "country": "Benin",
+      "latitude": 10.3045,
+      "longitude": 1.3797,
+      "vegetation_health": {
+        "current_ndvi": 0.2285,
+        "average_ndvi": 0.2056,
+        "min_ndvi": 0.1833,
+        "max_ndvi": 0.2285,
+        "status": "poor",
+        "health_description": "Végétation faible",
+        "color": "orange"
+      },
+      "timeseries": [
+        {
+          "date": "2024-12-18",
+          "ndvi": 0.1833,
+          "health": "Sol nu / Très mauvaise",
+          "status": "bare",
+          "raw_value": 1833
+        },
+        {
+          "date": "2025-01-01",
+          "ndvi": 0.2051,
+          "health": "Végétation faible",
+          "status": "poor",
+          "raw_value": 2051
+        },
+        {
+          "date": "2025-01-17",
+          "ndvi": 0.2285,
+          "health": "Végétation faible",
+          "status": "poor",
+          "raw_value": 2285
+        }
+      ]
+    },
+    {
+      "city": "Kandi",
+      "country": "Benin",
+      "latitude": 11.1342,
+      "longitude": 2.9386,
+      "vegetation_health": {
+        "current_ndvi": 0.134,
+        "average_ndvi": 0.1708,
+        "min_ndvi": 0.134,
+        "max_ndvi": 0.2086,
+        "status": "bare",
+        "health_description": "Sol nu / Très mauvaise",
+        "color": "brown"
+      },
+      "timeseries": [
+        {
+          "date": "2024-12-18",
+          "ndvi": 0.1698,
+          "health": "Sol nu / Très mauvaise",
+          "status": "bare",
+          "raw_value": 1698
+        },
+        {
+          "date": "2025-01-01",
+          "ndvi": 0.2086,
+          "health": "Végétation faible",
+          "status": "poor",
+          "raw_value": 2086
+        },
+        {
+          "date": "2025-01-17",
+          "ndvi": 0.134,
+          "health": "Sol nu / Très mauvaise",
+          "status": "bare",
+          "raw_value": 1340
+        }
+      ]
+    }
+  ],
+  "interpretation": {
+    "ranges": {
+      "< 0": "Eau",
+      "0 - 0.2": "Sol nu / Végétation très faible",
+      "0.2 - 0.4": "Végétation faible",
+      "0.4 - 0.6": "Bonne santé",
+      "0.6 - 0.8": "Excellente santé",
+      "0.8 - 1.0": "Végétation très dense"
+    }
+  }
+}

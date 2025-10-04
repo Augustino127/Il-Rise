@@ -1,0 +1,6 @@
+City,Country,Latitude,Longitude,Temperature_Current_C,Temperature_Avg_C,Temperature_Min_C,Temperature_Max_C,NDVI_Current,NDVI_Avg,Health_Status,Health_Description
+Parakou,Benin,9.3372,2.6103,30.51,31.96,30.51,33.25,0.3102,0.3084,poor,Végétation faible
+Djougou,Benin,9.7084,1.666,31.59,32.04,30.97,33.57,0.1234,0.1258,bare,Sol nu / Très mauvaise
+Bohicon,Benin,7.1782,2.0667,34.51,34.47,32.87,35.25,0.1596,0.1597,bare,Sol nu / Très mauvaise
+Natitingou,Benin,10.3045,1.3797,32.37,33.42,32.29,34.89,0.2285,0.2056,poor,Végétation faible
+Kandi,Benin,11.1342,2.9386,31.07,31.44,30.83,32.95,0.134,0.1708,bare,Sol nu / Très mauvaise

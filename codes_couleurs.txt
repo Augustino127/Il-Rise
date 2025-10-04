@@ -1,0 +1,14 @@
+==========CODES COULEURS DU JEUX=========
+
+=========DEBUT SECTION========
+Vert: #82CC68
+Vert2: #005F1A
+Orange: #F9A94B
+Bleu: #59A7EB
+Noir: #2E1F03
+Rouge: #F00000
+Orange2: #F7931E
+Jaune: #FEC103
+Marron: #7c4A0F
+
+=========FIN SECTION==========

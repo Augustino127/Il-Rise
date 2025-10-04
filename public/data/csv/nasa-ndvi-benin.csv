@@ -1,0 +1,16 @@
+City,Country,Latitude,Longitude,Date,NDVI,Health_Status,Health_Description,Color,Raw_Value,Average_NDVI,Min_NDVI,Max_NDVI,Current_NDVI
+Parakou,Benin,9.3372,2.6103,2024-12-18,0.2495,poor,Végétation faible,orange,2495,0.3084,0.2495,0.3654,0.3102
+Parakou,Benin,9.3372,2.6103,2025-01-01,0.3654,poor,Végétation faible,orange,3654,0.3084,0.2495,0.3654,0.3102
+Parakou,Benin,9.3372,2.6103,2025-01-17,0.3102,poor,Végétation faible,orange,3102,0.3084,0.2495,0.3654,0.3102
+Djougou,Benin,9.7084,1.666,2024-12-18,0.1265,bare,Sol nu / Très mauvaise,brown,1265,0.1258,0.1234,0.1275,0.1234
+Djougou,Benin,9.7084,1.666,2025-01-01,0.1275,bare,Sol nu / Très mauvaise,brown,1275,0.1258,0.1234,0.1275,0.1234
+Djougou,Benin,9.7084,1.666,2025-01-17,0.1234,bare,Sol nu / Très mauvaise,brown,1234,0.1258,0.1234,0.1275,0.1234
+Bohicon,Benin,7.1782,2.0667,2024-12-18,0.1614,bare,Sol nu / Très mauvaise,brown,1614,0.1597,0.158,0.1614,0.1596
+Bohicon,Benin,7.1782,2.0667,2025-01-01,0.158,bare,Sol nu / Très mauvaise,brown,1580,0.1597,0.158,0.1614,0.1596
+Bohicon,Benin,7.1782,2.0667,2025-01-17,0.1596,bare,Sol nu / Très mauvaise,brown,1596,0.1597,0.158,0.1614,0.1596
+Natitingou,Benin,10.3045,1.3797,2024-12-18,0.1833,bare,Sol nu / Très mauvaise,orange,1833,0.2056,0.1833,0.2285,0.2285
+Natitingou,Benin,10.3045,1.3797,2025-01-01,0.2051,poor,Végétation faible,orange,2051,0.2056,0.1833,0.2285,0.2285
+Natitingou,Benin,10.3045,1.3797,2025-01-17,0.2285,poor,Végétation faible,orange,2285,0.2056,0.1833,0.2285,0.2285
+Kandi,Benin,11.1342,2.9386,2024-12-18,0.1698,bare,Sol nu / Très mauvaise,brown,1698,0.1708,0.134,0.2086,0.134
+Kandi,Benin,11.1342,2.9386,2025-01-01,0.2086,poor,Végétation faible,brown,2086,0.1708,0.134,0.2086,0.134
+Kandi,Benin,11.1342,2.9386,2025-01-17,0.134,bare,Sol nu / Très mauvaise,brown,1340,0.1708,0.134,0.2086,0.134
