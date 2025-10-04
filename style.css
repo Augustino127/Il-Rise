@@ -7,30 +7,31 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     overflow: hidden;
-    background: linear-gradient(135deg, #0a4b33 0%, #1a1a2e 100%);
+    background: linear-gradient(135deg, #FFFFFF 0%, #F8F9FA 100%);
 }
 
 #info {
     position: absolute;
     top: 20px;
     left: 20px;
-    color: white;
-    background: rgba(0, 0, 0, 0.7);
+    color: #2C3E50;
+    background: rgba(255, 255, 255, 0.95);
     padding: 20px;
     border-radius: 10px;
     z-index: 100;
-    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #E0E0E0;
 }
 
 #info h1 {
     font-size: 24px;
     margin-bottom: 10px;
-    color: #4ade80;
+    color: #2ECC71;
 }
 
 #info p {
     font-size: 14px;
-    color: #94a3b8;
+    color: #7F8C8D;
 }
 
 canvas {

@@ -4,11 +4,23 @@
  * NASA Space Apps Challenge 2025
  */
 
+import { ProgressManager } from './ProgressManager.js';
+import { CompetenceSystem } from './CompetenceSystem.js';
+import { LivesSystem } from './LivesSystem.js';
+
 export class GameEngine {
   constructor() {
     this.currentLevel = null;
     this.player = this.loadPlayerData();
     this.nasaData = null;
+
+    // Nouveaux systemes
+    this.progressManager = new ProgressManager();
+    this.competenceSystem = new CompetenceSystem();
+    this.livesSystem = new LivesSystem();
+
+    // Tracking de la partie en cours
+    this.currentGame = null;
   }
 
   /**
@@ -139,51 +151,26 @@ export class GameEngine {
   }
 
   /**
-   * Gérer système de vies
+   * Gérer système de vies (DELEGUE a LivesSystem)
    */
   checkLives() {
-  const now = Date.now();
-  const hoursSinceReset = (now - this.player.livesResetTime) / (1000 * 60 * 60);
-
-  // Dev mode: always max lives
-  if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-    this.player.lives = 99;
-    return 99;
+    const state = this.livesSystem.getLivesState();
+    return state.current;
   }
-
-  // Production logic...
-  if (hoursSinceReset >= 24) {
-    this.player.lives = 5;
-    this.player.livesResetTime = now;
-    this.savePlayerData();
-  }
-
-  if (this.player.lives < 5) {
-    const livesToAdd = Math.floor(hoursSinceReset / 4);
-    if (livesToAdd > 0) {
-      this.player.lives = Math.min(5, this.player.lives + livesToAdd);
-      this.player.livesResetTime = now;
-      this.savePlayerData();
-    }
-  }
-
-  return this.player.lives;
-}
 
   /**
-   * Utiliser une vie
+   * Utiliser une vie (DELEGUE a LivesSystem)
    */
   useLife() {
-  if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-    return true; // Unlimited in dev
+    return this.livesSystem.useLife();
   }
-  if (this.player.lives > 0) {
-    this.player.lives--;
-    this.savePlayerData();
-    return true;
+
+  /**
+   * Obtenir l'etat complet des vies pour l'UI
+   */
+  getLivesUI() {
+    return this.livesSystem.getUIInfo();
   }
-  return false;
-}
 
   /**
    * Ajouter des pièces
@@ -223,32 +210,172 @@ export class GameEngine {
   }
 
   /**
-   * Compléter un niveau
+   * Demarrer une nouvelle partie
    */
-  completeLevel(levelId, score, stars) {
-    // Enregistrer score
-    if (!this.player.highScores[levelId] || score > this.player.highScores[levelId].score) {
-      this.player.highScores[levelId] = { score, stars };
+  startGame(levelKey, cropId, levelId) {
+    this.currentGame = {
+      levelKey,
+      cropId,
+      levelId,
+      startTime: Date.now(),
+      nasaUsageCount: 0,
+      nasaDataUsed: null,
+      previousCrops: this.getPreviousCrops()
+    };
+    return this.currentGame;
+  }
+
+  /**
+   * Recuperer les cultures precedentes pour la rotation
+   */
+  getPreviousCrops() {
+    const progress = this.progressManager.loadPlayerProgress();
+    const allGames = Object.values(progress.levelHistory).flat();
+
+    // Retourner les 5 dernieres cultures plantees
+    return allGames
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, 5)
+      .map(g => ({
+        cropId: g.levelKey.split('_')[0],
+        family: this.getCropFamily(g.levelKey.split('_')[0])
+      }));
+  }
+
+  /**
+   * Obtenir la famille d'une culture (pour rotation)
+   */
+  getCropFamily(cropId) {
+    const families = {
+      maize: 'cereal',
+      rice: 'cereal',
+      cowpea: 'legume',
+      cassava: 'tuber',
+      cacao: 'tree_crop',
+      cotton: 'fiber'
+    };
+    return families[cropId] || 'unknown';
+  }
+
+  /**
+   * Enregistrer l'utilisation de donnees NASA
+   */
+  useNASAData(types = []) {
+    if (!this.currentGame) return;
+
+    this.currentGame.nasaUsageCount++;
+    this.currentGame.nasaDataUsed = {
+      types,
+      timestamp: Date.now()
+    };
+  }
+
+  /**
+   * Completer un niveau avec le nouveau systeme de competences
+   */
+  completeLevel(gameData) {
+    if (!this.currentGame) {
+      throw new Error('Aucune partie en cours');
     }
 
-    // Marquer comme complété
+    // Fusionner les donnees de partie
+    const fullGameData = {
+      ...this.currentGame,
+      ...gameData
+    };
+
+    // Enregistrer la partie dans ProgressManager
+    const result = this.progressManager.recordGame(
+      this.currentGame.levelKey,
+      fullGameData
+    );
+
+    // Calculer recompenses en pieces
+    const coins = this.calculateCoinsReward(result.game.globalScore, result.game.stars);
+    this.addCoins(coins);
+
+    // Mettre a jour anciennes donnees pour compatibilite
+    const levelId = this.currentGame.levelKey;
+    if (!this.player.highScores[levelId] || result.game.globalScore > this.player.highScores[levelId].score) {
+      this.player.highScores[levelId] = {
+        score: result.game.globalScore,
+        stars: result.game.stars
+      };
+    }
+
     if (!this.player.completedLevels.includes(levelId)) {
       this.player.completedLevels.push(levelId);
     }
 
-    // Calculer récompense
-    const coins = Math.floor(score / 10);
-    const bonus = stars === 3 ? 50 : 0;
-
-    this.addCoins(coins + bonus);
-
     this.savePlayerData();
 
+    // Reset partie en cours
+    this.currentGame = null;
+
     return {
-      coins: coins + bonus,
+      ...result,
+      coins,
       totalCoins: this.player.coins,
-      newHighScore: score > (this.player.highScores[levelId]?.score || 0)
+      feedback: this.generateFeedback(result.game)
     };
+  }
+
+  /**
+   * Calculer la recompense en pieces
+   */
+  calculateCoinsReward(globalScore, stars) {
+    let coins = Math.floor(globalScore / 2); // Base: 50 points = 25 coins
+
+    // Bonus etoiles
+    if (stars === 3) coins += 50;
+    else if (stars === 2) coins += 20;
+
+    return coins;
+  }
+
+  /**
+   * Generer feedback detaille pour le joueur
+   */
+  generateFeedback(gameRecord) {
+    const feedback = {
+      overall: this.getOverallFeedback(gameRecord.stars, gameRecord.globalScore),
+      competences: {}
+    };
+
+    // Feedback par competence
+    Object.keys(gameRecord.scores).forEach(comp => {
+      feedback.competences[comp] = this.competenceSystem.getScoreFeedback(
+        comp,
+        gameRecord.scores[comp]
+      );
+    });
+
+    return feedback;
+  }
+
+  /**
+   * Feedback global
+   */
+  getOverallFeedback(stars, score) {
+    if (stars === 3) {
+      return {
+        title: 'Excellent travail !',
+        emoji: '⭐⭐⭐',
+        message: `Score parfait de ${score}/100. Vous maitrisez l'agriculture de precision !`
+      };
+    } else if (stars === 2) {
+      return {
+        title: 'Bon travail !',
+        emoji: '⭐⭐',
+        message: `Score de ${score}/100. Quelques ameliorations possibles.`
+      };
+    } else {
+      return {
+        title: 'Essayez encore',
+        emoji: '⭐',
+        message: `Score de ${score}/100. Consultez les donnees NASA pour optimiser vos cultures.`
+      };
+    }
   }
 
   /**

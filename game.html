@@ -6,6 +6,7 @@
     <title>IleRise - NASA Space Apps Challenge 2025</title>
     <link rel="stylesheet" href="/src/styles/game.css">
     <link rel="stylesheet" href="/src/styles/cursors.css">
+    <link rel="stylesheet" href="/src/styles/tutorial.css">
 </head>
 <body>
     <!-- ========== ÉCRAN D'ACCUEIL ========== -->
@@ -38,6 +39,10 @@
 
             <button class="btn-primary btn-large" id="btn-start">
                 🚀 Commencer
+            </button>
+
+            <button class="btn-secondary" id="btn-tutorial">
+                🎓 Tutoriel Interactif
             </button>
 
             <div class="nasa-credit">
@@ -332,6 +337,173 @@
                 <button class="btn-secondary" id="btn-main-menu">
                     🏠 Menu Principal
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== ÉCRAN PROFIL UTILISATEUR ========== -->
+    <div id="screen-profile" class="screen">
+        <div class="profile-container">
+            <!-- En-tête Profil -->
+            <div class="profile-header">
+                <button class="btn-back" id="btn-back-profile">← Retour</button>
+                <h2>Mon Profil</h2>
+                <div class="profile-actions">
+                    <button class="btn-secondary btn-small" id="btn-export-profile">
+                        📥 Exporter
+                    </button>
+                </div>
+            </div>
+
+            <!-- Avatar et Info Utilisateur -->
+            <div class="profile-user-card">
+                <div class="profile-avatar" id="profile-avatar">
+                    👤
+                </div>
+                <div class="profile-user-info">
+                    <h3 class="profile-username" id="profile-username">Agriculteur IleRise</h3>
+                    <p class="profile-level">Niveau <span id="profile-level">1</span> - <span id="profile-title">Débutant</span></p>
+                </div>
+            </div>
+
+            <!-- Statistiques Globales -->
+            <div class="profile-stats-grid">
+                <div class="profile-stat-card">
+                    <div class="stat-icon">🎮</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="profile-games-played">0</div>
+                        <div class="stat-label">Parties jouées</div>
+                    </div>
+                </div>
+
+                <div class="profile-stat-card">
+                    <div class="stat-icon">⭐</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="profile-total-stars">0</div>
+                        <div class="stat-label">Étoiles totales</div>
+                    </div>
+                </div>
+
+                <div class="profile-stat-card">
+                    <div class="stat-icon">❤️</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="profile-lives">5</div>
+                        <div class="stat-label">Vies restantes</div>
+                    </div>
+                </div>
+
+                <div class="profile-stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="profile-coins">0</div>
+                        <div class="stat-label">Pièces</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Graphique Radar des Compétences -->
+            <div class="profile-competences-card">
+                <h3>📊 Compétences Développées</h3>
+                <div class="competences-radar-container">
+                    <canvas id="competences-radar" width="400" height="400"></canvas>
+                </div>
+                <div class="competences-legend">
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background: #4CAF50;"></span>
+                        <span>Analyse Données NASA</span>
+                        <strong id="comp-nasa">0%</strong>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background: #0B3D91;"></span>
+                        <span>Gestion des Ressources</span>
+                        <strong id="comp-resources">0%</strong>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background: #F39C12;"></span>
+                        <span>Prise de Décision</span>
+                        <strong id="comp-decision">0%</strong>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background: #E53935;"></span>
+                        <span>Diagnostic Agricole</span>
+                        <strong id="comp-diagnostic">0%</strong>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-dot" style="background: #9C27B0;"></span>
+                        <span>Planification</span>
+                        <strong id="comp-planning">0%</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Progression Globale -->
+            <div class="profile-progress-card">
+                <h3>🎯 Progression Globale</h3>
+                <div class="global-progress">
+                    <div class="progress-info">
+                        <span>Complétion du jeu</span>
+                        <strong id="global-completion">0%</strong>
+                    </div>
+                    <div id="global-progress-bar"></div>
+                </div>
+                <div class="unlock-status">
+                    <div class="unlock-item">
+                        <span>Cultures débloquées:</span>
+                        <strong><span id="unlocked-crops">1</span> / <span id="total-crops">5</span></strong>
+                    </div>
+                    <div class="unlock-item">
+                        <span>Niveaux complétés:</span>
+                        <strong><span id="completed-levels">0</span> / <span id="total-levels">15</span></strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Achievements Débloqués -->
+            <div class="profile-achievements-card">
+                <h3>🏆 Achievements Débloqués</h3>
+                <div class="achievements-grid" id="achievements-grid">
+                    <!-- Généré dynamiquement -->
+                    <div class="achievement-item locked">
+                        <div class="achievement-icon">🌱</div>
+                        <div class="achievement-info">
+                            <div class="achievement-name">Premier Pas</div>
+                            <div class="achievement-desc">Compléter le premier niveau</div>
+                        </div>
+                    </div>
+                    <div class="achievement-item locked">
+                        <div class="achievement-icon">⭐</div>
+                        <div class="achievement-info">
+                            <div class="achievement-name">Étoile Filante</div>
+                            <div class="achievement-desc">Obtenir 3 étoiles sur un niveau</div>
+                        </div>
+                    </div>
+                    <div class="achievement-item locked">
+                        <div class="achievement-icon">📡</div>
+                        <div class="achievement-info">
+                            <div class="achievement-name">Maître NASA</div>
+                            <div class="achievement-desc">Utiliser 10 fois les recommandations NASA</div>
+                        </div>
+                    </div>
+                    <div class="achievement-item locked">
+                        <div class="achievement-icon">💯</div>
+                        <div class="achievement-info">
+                            <div class="achievement-name">Perfectionniste</div>
+                            <div class="achievement-desc">Score parfait de 1000 points</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historique des Dernières Parties -->
+            <div class="profile-history-card">
+                <h3>📜 Historique des Parties</h3>
+                <div class="history-list" id="history-list">
+                    <!-- Généré dynamiquement -->
+                    <div class="history-empty">
+                        <p>Aucune partie jouée pour le moment</p>
+                        <p class="text-secondary">Commencez à jouer pour voir votre historique ici</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

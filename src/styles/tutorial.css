@@ -1,0 +1,331 @@
+/* ========================================
+   TUTORIEL INTERACTIF - STYLES
+   ======================================== */
+
+/* Overlay du tutoriel */
+.tutorial-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+}
+
+.tutorial-overlay.hidden {
+    display: none;
+}
+
+/* Conteneur de l'étape */
+.tutorial-step-container {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 2px solid #00d4ff;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 212, 255, 0.3);
+    position: relative;
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.tutorial-step-container.tutorial-fade-in {
+    animation: slideUp 0.4s ease forwards;
+}
+
+@keyframes slideUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header */
+.tutorial-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.tutorial-header h3 {
+    color: #00d4ff;
+    font-size: 1.8rem;
+    margin: 0;
+}
+
+.tutorial-skip-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s;
+}
+
+.tutorial-skip-btn:hover {
+    background: rgba(255, 59, 48, 0.2);
+    border-color: #ff3b30;
+    color: #ff3b30;
+}
+
+/* Contenu */
+.tutorial-content {
+    margin: 25px 0;
+    min-height: 200px;
+}
+
+.tutorial-icon {
+    font-size: 4rem;
+    text-align: center;
+    margin-bottom: 20px;
+    animation: bounce 1s ease infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.tutorial-text {
+    color: #e0e0e0;
+    font-size: 1rem;
+    line-height: 1.6;
+}
+
+.tutorial-text p {
+    margin: 15px 0;
+}
+
+.tutorial-text strong {
+    color: #00d4ff;
+}
+
+.tutorial-text .tutorial-highlight-text {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1) 0%, rgba(0, 255, 157, 0.1) 100%);
+    border-left: 3px solid #00ff9d;
+    padding: 12px 15px;
+    margin: 15px 0;
+    border-radius: 8px;
+    color: #00ff9d;
+}
+
+.tutorial-list {
+    list-style: none;
+    padding: 0;
+    margin: 15px 0;
+}
+
+.tutorial-list li {
+    padding: 10px 0;
+    padding-left: 25px;
+    position: relative;
+    color: #e0e0e0;
+}
+
+.tutorial-list li::before {
+    content: "▸";
+    position: absolute;
+    left: 0;
+    color: #00d4ff;
+    font-weight: bold;
+}
+
+/* Barre de progression */
+.tutorial-progress {
+    margin: 25px 0;
+}
+
+.tutorial-progress-bar {
+    background: rgba(255, 255, 255, 0.1);
+    height: 8px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.tutorial-progress-fill {
+    background: linear-gradient(90deg, #00d4ff 0%, #00ff9d 100%);
+    height: 100%;
+    width: 0%;
+    transition: width 0.5s ease;
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+}
+
+.tutorial-step-counter {
+    text-align: center;
+    color: #888;
+    font-size: 0.9rem;
+    margin: 8px 0 0 0;
+}
+
+.tutorial-step-counter span {
+    color: #00d4ff;
+    font-weight: bold;
+}
+
+/* Boutons d'action */
+.tutorial-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: space-between;
+    margin-top: 25px;
+}
+
+.tutorial-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.tutorial-btn-primary {
+    background: linear-gradient(135deg, #00d4ff 0%, #00b8e6 100%);
+    color: #000;
+    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+}
+
+.tutorial-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5);
+}
+
+.tutorial-btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tutorial-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.tutorial-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Pointeur animé */
+.tutorial-pointer {
+    position: absolute;
+    pointer-events: none;
+    z-index: 10001;
+    transition: all 0.5s ease;
+}
+
+.tutorial-pointer.hidden {
+    display: none;
+}
+
+.pointer-arrow {
+    width: 0;
+    height: 0;
+    border-left: 20px solid transparent;
+    border-right: 20px solid transparent;
+    border-top: 30px solid #00d4ff;
+    position: relative;
+    animation: pointerBounce 1s ease-in-out infinite;
+}
+
+@keyframes pointerBounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.pointer-pulse {
+    width: 20px;
+    height: 20px;
+    background: #00d4ff;
+    border-radius: 50%;
+    position: absolute;
+    top: -45px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: translateX(-50%) scale(1.5);
+    }
+}
+
+/* Surbrillance des éléments */
+.tutorial-highlight {
+    position: relative;
+    z-index: 9999;
+    box-shadow: 0 0 0 4px #00d4ff, 0 0 30px rgba(0, 212, 255, 0.6) !important;
+    animation: highlightPulse 2s ease-in-out infinite;
+}
+
+@keyframes highlightPulse {
+    0%, 100% {
+        box-shadow: 0 0 0 4px #00d4ff, 0 0 30px rgba(0, 212, 255, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 0 6px #00d4ff, 0 0 40px rgba(0, 212, 255, 0.8);
+    }
+}
+
+/* Animation d'entrée */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .tutorial-step-container {
+        padding: 20px;
+        max-width: 95%;
+    }
+
+    .tutorial-header h3 {
+        font-size: 1.4rem;
+    }
+
+    .tutorial-icon {
+        font-size: 3rem;
+    }
+
+    .tutorial-text {
+        font-size: 0.9rem;
+    }
+
+    .tutorial-actions {
+        flex-direction: column;
+    }
+
+    .tutorial-btn {
+        width: 100%;
+    }
+}

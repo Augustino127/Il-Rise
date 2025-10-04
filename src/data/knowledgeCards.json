@@ -1,0 +1,452 @@
+[
+  {
+    "id": "water_beginner_1",
+    "competence": "water",
+    "level": "beginner",
+    "title": "L'irrigation des cultures : Les bases",
+    "content": "L'irrigation est essentielle pour la croissance des plantes. Les données SMAP de la NASA mesurent l'humidité du sol en temps réel, vous permettant d'ajuster l'arrosage avec précision.\n\n**Points clés :**\n- L'humidité optimale varie selon la culture (25-35% pour le maïs)\n- Trop d'eau = asphyxie des racines et lessivage des nutriments\n- Pas assez d'eau = stress hydrique et baisse de rendement\n\n**Astuce NASA :** Consultez les données SMAP L4 avant chaque irrigation !",
+    "image": "/images/cards/water_1.jpg",
+    "nasaSource": "SMAP L4 - Soil Moisture Active Passive",
+    "quiz": {
+      "question": "Quelle est la plage d'humidité optimale pour le maïs ?",
+      "answers": ["10-20%", "25-35%", "40-50%", "60-70%"],
+      "correct": 1,
+      "explanation": "Le maïs prospère avec une humidité du sol entre 25-35%. En dessous, la plante souffre de stress hydrique. Au-dessus, les racines risquent l'asphyxie."
+    }
+  },
+  {
+    "id": "water_beginner_2",
+    "competence": "water",
+    "level": "beginner",
+    "title": "Comprendre les besoins en eau",
+    "content": "Chaque stade de croissance a des besoins différents en eau. Les satellites NASA permettent de suivre ces besoins en temps réel.\n\n**Stades de croissance :**\n- **Germination** : Humidité élevée (30-40%)\n- **Croissance végétative** : Humidité modérée (25-30%)\n- **Floraison** : Besoins critiques (30-35%)\n- **Maturation** : Réduction progressive (20-25%)\n\n**Donnée NASA utilisée :** SMAP mesure l'humidité jusqu'à 5cm de profondeur.",
+    "image": "/images/cards/water_2.jpg",
+    "nasaSource": "SMAP L4",
+    "quiz": {
+      "question": "À quel stade les besoins en eau sont-ils les plus critiques ?",
+      "answers": ["Germination", "Croissance végétative", "Floraison", "Maturation"],
+      "correct": 2,
+      "explanation": "La floraison est le stade le plus critique. Un manque d'eau à ce moment réduit drastiquement le nombre de grains et donc le rendement final."
+    }
+  },
+  {
+    "id": "water_intermediate_1",
+    "competence": "water",
+    "level": "intermediate",
+    "title": "Irrigation de précision avec SMAP",
+    "content": "L'irrigation de précision utilise les données satellites pour optimiser chaque goutte d'eau. SMAP fournit des mesures d'humidité tous les 2-3 jours avec une résolution de 9 km.\n\n**Technique avancée :**\n1. Analyser la carte d'humidité SMAP\n2. Identifier les zones sous-irriguées (< 25%)\n3. Calculer le déficit hydrique\n4. Irriguer uniquement les zones nécessaires\n\n**Économie :** Jusqu'à 30% d'eau en moins avec la même performance !",
+    "image": "/images/cards/water_3.jpg",
+    "nasaSource": "SMAP L4",
+    "quiz": {
+      "question": "Quelle économie d'eau peut-on réaliser avec l'irrigation de précision ?",
+      "answers": ["10%", "20%", "30%", "50%"],
+      "correct": 2,
+      "explanation": "L'irrigation de précision basée sur SMAP permet d'économiser jusqu'à 30% d'eau en ciblant uniquement les zones qui en ont besoin."
+    }
+  },
+  {
+    "id": "water_intermediate_2",
+    "competence": "water",
+    "level": "intermediate",
+    "title": "Gestion du stress hydrique",
+    "content": "Le stress hydrique affecte directement le NDVI (indice de végétation). En combinant SMAP et MODIS NDVI, on peut détecter le stress avant qu'il soit visible.\n\n**Indicateurs de stress :**\n- SMAP < 20% + NDVI en baisse = Stress hydrique sévère\n- SMAP 20-25% + NDVI stable = Stress modéré\n- SMAP > 25% + NDVI en hausse = Bonne santé\n\n**Action corrective :** Irriguer immédiatement si NDVI < 0.4 et humidité < 20%.",
+    "image": "/images/cards/water_4.jpg",
+    "nasaSource": "SMAP L4 + MODIS NDVI",
+    "quiz": {
+      "question": "Quand faut-il irriguer en urgence ?",
+      "answers": ["NDVI > 0.6", "SMAP > 30%", "NDVI < 0.4 et humidité < 20%", "NDVI = 0.5"],
+      "correct": 2,
+      "explanation": "Un NDVI inférieur à 0.4 avec une humidité sous 20% indique un stress hydrique critique nécessitant une irrigation immédiate."
+    }
+  },
+  {
+    "id": "water_expert_1",
+    "competence": "water",
+    "level": "expert",
+    "title": "Modélisation prédictive de l'irrigation",
+    "content": "Les experts utilisent les modèles prédictifs de la NASA pour anticiper les besoins en eau. SMAP fournit non seulement l'état actuel, mais aussi des prévisions à 7 jours.\n\n**Modèle SMAP L4 :**\n- Assimilation de données météo\n- Calcul de l'évapotranspiration\n- Prédiction de l'humidité future\n- Recommandation d'irrigation optimale\n\n**Stratégie avancée :** Planifier l'irrigation 3 jours à l'avance selon les prévisions SMAP.",
+    "image": "/images/cards/water_5.jpg",
+    "nasaSource": "SMAP L4 Root Zone Soil Moisture",
+    "quiz": {
+      "question": "Combien de jours à l'avance peut-on planifier l'irrigation avec SMAP L4 ?",
+      "answers": ["1 jour", "3 jours", "7 jours", "14 jours"],
+      "correct": 2,
+      "explanation": "SMAP L4 fournit des prévisions d'humidité du sol jusqu'à 7 jours, permettant une planification optimale de l'irrigation."
+    }
+  },
+  {
+    "id": "water_expert_2",
+    "competence": "water",
+    "level": "expert",
+    "title": "Irrigation différenciée par zone",
+    "content": "L'irrigation différenciée consiste à adapter l'apport d'eau selon les caractéristiques de chaque zone du champ. SMAP révèle l'hétérogénéité du sol.\n\n**Méthodologie :**\n1. Segmenter le champ en zones homogènes (texture, pente)\n2. Analyser l'historique SMAP de chaque zone\n3. Définir des seuils d'irrigation spécifiques\n4. Automatiser avec des systèmes GPS\n\n**Résultat :** +15% de rendement avec la même quantité d'eau !",
+    "image": "/images/cards/water_6.jpg",
+    "nasaSource": "SMAP L4 9km Resolution",
+    "quiz": {
+      "question": "Quel gain de rendement peut apporter l'irrigation différenciée ?",
+      "answers": ["+5%", "+10%", "+15%", "+25%"],
+      "correct": 2,
+      "explanation": "L'irrigation différenciée par zone, guidée par les données SMAP, peut augmenter le rendement de 15% en optimisant l'eau selon les besoins locaux."
+    }
+  },
+  {
+    "id": "npk_beginner_1",
+    "competence": "npk",
+    "level": "beginner",
+    "title": "NPK : Azote, Phosphore, Potassium",
+    "content": "NPK désigne les trois éléments essentiels à la nutrition des plantes. Le NDVI de la NASA aide à déterminer les besoins en fertilisation.\n\n**Les 3 éléments :**\n- **N (Azote)** : Croissance des feuilles et tiges\n- **P (Phosphore)** : Développement des racines et fleurs\n- **K (Potassium)** : Résistance au stress et qualité\n\n**Dosage de base pour le maïs :** 120-150 kg/ha de NPK équilibré (15-15-15)",
+    "image": "/images/cards/npk_1.jpg",
+    "nasaSource": "MODIS NDVI",
+    "quiz": {
+      "question": "Quel élément NPK favorise la croissance des feuilles ?",
+      "answers": ["Phosphore", "Potassium", "Azote", "Calcium"],
+      "correct": 2,
+      "explanation": "L'Azote (N) est l'élément clé pour la croissance des feuilles et des tiges. Un NDVI faible indique souvent une carence en azote."
+    }
+  },
+  {
+    "id": "npk_beginner_2",
+    "competence": "npk",
+    "level": "beginner",
+    "title": "Reconnaître les carences avec NDVI",
+    "content": "Le NDVI (Normalized Difference Vegetation Index) révèle la santé des plantes et les carences nutritives avant qu'elles soient visibles à l'œil nu.\n\n**Interprétation NDVI :**\n- **0.7-0.9** : Excellente santé, nutrition optimale\n- **0.5-0.7** : Bonne santé, surveillance recommandée\n- **0.3-0.5** : Stress nutritif possible, analyser NPK\n- **< 0.3** : Carence sévère, fertilisation urgente\n\n**Source NASA :** MODIS mesure le NDVI tous les 1-2 jours.",
+    "image": "/images/cards/npk_2.jpg",
+    "nasaSource": "MODIS NDVI",
+    "quiz": {
+      "question": "À partir de quel NDVI doit-on suspecter une carence nutritive ?",
+      "answers": ["< 0.3", "< 0.5", "< 0.7", "< 0.9"],
+      "correct": 1,
+      "explanation": "Un NDVI inférieur à 0.5 indique un stress nutritif possible. Il faut alors analyser les besoins en NPK et fertiliser si nécessaire."
+    }
+  },
+  {
+    "id": "npk_intermediate_1",
+    "competence": "npk",
+    "level": "intermediate",
+    "title": "Fertilisation fractionnée guidée par satellite",
+    "content": "La fertilisation fractionnée consiste à apporter l'engrais en plusieurs fois selon les besoins réels de la plante. Le NDVI indique le moment optimal.\n\n**Programme fractionné pour le maïs :**\n1. **Semis** : 30% du NPK total (45 kg/ha)\n2. **NDVI 0.4-0.5** : 40% du NPK (60 kg/ha)\n3. **NDVI 0.6-0.7** : 30% du NPK (45 kg/ha)\n\n**Avantage :** Efficacité +25%, lessivage -40%",
+    "image": "/images/cards/npk_3.jpg",
+    "nasaSource": "MODIS NDVI Terra/Aqua",
+    "quiz": {
+      "question": "Quel pourcentage du NPK total apporter au semis ?",
+      "answers": ["20%", "30%", "50%", "70%"],
+      "correct": 1,
+      "explanation": "On apporte 30% du NPK au semis pour un démarrage optimal, puis on ajuste les apports selon l'évolution du NDVI."
+    }
+  },
+  {
+    "id": "npk_intermediate_2",
+    "competence": "npk",
+    "level": "intermediate",
+    "title": "Cartographie des besoins en azote",
+    "content": "Les cartes NDVI haute résolution permettent de créer des cartes de prescription pour l'azote. Chaque zone du champ reçoit la dose exacte nécessaire.\n\n**Méthodologie :**\n1. Télécharger la carte NDVI MODIS (250m)\n2. Identifier les zones à NDVI faible (< 0.5)\n3. Calculer le besoin en N par zone\n4. Générer une carte de prescription\n\n**Formule :** Besoin N (kg/ha) = 200 × (0.8 - NDVI actuel)",
+    "image": "/images/cards/npk_4.jpg",
+    "nasaSource": "MODIS NDVI 250m",
+    "quiz": {
+      "question": "Si une zone a un NDVI de 0.4, quel est son besoin en azote selon la formule ?",
+      "answers": ["40 kg/ha", "60 kg/ha", "80 kg/ha", "100 kg/ha"],
+      "correct": 2,
+      "explanation": "Besoin N = 200 × (0.8 - 0.4) = 200 × 0.4 = 80 kg/ha. Les zones à faible NDVI nécessitent plus d'azote."
+    }
+  },
+  {
+    "id": "npk_expert_1",
+    "competence": "npk",
+    "level": "expert",
+    "title": "Synergie NPK et données multi-spectrales",
+    "content": "Les experts combinent plusieurs bandes spectrales de MODIS pour affiner le diagnostic nutritionnel. Chaque carence a une signature spectrale unique.\n\n**Signatures spectrales :**\n- **Carence N** : Faible réflectance dans le proche infrarouge (NIR)\n- **Carence P** : Anomalie dans le rouge profond\n- **Carence K** : Perturbation du vert et du rouge\n\n**Indice avancé :** GNDVI (Green NDVI) pour l'azote, plus sensible que le NDVI classique.",
+    "image": "/images/cards/npk_5.jpg",
+    "nasaSource": "MODIS Multi-spectral (7 bandes)",
+    "quiz": {
+      "question": "Quel indice est plus sensible à l'azote que le NDVI ?",
+      "answers": ["SAVI", "GNDVI", "EVI", "MSAVI"],
+      "correct": 1,
+      "explanation": "Le GNDVI (Green NDVI) utilise la bande verte et est plus sensible aux variations d'azote que le NDVI classique."
+    }
+  },
+  {
+    "id": "npk_expert_2",
+    "competence": "npk",
+    "level": "expert",
+    "title": "Modélisation de la réponse à l'azote",
+    "content": "Les modèles de réponse à l'azote prédisent le rendement en fonction de la dose NPK. MODIS alimente ces modèles avec des données de terrain.\n\n**Modèle linéaire-plateau :**\nRendement = Min(a + b×Dose_N, Rendement_max)\n\n**Paramètres MODIS :**\n- NDVI initial → Estimation du rendement potentiel\n- Évolution NDVI → Calibration des coefficients a et b\n- Température MODIS → Ajustement selon le stress thermique\n\n**Optimisation :** Dose économique optimale = (Rendement_max - a) / (2×b)",
+    "image": "/images/cards/npk_6.jpg",
+    "nasaSource": "MODIS NDVI + LST (Land Surface Temperature)",
+    "quiz": {
+      "question": "Quelles données MODIS sont utilisées dans le modèle de réponse à l'azote ?",
+      "answers": ["NDVI uniquement", "Température uniquement", "NDVI + Température", "Humidité uniquement"],
+      "correct": 2,
+      "explanation": "Le modèle combine NDVI (santé végétale) et LST (stress thermique) pour prédire la réponse optimale à l'azote."
+    }
+  },
+  {
+    "id": "soil_beginner_1",
+    "competence": "soil",
+    "level": "beginner",
+    "title": "Santé du sol : Les fondamentaux",
+    "content": "Un sol sain est la base d'une agriculture productive. Les données NASA révèlent la structure et la composition du sol à distance.\n\n**Indicateurs de santé du sol :**\n- **Matière organique** : > 3% (idéal 5-7%)\n- **pH** : 6.0-7.0 pour la plupart des cultures\n- **Compaction** : Densité < 1.4 g/cm³\n- **Drainage** : Visible via SMAP (eau stagnante = problème)\n\n**Donnée NASA :** SMAP détecte la saturation en eau = indicateur de drainage.",
+    "image": "/images/cards/soil_1.jpg",
+    "nasaSource": "SMAP L4",
+    "quiz": {
+      "question": "Quel est le taux idéal de matière organique dans le sol ?",
+      "answers": ["1-2%", "3-4%", "5-7%", "10-12%"],
+      "correct": 2,
+      "explanation": "Un taux de matière organique de 5-7% est idéal. Il améliore la structure, la rétention d'eau et la vie microbienne du sol."
+    }
+  },
+  {
+    "id": "soil_beginner_2",
+    "competence": "soil",
+    "level": "beginner",
+    "title": "Texture du sol et productivité",
+    "content": "La texture du sol (argile, limon, sable) influence sa capacité à retenir l'eau et les nutriments. SMAP révèle ces caractéristiques.\n\n**Types de sol :**\n- **Sol argileux** : Retient beaucoup d'eau, drainage lent\n- **Sol limoneux** : IDÉAL - Équilibre eau/air parfait\n- **Sol sableux** : Draine rapidement, irrigations fréquentes\n\n**Interprétation SMAP :**\nSi l'humidité baisse très vite après pluie → Sol sableux\nSi l'humidité reste élevée longtemps → Sol argileux",
+    "image": "/images/cards/soil_2.jpg",
+    "nasaSource": "SMAP L4",
+    "quiz": {
+      "question": "Quel type de sol est considéré comme idéal pour l'agriculture ?",
+      "answers": ["Argileux", "Limoneux", "Sableux", "Rocheux"],
+      "correct": 1,
+      "explanation": "Le sol limoneux offre le meilleur équilibre entre rétention d'eau, drainage et disponibilité des nutriments."
+    }
+  },
+  {
+    "id": "soil_intermediate_1",
+    "competence": "soil",
+    "level": "intermediate",
+    "title": "Détection de la compaction du sol",
+    "content": "La compaction réduit la porosité du sol et limite la croissance racinaire. Les données SMAP combinées au NDVI révèlent les zones compactées.\n\n**Indicateurs de compaction :**\n- Humidité SMAP élevée MAIS NDVI faible = Compaction probable\n- Eau stagnante après pluie (SMAP > 45%)\n- Racines superficielles visibles au NDVI\n\n**Solution :** Sous-solage des zones détectées + apport de matière organique",
+    "image": "/images/cards/soil_3.jpg",
+    "nasaSource": "SMAP + MODIS NDVI",
+    "quiz": {
+      "question": "Comment détecter une zone compactée avec les données NASA ?",
+      "answers": ["SMAP faible + NDVI élevé", "SMAP élevé + NDVI faible", "SMAP et NDVI élevés", "SMAP et NDVI faibles"],
+      "correct": 1,
+      "explanation": "Une humidité SMAP élevée avec un NDVI faible indique que l'eau stagne et les racines ne se développent pas = compaction."
+    }
+  },
+  {
+    "id": "soil_intermediate_2",
+    "competence": "soil",
+    "level": "intermediate",
+    "title": "Gestion de la salinité",
+    "content": "La salinité du sol bloque l'absorption d'eau par les racines. Les satellites détectent les zones salines grâce aux anomalies spectrales.\n\n**Détection de la salinité :**\n- Réflectance élevée dans le visible (sol blanc)\n- NDVI très faible malgré irrigation (SMAP > 30%)\n- Croûtes de sel visibles en haute résolution\n\n**Remédiation :**\n1. Drainage pour lessiver les sels\n2. Irrigation d'eau douce abondante\n3. Apport de gypse (sulfate de calcium)",
+    "image": "/images/cards/soil_4.jpg",
+    "nasaSource": "MODIS Surface Reflectance",
+    "quiz": {
+      "question": "Quel est le signe d'un sol salin au satellite ?",
+      "answers": ["NDVI élevé", "Réflectance faible", "NDVI faible + SMAP élevé", "SMAP faible"],
+      "correct": 2,
+      "explanation": "Un NDVI faible malgré une humidité SMAP élevée indique que les plantes souffrent non pas de manque d'eau, mais de salinité."
+    }
+  },
+  {
+    "id": "soil_expert_1",
+    "competence": "soil",
+    "level": "expert",
+    "title": "Cartographie de la matière organique",
+    "content": "La matière organique est invisible aux satellites, mais elle corrèle avec certaines propriétés spectrales mesurables par MODIS.\n\n**Méthode de cartographie MO :**\n1. Mesurer MO sur 20-30 points de référence\n2. Extraire les valeurs spectrales MODIS à ces points\n3. Créer un modèle de régression (MO = f(MODIS))\n4. Appliquer le modèle à tout le champ\n\n**Bandes clés :** Rouge (620-670nm) et SWIR (2105-2155nm)\n\n**Précision :** R² = 0.75-0.85 selon les conditions",
+    "image": "/images/cards/soil_5.jpg",
+    "nasaSource": "MODIS Surface Reflectance (Bandes 1, 6, 7)",
+    "quiz": {
+      "question": "Quelle précision peut-on atteindre pour la cartographie MO par satellite ?",
+      "answers": ["R² = 0.3-0.5", "R² = 0.5-0.6", "R² = 0.75-0.85", "R² = 0.95-0.99"],
+      "correct": 2,
+      "explanation": "La cartographie de la matière organique par satellite atteint une précision de R² = 0.75-0.85, suffisante pour la gestion différenciée."
+    }
+  },
+  {
+    "id": "soil_expert_2",
+    "competence": "soil",
+    "level": "expert",
+    "title": "Suivi de l'érosion par télédétection",
+    "content": "L'érosion appauvrit le sol en emportant la matière organique et les nutriments. MODIS et SMAP permettent un suivi précis de l'érosion.\n\n**Indicateurs d'érosion :**\n- Diminution progressive du NDVI en bas de pente\n- Accumulation de sédiments (NDVI élevé localement)\n- Changement de texture (SMAP plus faible en zone érodée)\n\n**Modèle RUSLE amélioré par NASA :**\nÉrosion (t/ha/an) = R × K × LS × C × P\nOù LS (pente) = extrait de DEM, C (couverture) = NDVI",
+    "image": "/images/cards/soil_6.jpg",
+    "nasaSource": "MODIS NDVI + SRTM DEM + SMAP",
+    "quiz": {
+      "question": "Quelles données NASA sont utilisées dans le modèle d'érosion RUSLE ?",
+      "answers": ["NDVI uniquement", "SMAP uniquement", "NDVI + DEM + SMAP", "Température uniquement"],
+      "correct": 2,
+      "explanation": "Le modèle RUSLE utilise NDVI (couverture végétale), DEM/SRTM (pente) et SMAP (texture) pour estimer l'érosion."
+    }
+  },
+  {
+    "id": "rotation_beginner_1",
+    "competence": "rotation",
+    "level": "beginner",
+    "title": "Principes de la rotation des cultures",
+    "content": "La rotation des cultures consiste à alterner différentes espèces sur une même parcelle. Cela prévient les maladies et équilibre les nutriments.\n\n**Avantages de la rotation :**\n- Réduction des ravageurs (-50 à -70%)\n- Amélioration de la structure du sol\n- Fixation d'azote avec les légumineuses\n- Rupture du cycle des mauvaises herbes\n\n**Exemple simple :** Année 1 : Maïs → Année 2 : Soja → Année 3 : Blé",
+    "image": "/images/cards/rotation_1.jpg",
+    "nasaSource": "MODIS - Suivi des cultures par saison",
+    "quiz": {
+      "question": "Quel est le principal avantage de la rotation des cultures ?",
+      "answers": ["Augmenter le prix", "Réduire les ravageurs", "Économiser l'eau", "Réduire le travail"],
+      "correct": 1,
+      "explanation": "La rotation réduit les ravageurs et maladies de 50-70% en cassant leur cycle de vie, tout en améliorant la fertilité du sol."
+    }
+  },
+  {
+    "id": "rotation_beginner_2",
+    "competence": "rotation",
+    "level": "beginner",
+    "title": "Suivi des rotations par satellite",
+    "content": "Les satellites NASA permettent de suivre l'historique des cultures sur plusieurs années. Le NDVI révèle quelle culture a été plantée chaque saison.\n\n**Signature NDVI par culture :**\n- **Maïs** : Pic NDVI en juillet-août (0.7-0.9)\n- **Soja** : Pic NDVI en septembre (0.6-0.8)\n- **Blé** : Pic NDVI en mai-juin (0.6-0.7)\n\n**Application :** Analyser l'historique MODIS pour planifier la rotation optimale.",
+    "image": "/images/cards/rotation_2.jpg",
+    "nasaSource": "MODIS NDVI Time Series",
+    "quiz": {
+      "question": "Quand le maïs atteint-il son pic de NDVI ?",
+      "answers": ["Mai-juin", "Juillet-août", "Septembre", "Octobre"],
+      "correct": 1,
+      "explanation": "Le maïs atteint son pic de NDVI en juillet-août, correspondant à la floraison et au remplissage des grains."
+    }
+  },
+  {
+    "id": "rotation_intermediate_1",
+    "competence": "rotation",
+    "level": "intermediate",
+    "title": "Rotation optimale selon les données sol",
+    "content": "La rotation idéale dépend du type de sol et de l'historique nutritionnel. SMAP et NDVI guident le choix de la culture suivante.\n\n**Règles de rotation basées NASA :**\n- Si SMAP montre un sol argileux → Alterner cultures profondes/superficielles\n- Si NDVI montre épuisement (< 0.5) → Planter une légumineuse\n- Si MODIS montre stress hydrique → Éviter le maïs, préférer le sorgho\n\n**Séquence recommandée :** Maïs (épuisant) → Soja (régénérant) → Blé (neutre)",
+    "image": "/images/cards/rotation_3.jpg",
+    "nasaSource": "SMAP + MODIS NDVI",
+    "quiz": {
+      "question": "Quelle culture planter après un maïs qui a épuisé le sol (NDVI < 0.5) ?",
+      "answers": ["Maïs à nouveau", "Blé", "Soja (légumineuse)", "Tournesol"],
+      "correct": 2,
+      "explanation": "Après une culture épuisante comme le maïs, il faut planter une légumineuse (soja) qui fixe l'azote et régénère le sol."
+    }
+  },
+  {
+    "id": "rotation_intermediate_2",
+    "competence": "rotation",
+    "level": "intermediate",
+    "title": "Détection des résidus de culture",
+    "content": "Les résidus de la culture précédente influencent la suivante. MODIS détecte les résidus via leur signature spectrale unique.\n\n**Indice de résidus (CAI) :**\nCAI = (SWIR1 - SWIR2) / SWIR1\n- CAI > 0.1 : Résidus abondants (> 30% de couverture)\n- CAI 0.05-0.1 : Résidus modérés\n- CAI < 0.05 : Sol nu\n\n**Gestion :** Résidus abondants → Retarder le semis ou enfouir pour éviter les maladies",
+    "image": "/images/cards/rotation_4.jpg",
+    "nasaSource": "MODIS SWIR (Bandes 6 et 7)",
+    "quiz": {
+      "question": "Que signifie un CAI > 0.1 ?",
+      "answers": ["Sol nu", "Résidus modérés", "Résidus abondants", "Culture en croissance"],
+      "correct": 2,
+      "explanation": "Un CAI supérieur à 0.1 indique une couverture de résidus supérieure à 30%, ce qui peut nécessiter un enfouissement avant le prochain semis."
+    }
+  },
+  {
+    "id": "rotation_expert_1",
+    "competence": "rotation",
+    "level": "expert",
+    "title": "Modélisation de la rotation multi-critères",
+    "content": "Les experts utilisent des modèles d'optimisation pour planifier la rotation sur 5-10 ans. Les données NASA alimentent ces modèles en temps réel.\n\n**Critères d'optimisation :**\n- Rendement économique (€/ha/an)\n- Bilan azoté (kg N/ha) → NDVI historique\n- Résistance climatique → LST MODIS\n- Biodiversité → Nombre d'espèces\n\n**Algorithme génétique :** Teste 10 000 rotations possibles et sélectionne l'optimale selon les données NASA.",
+    "image": "/images/cards/rotation_5.jpg",
+    "nasaSource": "MODIS Multi-paramètres (NDVI, LST, FPAR)",
+    "quiz": {
+      "question": "Combien de rotations un algorithme génétique peut-il tester ?",
+      "answers": ["100", "1 000", "10 000", "100 000"],
+      "correct": 2,
+      "explanation": "Les algorithmes génétiques peuvent tester 10 000 combinaisons de rotations et sélectionner l'optimale selon les critères définis."
+    }
+  },
+  {
+    "id": "rotation_expert_2",
+    "competence": "rotation",
+    "level": "expert",
+    "title": "Rotation adaptative au changement climatique",
+    "content": "Le changement climatique impose d'adapter les rotations. Les séries temporelles NASA (20+ ans) révèlent les tendances et guident les choix futurs.\n\n**Analyse de tendance (1999-2024) :**\n- Température MODIS : +1.5°C en moyenne\n- Sécheresses SMAP : +15% de fréquence\n- Saison de croissance : +12 jours\n\n**Adaptation de rotation :**\n→ Introduire des cultures résistantes à la chaleur (sorgho, mil)\n→ Avancer les dates de semis de 10-15 jours\n→ Doubler les légumineuses pour la résilience",
+    "image": "/images/cards/rotation_6.jpg",
+    "nasaSource": "MODIS Long-term Archives (2000-2024)",
+    "quiz": {
+      "question": "De combien la saison de croissance s'est-elle allongée depuis 1999 ?",
+      "answers": ["+5 jours", "+8 jours", "+12 jours", "+20 jours"],
+      "correct": 2,
+      "explanation": "La saison de croissance s'est allongée de 12 jours en 25 ans, offrant des opportunités pour des cultures à cycle plus long."
+    }
+  },
+  {
+    "id": "nasa_beginner_1",
+    "competence": "nasa_data",
+    "level": "beginner",
+    "title": "Introduction aux données NASA",
+    "content": "La NASA collecte des données sur toute la Terre grâce à une flotte de satellites. Ces données sont gratuites et accessibles à tous !\n\n**Principaux satellites agricoles :**\n- **MODIS (Terra/Aqua)** : Données quotidiennes, résolution 250m-1km\n- **SMAP** : Humidité du sol tous les 2-3 jours, 9km\n- **Landsat 8/9** : Haute résolution (30m) tous les 16 jours\n\n**Accès gratuit :** earthdata.nasa.gov",
+    "image": "/images/cards/nasa_1.jpg",
+    "nasaSource": "NASA Earth Observing System",
+    "quiz": {
+      "question": "Quelle est la fréquence des données MODIS ?",
+      "answers": ["Hebdomadaire", "Tous les 2 jours", "Quotidienne", "Mensuelle"],
+      "correct": 2,
+      "explanation": "MODIS fournit des données quotidiennes, permettant un suivi en temps quasi-réel de la végétation et de la température."
+    }
+  },
+  {
+    "id": "nasa_beginner_2",
+    "competence": "nasa_data",
+    "level": "beginner",
+    "title": "Comprendre le NDVI",
+    "content": "Le NDVI (Normalized Difference Vegetation Index) est l'indice de végétation le plus utilisé. Il mesure la santé et la densité des plantes.\n\n**Formule NDVI :**\nNDVI = (NIR - Rouge) / (NIR + Rouge)\n\n**Interprétation :**\n- NDVI < 0.2 : Sol nu ou végétation morte\n- NDVI 0.2-0.4 : Végétation clairsemée ou stressée\n- NDVI 0.4-0.6 : Végétation modérée\n- NDVI > 0.6 : Végétation dense et saine\n\n**Astuce :** Comparer le NDVI actuel avec l'historique du champ !",
+    "image": "/images/cards/nasa_2.jpg",
+    "nasaSource": "MODIS NDVI",
+    "quiz": {
+      "question": "Que signifie un NDVI de 0.75 ?",
+      "answers": ["Sol nu", "Végétation stressée", "Végétation dense et saine", "Eau"],
+      "correct": 2,
+      "explanation": "Un NDVI de 0.75 indique une végétation très dense et en bonne santé, idéal pour une culture en pleine croissance."
+    }
+  },
+  {
+    "id": "nasa_intermediate_1",
+    "competence": "nasa_data",
+    "level": "intermediate",
+    "title": "Télécharger et traiter les données MODIS",
+    "content": "Apprendre à télécharger et traiter les données MODIS est essentiel pour l'agriculture de précision.\n\n**Étapes de téléchargement :**\n1. Créer un compte sur earthdata.nasa.gov\n2. Utiliser AppEEARS pour extraire des zones\n3. Choisir le produit : MOD13Q1 (NDVI 16 jours, 250m)\n4. Sélectionner la période et la zone d'intérêt\n5. Télécharger au format GeoTIFF\n\n**Traitement :** QGIS ou Python avec bibliothèque rasterio",
+    "image": "/images/cards/nasa_3.jpg",
+    "nasaSource": "MODIS MOD13Q1",
+    "quiz": {
+      "question": "Quel produit MODIS offre le NDVI à 250m tous les 16 jours ?",
+      "answers": ["MOD11A2", "MOD13Q1", "MOD09A1", "MOD17A2"],
+      "correct": 1,
+      "explanation": "MOD13Q1 fournit le NDVI et l'EVI à 250m de résolution avec une composante temporelle de 16 jours, idéal pour le suivi agricole."
+    }
+  },
+  {
+    "id": "nasa_intermediate_2",
+    "competence": "nasa_data",
+    "level": "intermediate",
+    "title": "Combiner SMAP et MODIS",
+    "content": "La vraie puissance vient de la combinaison de plusieurs sources NASA. SMAP (humidité) + MODIS (NDVI) = diagnostic complet.\n\n**Matrice de diagnostic :**\n\n| SMAP | NDVI | Diagnostic |\n|------|------|------------|\n| Élevé | Élevé | Santé optimale |\n| Élevé | Faible | Problème nutrition ou maladie |\n| Faible | Élevé | Consommation d'eau élevée |\n| Faible | Faible | Stress hydrique sévère |\n\n**Action :** Adapter l'irrigation ET la fertilisation selon la matrice.",
+    "image": "/images/cards/nasa_4.jpg",
+    "nasaSource": "SMAP L4 + MODIS NDVI",
+    "quiz": {
+      "question": "Que signifie SMAP élevé + NDVI faible ?",
+      "answers": ["Santé optimale", "Stress hydrique", "Problème nutrition/maladie", "Sol nu"],
+      "correct": 2,
+      "explanation": "Si le sol est humide (SMAP élevé) mais le NDVI est faible, le problème n'est pas l'eau mais probablement la nutrition ou une maladie."
+    }
+  },
+  {
+    "id": "nasa_expert_1",
+    "competence": "nasa_data",
+    "level": "expert",
+    "title": "API et automatisation des données NASA",
+    "content": "Les experts automatisent la collecte de données NASA via des API. Plus besoin de téléchargement manuel !\n\n**API disponibles :**\n- **CMR (Common Metadata Repository)** : Recherche de données\n- **OPeNDAP** : Accès direct aux sous-ensembles\n- **AppEEARS API** : Extraction automatisée de séries temporelles\n- **Google Earth Engine** : Traitement cloud massif\n\n**Exemple Python :**\n```python\nimport earthaccess\nauth = earthaccess.login()\nresults = earthaccess.search_data(\n    short_name='MOD13Q1',\n    bounding_box=(-5, 42, -4, 43)\n)\n```",
+    "image": "/images/cards/nasa_5.jpg",
+    "nasaSource": "NASA APIs (CMR, AppEEARS, OPeNDAP)",
+    "quiz": {
+      "question": "Quelle API NASA permet l'extraction automatisée de séries temporelles ?",
+      "answers": ["CMR", "OPeNDAP", "AppEEARS API", "EOSDIS"],
+      "correct": 2,
+      "explanation": "AppEEARS API permet d'automatiser l'extraction de séries temporelles pour des zones spécifiques, sans téléchargement manuel."
+    }
+  },
+  {
+    "id": "nasa_expert_2",
+    "competence": "nasa_data",
+    "level": "expert",
+    "title": "Intelligence Artificielle et données NASA",
+    "content": "L'IA transforme les données NASA en prédictions précises. Les modèles de deep learning détectent des patterns invisibles à l'œil humain.\n\n**Applications IA + NASA :**\n- **Prédiction de rendement** : R² > 0.90 avec LSTM sur séries NDVI\n- **Détection précoce de maladies** : CNN sur images MODIS\n- **Estimation de biomasse** : Random Forest avec 15 indices spectraux\n- **Prévision de sécheresse** : Transformer sur SMAP historique\n\n**Dataset d'entraînement :** 20 ans de données MODIS + vérité terrain",
+    "image": "/images/cards/nasa_6.jpg",
+    "nasaSource": "MODIS + SMAP + Landsat (2000-2024)",
+    "quiz": {
+      "question": "Quelle précision peut atteindre la prédiction de rendement avec IA + NASA ?",
+      "answers": ["R² > 0.60", "R² > 0.75", "R² > 0.90", "R² > 0.95"],
+      "correct": 2,
+      "explanation": "Les modèles LSTM entraînés sur des séries temporelles NDVI peuvent atteindre une précision R² > 0.90 pour la prédiction de rendement."
+    }
+  }
+]

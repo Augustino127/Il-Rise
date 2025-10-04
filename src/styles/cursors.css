@@ -27,8 +27,8 @@
 }
 
 .cursor-container:hover {
-  border-color: #82CC68;
-  box-shadow: 0 2px 8px rgba(130, 204, 104, 0.2);
+  border-color: #2ECC71;
+  box-shadow: 0 2px 8px rgba(46, 204, 113, 0.2);
 }
 
 /* En-tête curseur */
@@ -46,14 +46,14 @@
 .cursor-label {
   flex: 1;
   font-size: 1.125rem;
-  color: #2E1F03;
+  color: #2C3E50;
 }
 
 .cursor-value {
   font-size: 1.25rem;
-  color: #82CC68;
+  color: #1E8449;
   font-weight: 700;
-  background: #e8f5e9;
+  background: #D5F4E6;
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
 }
@@ -71,7 +71,7 @@
   width: 100%;
   height: 8px;
   border-radius: 5px;
-  background: linear-gradient(to right, #F00000, #FEC103, #82CC68, #FEC103, #F00000);
+  background: linear-gradient(to right, #E74C3C, #F39C12, #2ECC71, #F39C12, #E74C3C);
   outline: none;
   opacity: 0.9;
   transition: opacity 0.2s;
@@ -93,8 +93,8 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #fff;
-  border: 3px solid #82CC68;
+  background: #FFFFFF;
+  border: 3px solid #2ECC71;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
@@ -109,8 +109,8 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #fff;
-  border: 3px solid #82CC68;
+  background: #FFFFFF;
+  border: 3px solid #2ECC71;
   cursor: pointer;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transition: all 0.2s ease;
@@ -136,9 +136,9 @@
 }
 
 .range-optimal {
-  color: #82CC68;
+  color: #1E8449;
   font-weight: 600;
-  background: #e8f5e9;
+  background: #D5F4E6;
   padding: 0.125rem 0.5rem;
   border-radius: 10px;
 }
@@ -158,20 +158,20 @@
 
 .indicator-bar {
   height: 100%;
-  background: #82CC68;
+  background: #2ECC71;
   border-radius: 6px;
   transition: all 0.3s ease;
-  box-shadow: 0 0 8px rgba(130, 204, 104, 0.5);
+  box-shadow: 0 0 8px rgba(46, 204, 113, 0.5);
 }
 
 /* Aide contextuelle */
 .cursor-help {
   font-size: 0.875rem;
-  color: #666;
+  color: #7F8C8D;
   padding: 0.5rem;
-  background: #fff;
+  background: #FFFFFF;
   border-radius: 6px;
-  border-left: 3px solid #59A7EB;
+  border-left: 3px solid #3498DB;
   font-style: italic;
 }
 

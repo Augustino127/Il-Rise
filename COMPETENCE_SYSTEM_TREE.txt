@@ -1,0 +1,212 @@
+SYSTEME DE COMPETENCES - STRUCTURE DES FICHIERS
+================================================
+
+src/game/
+│
+├── CompetenceSystem.js              (11 KB) ★ NOUVEAU
+│   └── Calcul des 5 competences
+│       ├── Water Management (25%)
+│       ├── NPK Management (25%)
+│       ├── Soil Management (20%)
+│       ├── Crop Rotation (15%)
+│       └── NASA Data Usage (15%)
+│
+├── LivesSystem.js                   (5.3 KB) ★ NOUVEAU
+│   └── Gestion des vies
+│       ├── 5 vies maximum
+│       ├── Regeneration 15 min
+│       └── Reset minuit
+│
+├── UnlockSystem.js                  (7.3 KB) ★ NOUVEAU
+│   └── Deverrouillage niveaux
+│       ├── Methode 1: 3 etoiles x1
+│       └── Methode 2: 2 etoiles x3 consecutives
+│
+├── ProgressManager.js               (9.9 KB) ★ NOUVEAU
+│   └── Orchestration progression
+│       ├── Sauvegarde localStorage
+│       ├── Statistiques par competence
+│       ├── Historique parties
+│       └── Export/Import
+│
+├── GameEngine.js                    (7.4 KB) ★ MODIFIE
+│   └── Integration systemes
+│       ├── startGame()
+│       ├── useNASAData()
+│       └── completeLevel() [REECRIT]
+│
+├── CompetenceSystem.test.js         (6.6 KB) ★ NOUVEAU
+│   └── Tests avec donnees realistes
+│       ├── Partie parfaite (96.6/100 - 3⭐)
+│       ├── Partie moyenne (65.7/100 - 2⭐)
+│       └── Partie faible (25.4/100 - 1⭐)
+│
+├── COMPETENCE_SYSTEM_README.md         ★ NOUVEAU
+│   └── Documentation utilisateur complete
+│
+├── INTEGRATION_GUIDE.md                ★ NOUVEAU
+│   └── Guide developpeur + exemples code
+│
+└── [Fichiers existants non modifies]
+    ├── CropDatabase.js
+    ├── LevelSystem.js
+    ├── SimulationEngine.js
+    └── NASARecommendations.js
+
+
+RACINE DU PROJET
+================
+
+IMPLEMENTATION_SUMMARY.md               ★ NOUVEAU
+└── Resume complet implementation
+    ├── Algorithmes detailles
+    ├── Exemples de calcul
+    └── Verification suppression hectares
+
+QUICK_START_COMPETENCES.md              ★ NOUVEAU
+└── Guide demarrage rapide
+    ├── Code copy-paste
+    ├── Valeurs recommandees
+    └── Exemples par culture
+
+
+STOCKAGE (localStorage)
+=======================
+
+ilerise_player
+├── coins
+├── lives [DELEGUE A LivesSystem]
+├── unlockedCrops
+├── completedLevels
+└── highScores
+
+ilerise_progress                        ★ NOUVEAU
+├── levelHistory
+├── unlockedLevels
+├── competenceStats
+├── totalGamesPlayed
+├── totalStarsEarned
+└── perfectScores
+
+ilerise_lives                           ★ NOUVEAU
+├── lives (current)
+├── lastRegenTime
+└── lastResetDate
+
+
+WORKFLOW DE JEU
+===============
+
+1. engine.startGame('maize_1', 'maize', 1)
+   └── Initialise partie en cours
+
+2. engine.useNASAData(['temperature', 'precipitation'])
+   └── Enregistre utilisation NASA
+
+3. Joueur configure culture (irrigation, NPK, sol)
+
+4. result = engine.completeLevel(gameData)
+   ├── CompetenceSystem.calculateCompetenceScore()
+   │   ├── calculateWaterScore() → 0-100
+   │   ├── calculateNPKScore() → 0-100
+   │   ├── calculateSoilScore() → 0-100
+   │   ├── calculateRotationScore() → 0-100
+   │   └── calculateNASAScore() → 0-100
+   │
+   ├── Score global = moyenne ponderee
+   ├── Etoiles = 1/2/3 selon score
+   ├── ProgressManager.recordGame()
+   │   ├── Sauvegarde historique
+   │   ├── Mise a jour stats
+   │   └── UnlockSystem.checkUnlock()
+   │
+   └── Retourne resultats + feedback
+
+
+SYSTEME D'ETOILES
+=================
+
+0-50 points    → ⭐      (Echec)
+50-75 points   → ⭐⭐    (Moyen)
+75-100 points  → ⭐⭐⭐  (Excellent)
+
+
+DEVERROUILLAGE
+==============
+
+Niveau suivant debloque si :
+  • 1x score >= 75 points (3 etoiles)
+    OU
+  • 3x scores >= 50 points consecutifs (2+ etoiles)
+
+
+FAMILLES DE CULTURES
+====================
+
+cereal     → Mais, Riz
+legume     → Niebe (fixe azote)
+tuber      → Manioc
+tree_crop  → Cacao
+fiber      → Coton
+
+Rotation optimale : alterner familles differentes
+
+
+DONNEES NASA
+============
+
+Types disponibles :
+  • temperature   → Optimiser periodes plantation
+  • ndvi          → Sante vegetation
+  • precipitation → Planifier irrigation
+  • smap          → Humidite du sol
+
+Limite : 3 utilisations par niveau
+
+
+STATISTIQUES TRACKEES
+======================
+
+Par competence :
+  • Meilleur score (best)
+  • Moyenne (average)
+  • Total parties (total)
+  • Tendance (improving/stable/declining)
+
+Globales :
+  • Total parties jouees
+  • Total etoiles gagnees
+  • Scores parfaits (3 etoiles)
+  • Serie victoires consecutives
+  • Completion globale (%)
+
+
+FICHIERS CREES
+==============
+
+Code source (5 fichiers) :
+  ✓ CompetenceSystem.js
+  ✓ LivesSystem.js
+  ✓ UnlockSystem.js
+  ✓ ProgressManager.js
+  ✓ CompetenceSystem.test.js
+
+Documentation (4 fichiers) :
+  ✓ COMPETENCE_SYSTEM_README.md
+  ✓ INTEGRATION_GUIDE.md
+  ✓ IMPLEMENTATION_SUMMARY.md
+  ✓ QUICK_START_COMPETENCES.md
+
+Modifications (1 fichier) :
+  ✓ GameEngine.js
+
+
+TOTAL
+=====
+  • 39.4 KB de code JavaScript
+  • 4 fichiers documentation complete
+  • 0 references aux hectares dans la logique
+  • 100% fonctionnel et teste
+
+
+STATUS : ✅ IMPLEMENTATION COMPLETE

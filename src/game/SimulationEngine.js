@@ -2,12 +2,36 @@
  * SimulationEngine.js
  * Moteur de simulation agricole (inspiré DSSAT)
  * NASA Space Apps Challenge 2025
+ *
+ * DSSAT-like crop growth simulation with:
+ * - Daily time-step simulation
+ * - Phenological stages
+ * - Biomass accumulation
+ * - Water and nutrient stress
+ * - NDVI-based growth monitoring
  */
 
 export class SimulationEngine {
-  constructor(crop, nasaData) {
+  constructor(crop, nasaData, weatherEngine = null) {
     this.crop = crop;
     this.nasaData = nasaData;
+    this.weatherEngine = weatherEngine;
+
+    // Constants DSSAT
+    this.RUE = 3.0; // Radiation Use Efficiency (g biomass/MJ PAR)
+    this.LAI_MAX = 6.0; // Maximum Leaf Area Index
+    this.HARVEST_INDEX = crop.harvestIndex || 0.50; // Default 50%
+    this.BASE_TEMP = crop.baseTemp || 8; // Base temperature (C)
+    this.OPT_TEMP = crop.optTemp || 28; // Optimal temperature (C)
+    this.MAX_TEMP = crop.maxTemp || 35; // Maximum temperature (C)
+
+    // State variables
+    this.currentDay = 0;
+    this.phenologicalStage = 0;
+    this.totalBiomass = 0;
+    this.LAI = 0;
+    this.rootDepth = 0.1; // meters
+    this.soilWaterContent = 0.3; // volumetric (0-1)
   }
 
   /**
@@ -284,5 +308,386 @@ export class SimulationEngine {
     if (growthRate >= 0.7) return 'good';
     if (growthRate >= 0.5) return 'moderate';
     return 'poor';
+  }
+
+  /**
+   * ========================================
+   * DSSAT-LIKE DAILY SIMULATION
+   * ========================================
+   */
+
+  /**
+   * Simulate full crop cycle (90 days) with daily time steps
+   * @param {Object} managementInputs - { irrigation: 0-100, npk: 0-150, ph: 4-8 }
+   * @returns {Object} Complete simulation results
+   */
+  runFullSimulation(managementInputs = {}) {
+    const {
+      irrigation = 50,
+      npk = 80,
+      ph = 6.5,
+      duration = 90
+    } = managementInputs;
+
+    // Reset state
+    this.resetSimulation();
+
+    const dailyData = [];
+    const events = [];
+    const snapshots = [];
+
+    // Phenological stages from crop data
+    const phenoStages = this.crop.growth?.stages || this.getDefaultPhenoStages();
+
+    for (let day = 1; day <= duration; day++) {
+      this.currentDay = day;
+
+      // Get daily weather
+      const weather = this.weatherEngine
+        ? this.weatherEngine.getDailyWeather(day)
+        : this.generateSimpleWeather(day);
+
+      // Update phenological stage
+      const phenoStage = this.getPhenologicalStage(day, phenoStages);
+      this.phenologicalStage = phenoStage.index;
+
+      // Calculate daily thermal time (Growing Degree Days)
+      const GDD = this.calculateGDD(weather.temp);
+
+      // Calculate stress factors
+      const waterStress = this.calculateDailyWaterStress(irrigation, weather);
+      const nutrientStress = this.calculateNutrientStress(npk);
+      const tempStress = this.calculateTemperatureStress(weather.temp);
+
+      // Update LAI (Leaf Area Index)
+      this.updateLAI(day, duration, waterStress, nutrientStress);
+
+      // Calculate intercepted radiation
+      const PAR = this.calculatePAR(weather.radiation, this.LAI);
+
+      // Daily biomass accumulation (DSSAT formula)
+      const dailyBiomass = this.RUE * PAR * waterStress * nutrientStress * tempStress;
+      this.totalBiomass += dailyBiomass;
+
+      // Calculate NDVI from LAI
+      const ndvi = this.calculateNDVIFromLAI(this.LAI);
+
+      // Update soil water
+      const ET0 = this.calculateET0(weather);
+      this.updateSoilWater(irrigation, weather.rain, ET0);
+
+      // Check for weather events
+      const weatherEvent = this.checkWeatherEvents(weather, day);
+      if (weatherEvent) {
+        events.push(weatherEvent);
+      }
+
+      // Store daily data
+      dailyData.push({
+        day,
+        phenoStage: phenoStage.name,
+        temp: weather.temp,
+        rain: weather.rain,
+        radiation: weather.radiation,
+        gdd: GDD,
+        biomass: this.totalBiomass,
+        lai: this.LAI,
+        ndvi,
+        waterStress,
+        nutrientStress,
+        tempStress,
+        soilMoisture: this.soilWaterContent * 100,
+        weatherEvent: weatherEvent?.type || null
+      });
+
+      // Create snapshots every 10 days
+      if (day % 10 === 0 || day === duration) {
+        snapshots.push(this.createSnapshot(day, dailyData[dailyData.length - 1]));
+      }
+    }
+
+    // Calculate final yield
+    const finalYield = this.totalBiomass * this.HARVEST_INDEX / 1000; // kg/ha -> t/ha
+    const yieldPercentage = (finalYield / this.crop.maxYield) * 100;
+
+    return {
+      summary: {
+        finalYield: Math.round(finalYield * 100) / 100,
+        potentialYield: this.crop.maxYield,
+        yieldPercentage: Math.round(yieldPercentage),
+        totalBiomass: Math.round(this.totalBiomass),
+        harvestIndex: this.HARVEST_INDEX,
+        duration,
+        finalNDVI: dailyData[dailyData.length - 1].ndvi
+      },
+      dailyData,
+      snapshots,
+      events,
+      phenoStages,
+      performance: this.calculatePerformanceMetrics(dailyData)
+    };
+  }
+
+  /**
+   * Reset simulation state
+   */
+  resetSimulation() {
+    this.currentDay = 0;
+    this.phenologicalStage = 0;
+    this.totalBiomass = 0;
+    this.LAI = 0;
+    this.rootDepth = 0.1;
+    this.soilWaterContent = 0.3;
+  }
+
+  /**
+   * Get phenological stage for current day
+   */
+  getPhenologicalStage(day, stages) {
+    let cumulativeDays = 0;
+    for (let i = 0; i < stages.length; i++) {
+      cumulativeDays += stages[i].days;
+      if (day <= cumulativeDays) {
+        return {
+          index: i,
+          name: stages[i].name,
+          description: stages[i].description,
+          progress: ((day - (cumulativeDays - stages[i].days)) / stages[i].days) * 100
+        };
+      }
+    }
+    return {
+      index: stages.length - 1,
+      name: stages[stages.length - 1].name,
+      description: 'Maturity',
+      progress: 100
+    };
+  }
+
+  /**
+   * Get default phenological stages
+   */
+  getDefaultPhenoStages() {
+    return [
+      { name: 'Germination', days: 7, description: 'Seed germination' },
+      { name: 'Vegetative', days: 35, description: 'Vegetative growth' },
+      { name: 'Flowering', days: 20, description: 'Flowering and pollination' },
+      { name: 'Grain Fill', days: 20, description: 'Grain filling' },
+      { name: 'Maturity', days: 8, description: 'Physiological maturity' }
+    ];
+  }
+
+  /**
+   * Calculate Growing Degree Days (GDD)
+   */
+  calculateGDD(temp) {
+    const avgTemp = temp;
+    if (avgTemp < this.BASE_TEMP) return 0;
+    if (avgTemp > this.MAX_TEMP) return this.MAX_TEMP - this.BASE_TEMP;
+    return avgTemp - this.BASE_TEMP;
+  }
+
+  /**
+   * Calculate daily water stress
+   */
+  calculateDailyWaterStress(irrigation, weather) {
+    const availableWater = this.soilWaterContent * 100;
+    const demand = this.crop.waterNeed?.optimal || 60;
+
+    // Factor in irrigation and rain
+    const totalWater = availableWater + (irrigation / 10) + (weather.rain / 10);
+
+    if (totalWater < demand * 0.5) return 0.3; // Severe stress
+    if (totalWater < demand * 0.7) return 0.6; // Moderate stress
+    if (totalWater > demand * 1.3) return 0.7; // Waterlogging
+    return 1.0; // Optimal
+  }
+
+  /**
+   * Calculate temperature stress
+   */
+  calculateTemperatureStress(temp) {
+    if (temp < this.BASE_TEMP) return 0.2;
+    if (temp > this.MAX_TEMP) return 0.3;
+    if (temp >= this.OPT_TEMP - 3 && temp <= this.OPT_TEMP + 3) return 1.0;
+
+    // Linear interpolation
+    if (temp < this.OPT_TEMP) {
+      return 0.5 + 0.5 * ((temp - this.BASE_TEMP) / (this.OPT_TEMP - this.BASE_TEMP));
+    } else {
+      return 1.0 - 0.7 * ((temp - this.OPT_TEMP) / (this.MAX_TEMP - this.OPT_TEMP));
+    }
+  }
+
+  /**
+   * Update Leaf Area Index (LAI)
+   */
+  updateLAI(day, duration, waterStress, nutrientStress) {
+    const relativeDay = day / duration;
+
+    // Logistic curve for LAI development
+    const potentialLAI = this.LAI_MAX / (1 + Math.exp(-10 * (relativeDay - 0.5)));
+
+    // Apply stress
+    this.LAI = potentialLAI * waterStress * nutrientStress;
+
+    // Senescence in late season
+    if (relativeDay > 0.75) {
+      this.LAI *= (1 - (relativeDay - 0.75) * 2);
+    }
+
+    this.LAI = Math.max(0, Math.min(this.LAI_MAX, this.LAI));
+  }
+
+  /**
+   * Calculate Photosynthetically Active Radiation intercepted
+   */
+  calculatePAR(radiation, lai) {
+    // Beer's Law: PAR_intercepted = PAR_incident * (1 - exp(-k * LAI))
+    const k = 0.6; // Extinction coefficient
+    const PARfraction = 0.5; // PAR is ~50% of total radiation
+    const intercepted = radiation * PARfraction * (1 - Math.exp(-k * lai));
+    return intercepted;
+  }
+
+  /**
+   * Calculate NDVI from LAI (empirical relationship)
+   */
+  calculateNDVIFromLAI(lai) {
+    // NDVI = a * (1 - exp(-b * LAI))
+    const a = 0.95; // Maximum NDVI
+    const b = 0.6;  // Shape parameter
+    return Math.round(a * (1 - Math.exp(-b * lai)) * 100) / 100;
+  }
+
+  /**
+   * Calculate reference evapotranspiration (ET0) - Simplified Penman
+   */
+  calculateET0(weather) {
+    // Simplified formula: ET0 = 0.0023 * (Tmean + 17.8) * sqrt(Tmax - Tmin) * Ra
+    // For simulation, use simplified approach
+    const temp = weather.temp;
+    const radiation = weather.radiation;
+
+    const ET0 = 0.0135 * temp * radiation / 10;
+    return Math.max(0, Math.min(10, ET0)); // mm/day
+  }
+
+  /**
+   * Update soil water content
+   */
+  updateSoilWater(irrigation, rain, ET0) {
+    const waterIn = (rain + irrigation) / 100; // Convert to volumetric
+    const waterOut = ET0 / 100;
+
+    this.soilWaterContent += waterIn - waterOut;
+
+    // Field capacity and wilting point constraints
+    this.soilWaterContent = Math.max(0.1, Math.min(0.45, this.soilWaterContent));
+  }
+
+  /**
+   * Generate simple weather if no WeatherEngine
+   */
+  generateSimpleWeather(day) {
+    const season = Math.sin((day / 90) * Math.PI); // Seasonal variation
+
+    return {
+      temp: 26 + 6 * season + (Math.random() - 0.5) * 4,
+      rain: Math.random() > 0.7 ? Math.random() * 20 : 0,
+      radiation: 15 + 5 * season + (Math.random() - 0.5) * 3
+    };
+  }
+
+  /**
+   * Check for notable weather events
+   */
+  checkWeatherEvents(weather, day) {
+    if (weather.temp > 38) {
+      return {
+        type: 'heatwave',
+        day,
+        severity: 'high',
+        description: 'Canicule - stress thermique severe',
+        impact: -0.3
+      };
+    }
+
+    if (weather.rain > 50) {
+      return {
+        type: 'heavy_rain',
+        day,
+        severity: 'medium',
+        description: 'Pluie abondante - risque de lessivage',
+        impact: -0.1
+      };
+    }
+
+    if (this.soilWaterContent < 0.15) {
+      return {
+        type: 'drought',
+        day,
+        severity: 'high',
+        description: 'Secheresse - irrigation recommandee',
+        impact: -0.4
+      };
+    }
+
+    return null;
+  }
+
+  /**
+   * Create snapshot for timeline
+   */
+  createSnapshot(day, dailyData) {
+    return {
+      day,
+      title: `Jour ${day}`,
+      phenoStage: dailyData.phenoStage,
+      ndvi: dailyData.ndvi,
+      biomass: Math.round(dailyData.biomass),
+      lai: Math.round(dailyData.lai * 100) / 100,
+      soilMoisture: Math.round(dailyData.soilMoisture),
+      stresses: {
+        water: Math.round(dailyData.waterStress * 100),
+        nutrient: Math.round(dailyData.nutrientStress * 100),
+        temperature: Math.round(dailyData.tempStress * 100)
+      },
+      status: this.getSnapshotStatus(dailyData)
+    };
+  }
+
+  /**
+   * Get snapshot status
+   */
+  getSnapshotStatus(data) {
+    const avgStress = (data.waterStress + data.nutrientStress + data.tempStress) / 3;
+
+    if (avgStress >= 0.85) return { text: 'Excellent', color: 'green' };
+    if (avgStress >= 0.70) return { text: 'Bon', color: 'lightgreen' };
+    if (avgStress >= 0.50) return { text: 'Moyen', color: 'yellow' };
+    return { text: 'Stress', color: 'red' };
+  }
+
+  /**
+   * Calculate performance metrics
+   */
+  calculatePerformanceMetrics(dailyData) {
+    const avgWaterStress = dailyData.reduce((sum, d) => sum + d.waterStress, 0) / dailyData.length;
+    const avgNutrientStress = dailyData.reduce((sum, d) => sum + d.nutrientStress, 0) / dailyData.length;
+    const avgTempStress = dailyData.reduce((sum, d) => sum + d.tempStress, 0) / dailyData.length;
+
+    const stressDays = dailyData.filter(d =>
+      (d.waterStress < 0.6 || d.nutrientStress < 0.6 || d.tempStress < 0.6)
+    ).length;
+
+    return {
+      avgWaterStress: Math.round(avgWaterStress * 100),
+      avgNutrientStress: Math.round(avgNutrientStress * 100),
+      avgTempStress: Math.round(avgTempStress * 100),
+      overallHealth: Math.round(((avgWaterStress + avgNutrientStress + avgTempStress) / 3) * 100),
+      stressDays,
+      stressFreePercentage: Math.round(((dailyData.length - stressDays) / dailyData.length) * 100)
+    };
   }
 }

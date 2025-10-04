@@ -1,0 +1,943 @@
+{
+  "version": "1.0",
+  "lastUpdate": "2025-10-04",
+  "source": "Données compilées - recherches agricoles 2024-2025 (FAO, Our World in Data, INSTAD Bénin, Wikifarmer, EOS, IRRI, USDA)",
+  "disclaimer": "Données moyennes à des fins éducatives. Les rendements réels varient selon conditions locales.",
+
+  "crops": [
+    {
+      "id": "maize",
+      "names": {
+        "fr": "Maïs",
+        "en": "Maize/Corn",
+        "local": {
+          "fon": "Gbado",
+          "wolof": "Mburu",
+          "bambara": "Kaba"
+        }
+      },
+      "category": "cereal",
+      "icon": "/assets/icons/maize.svg",
+      "difficulty": 2,
+      "yields": {
+        "min": 1.5,
+        "average": 6.0,
+        "max": 12.0,
+        "unit": "t/ha",
+        "context": {
+          "africa": 2.2,
+          "benin": 1.3,
+          "world": 5.9
+        }
+      },
+      "growth": {
+        "durationDays": {
+          "min": 85,
+          "typical": 120,
+          "max": 145
+        },
+        "stages": [
+          {"name": "VE", "days": 5, "description": "Émergence"},
+          {"name": "V6", "days": 30, "description": "6 feuilles - croissance végétative"},
+          {"name": "VT", "days": 25, "description": "Floraison mâle (tassel)"},
+          {"name": "R1", "days": 5, "description": "Apparition soies"},
+          {"name": "R3", "days": 20, "description": "Grain laiteux"},
+          {"name": "R6", "days": 35, "description": "Maturité physiologique"}
+        ]
+      },
+      "waterRequirements": {
+        "totalMm": 650,
+        "criticalStages": ["VT-R1 (floraison)", "R1-R3 (remplissage)"],
+        "irrigationStrategy": "Maintenir 60-80% capacité au champ pendant phases critiques",
+        "droughtTolerance": "medium-low"
+      },
+      "nutrients": {
+        "NPK": {
+          "N": {
+            "min": 120,
+            "optimal": 160,
+            "max": 200,
+            "unit": "kg/ha",
+            "splitApplications": 3,
+            "timing": ["semis (1/3)", "V6 (1/3)", "VT (1/3)"]
+          },
+          "P": {
+            "min": 60,
+            "optimal": 80,
+            "max": 100,
+            "unit": "kg/ha",
+            "splitApplications": 1,
+            "timing": ["semis (tout)"]
+          },
+          "K": {
+            "min": 80,
+            "optimal": 100,
+            "max": 120,
+            "unit": "kg/ha",
+            "splitApplications": 1,
+            "timing": ["semis (tout)"]
+          }
+        },
+        "micronutrients": ["Zn", "Mg"],
+        "organicAlternatives": {
+          "compost": "25-35 t/ha",
+          "manure": "20-30 t/ha",
+          "note": "Fumier de volaille riche en N"
+        }
+      },
+      "climate": {
+        "temperature": {
+          "min": 10,
+          "optimal": 25,
+          "max": 35,
+          "unit": "°C",
+          "criticalPhases": {
+            "germination": "21°C minimum sol",
+            "floraison": "25-28°C optimal"
+          }
+        },
+        "rainfall": {
+          "min": 500,
+          "optimal": 650,
+          "max": 900,
+          "unit": "mm"
+        },
+        "sunlight": "full (8-12h/jour)",
+        "usdaZones": ["9b", "10a", "10b"]
+      },
+      "soil": {
+        "pH": {
+          "min": 5.5,
+          "optimal": 6.0,
+          "max": 6.5
+        },
+        "types": ["limoneux", "argilo-limoneux", "sablo-limoneux"],
+        "texture": "profond (>60cm), riche en matière organique",
+        "organicMatter": "3-5%",
+        "drainage": "bon drainage essentiel"
+      },
+      "practices": {
+        "rotation": {
+          "previous": ["légumineuses (niébé, soja)", "prairies"],
+          "following": ["blé", "soja", "légumes"],
+          "avoidAfter": ["maïs (min 2 ans)"],
+          "benefits": "Fixation N par légumineuses, rupture cycle parasites"
+        },
+        "seedingRate": "60,000-75,000 grains/ha",
+        "rowSpacing": "75-80 cm",
+        "plantSpacing": "15-20 cm sur ligne",
+        "depth": "4-6 cm",
+        "weedControl": "Précoce crucial (stade 1-3 feuilles), buttage à V6",
+        "diseaseRisks": ["pyrale", "helminthosporiose", "charbon"],
+        "pestRisks": ["foreurs de tiges", "légionnaire d'automne (Afrique)"]
+      },
+      "economics": {
+        "costPerHa": {
+          "seeds": 80,
+          "fertilizers": 180,
+          "pesticides": 60,
+          "labor": 150,
+          "total": 470,
+          "currency": "USD"
+        },
+        "revenue": {
+          "pricePerTon": 200,
+          "expectedYield": 6.0,
+          "expectedRevenue": 1200,
+          "netProfit": 730,
+          "currency": "USD"
+        }
+      },
+      "educational": {
+        "level": "beginner",
+        "funFacts": [
+          "Culture associée traditionnelle : maïs-niébé-courge (les 3 sœurs)",
+          "Chaque épi contient 400-600 grains disposés en 12-20 rangs",
+          "Origine : Domestiqué au Mexique il y a 9,000 ans",
+          "Au Bénin : Culture vivrière n°1, souvent associée au manioc"
+        ],
+        "commonMistakes": [
+          "Planter avant que le sol atteigne 21°C (germination faible)",
+          "Négliger irrigation pendant floraison (épis vides)",
+          "Densité inadaptée (trop faible = tallage excessif, trop élevée = verse)",
+          "Sur-fertilisation N sans K (verse, sensibilité maladies)"
+        ],
+        "tips": [
+          "Semer après dernières pluies pour maïs pluvial",
+          "Buttage à V6 renforce stabilité et contrôle adventices",
+          "Récolte à 20-25% humidité pour bon stockage"
+        ]
+      },
+      "media": {
+        "images": [
+          "/assets/images/maize-plant.jpg",
+          "/assets/images/maize-field-africa.jpg",
+          "/assets/images/maize-harvest.jpg"
+        ],
+        "audio": {
+          "fr": "/assets/audio/maize-fr.mp3",
+          "fon": "/assets/audio/maize-fon.mp3",
+          "wolof": "/assets/audio/maize-wolof.mp3"
+        },
+        "video": "https://youtube.com/watch?v=maize-cultivation-africa"
+      }
+    },
+    {
+      "id": "cowpea",
+      "names": {
+        "fr": "Niébé",
+        "en": "Cowpea",
+        "local": {
+          "fon": "Ayikun",
+          "wolof": "Niébé",
+          "hausa": "Wake"
+        }
+      },
+      "category": "legume",
+      "icon": "/assets/icons/cowpea.svg",
+      "difficulty": 2,
+      "yields": {
+        "min": 0.5,
+        "average": 1.5,
+        "max": 5.7,
+        "unit": "t/ha",
+        "context": {
+          "africa": 0.8,
+          "benin": 1.2,
+          "irrigated": 3.5
+        }
+      },
+      "growth": {
+        "durationDays": {
+          "min": 60,
+          "typical": 75,
+          "max": 90
+        },
+        "stages": [
+          {"name": "germination", "days": 5, "description": "Levée"},
+          {"name": "végétatif", "days": 25, "description": "Développement foliaire"},
+          {"name": "floraison", "days": 15, "description": "Apparition fleurs"},
+          {"name": "formation gousses", "days": 20, "description": "Développement gousses"},
+          {"name": "maturation", "days": 10, "description": "Séchage gousses"}
+        ]
+      },
+      "waterRequirements": {
+        "totalMm": 550,
+        "criticalStages": ["floraison", "remplissage gousses"],
+        "irrigationStrategy": "Tolérant sécheresse, irrigation 1-2 fois si <400mm",
+        "droughtTolerance": "high"
+      },
+      "nutrients": {
+        "NPK": {
+          "N": {
+            "min": 0,
+            "optimal": 15,
+            "max": 30,
+            "unit": "kg/ha",
+            "splitApplications": 1,
+            "timing": ["semis (starter uniquement)"],
+            "note": "Fixation symbiotique N₂ via Rhizobium"
+          },
+          "P": {
+            "min": 20,
+            "optimal": 30,
+            "max": 40,
+            "unit": "kg/ha",
+            "splitApplications": 1,
+            "timing": ["semis (super phosphate)"]
+          },
+          "K": {
+            "min": 20,
+            "optimal": 30,
+            "max": 40,
+            "unit": "kg/ha",
+            "splitApplications": 1,
+            "timing": ["semis"]
+          }
+        },
+        "micronutrients": ["Mo (molybdène pour nodulation)"],
+        "organicAlternatives": {
+          "compost": "10-15 t/ha",
+          "manure": "5-10 t/ha",
+          "inoculation": "Rhizobium sp. (essentiel si 1ère culture)"
+        }
+      },
+      "climate": {
+        "temperature": {
+          "min": 18,
+          "optimal": 29,
+          "max": 35,
+          "unit": "°C"
+        },
+        "rainfall": {
+          "min": 400,
+          "optimal": 600,
+          "max": 1200,
+          "unit": "mm"
+        },
+        "sunlight": "full",
+        "usdaZones": ["9a", "9b", "10a", "10b"]
+      },
+      "soil": {
+        "pH": {
+          "min": 5.5,
+          "optimal": 6.5,
+          "max": 8.0
+        },
+        "types": ["sableux (préféré)", "sablo-limoneux", "limoneux"],
+        "texture": "sols pauvres tolérés, drainage modéré",
+        "organicMatter": "1-3% (peu exigeant)",
+        "drainage": "bon drainage apprécié"
+      },
+      "practices": {
+        "rotation": {
+          "previous": ["céréales (maïs, mil, sorgho)"],
+          "following": ["toutes cultures (apport N)"],
+          "benefits": "Fixe 40-80 kg N/ha, améliore structure sol"
+        },
+        "seedingRate": "15-25 kg/ha (selon variété)",
+        "rowSpacing": "50-80 cm (culture pure)",
+        "plantSpacing": "10-20 cm sur ligne",
+        "depth": "3-5 cm",
+        "intercropping": "Souvent associé maïs, mil, sorgho",
+        "weedControl": "Sarclage 2-3 semaines après semis",
+        "diseaseRisks": ["virus mosaïque", "anthracnose"],
+        "pestRisks": ["thrips", "pucerons", "bruches (stockage)"]
+      },
+      "economics": {
+        "costPerHa": {
+          "seeds": 30,
+          "inoculum": 10,
+          "fertilizers": 40,
+          "pesticides": 20,
+          "labor": 100,
+          "total": 200,
+          "currency": "USD"
+        },
+        "revenue": {
+          "pricePerTon": 600,
+          "expectedYield": 1.5,
+          "expectedRevenue": 900,
+          "netProfit": 700,
+          "currency": "USD",
+          "note": "Protéine végétale prisée, prix élevé"
+        }
+      },
+      "educational": {
+        "level": "beginner",
+        "funFacts": [
+          "Culture idéale pour agriculteurs à ressources limitées",
+          "Fixe azote atmosphérique (réduit besoin engrais)",
+          "Feuilles et graines comestibles (riche protéines)",
+          "Tolère sols pauvres et sécheresse (culture Sahel)"
+        ],
+        "commonMistakes": [
+          "Apporter trop d'azote (réduit nodulation)",
+          "Négliger inoculation Rhizobium (1ère culture)",
+          "Semer trop tôt (sol froid <18°C)",
+          "Irrigation excessive (asphyxie racinaire)"
+        ],
+        "tips": [
+          "Inoculer semences avec Rhizobium avant semis",
+          "Associer avec céréales (maïs grimpe sur niébé)",
+          "Récolte échelonnée possible (consommation fraîche)"
+        ]
+      },
+      "media": {
+        "images": [
+          "/assets/images/cowpea-plant.jpg",
+          "/assets/images/cowpea-nodules.jpg",
+          "/assets/images/cowpea-harvest.jpg"
+        ],
+        "audio": {
+          "fr": "/assets/audio/cowpea-fr.mp3",
+          "fon": "/assets/audio/cowpea-fon.mp3"
+        }
+      }
+    },
+    {
+      "id": "rice",
+      "names": {
+        "fr": "Riz",
+        "en": "Rice",
+        "local": {
+          "fon": "Oryza",
+          "wolof": "Céréb"
+        }
+      },
+      "category": "cereal",
+      "icon": "/assets/icons/rice.svg",
+      "difficulty": 3,
+      "yields": {
+        "min": 2.0,
+        "average": 4.5,
+        "max": 8.0,
+        "unit": "t/ha",
+        "context": {
+          "rainfed": 2.8,
+          "irrigated": 5.5,
+          "benin": 3.2
+        }
+      },
+      "growth": {
+        "durationDays": {
+          "min": 100,
+          "typical": 130,
+          "max": 160
+        },
+        "stages": [
+          {"name": "germination", "days": 10, "description": "Pépinière"},
+          {"name": "tallage", "days": 30, "description": "Développement talles"},
+          {"name": "montaison", "days": 25, "description": "Élongation entre-nœuds"},
+          {"name": "épiaison", "days": 15, "description": "Sortie panicules"},
+          {"name": "floraison", "days": 10, "description": "Fécondation"},
+          {"name": "maturation", "days": 40, "description": "Remplissage grains"}
+        ]
+      },
+      "waterRequirements": {
+        "totalMm": 1500,
+        "irrigated": "Lame d'eau 5-15 cm permanente",
+        "rainfed": "1200-2000 mm",
+        "criticalStages": ["tallage", "floraison"],
+        "droughtTolerance": "low (irrigué), medium (pluvial)"
+      },
+      "nutrients": {
+        "NPK": {
+          "N": {
+            "min": 100,
+            "optimal": 120,
+            "max": 150,
+            "unit": "kg/ha",
+            "splitApplications": 3,
+            "timing": ["repiquage (1/3)", "tallage (1/3)", "épiaison (1/3)"]
+          },
+          "P": {
+            "min": 30,
+            "optimal": 45,
+            "max": 60,
+            "unit": "kg/ha",
+            "splitApplications": 1,
+            "timing": ["repiquage"]
+          },
+          "K": {
+            "min": 40,
+            "optimal": 60,
+            "max": 80,
+            "unit": "kg/ha",
+            "splitApplications": 2,
+            "timing": ["repiquage (1/2)", "épiaison (1/2)"]
+          }
+        },
+        "micronutrients": ["Zn", "Fe"],
+        "organicAlternatives": {
+          "compost": "20-25 t/ha",
+          "azolla": "Culture en eau (fixe N)"
+        }
+      },
+      "climate": {
+        "temperature": {
+          "min": 15,
+          "optimal": 28,
+          "max": 38,
+          "unit": "°C",
+          "criticalPhases": {
+            "photosynthèse": "30-35°C optimal",
+            "nuit": ">15°C minimum"
+          }
+        },
+        "rainfall": {
+          "irrigated": "Contrôlé",
+          "rainfed": 1500,
+          "unit": "mm"
+        },
+        "sunlight": "full",
+        "usdaZones": ["9b", "10a"]
+      },
+      "soil": {
+        "pH": {
+          "min": 5.0,
+          "optimal": 6.0,
+          "max": 7.0
+        },
+        "types": ["argileux (irrigué)", "limoneux (pluvial)"],
+        "texture": "Texture fine pour rétention eau (irrigué)",
+        "organicMatter": "2-4%"
+      },
+      "practices": {
+        "rotation": {
+          "previous": ["jachère", "légumineuses"],
+          "following": ["légumes", "maïs"],
+          "avoidAfter": ["riz (min 1 an)"]
+        },
+        "seedingRate": "Pépinière : 40-60 kg/ha",
+        "transplanting": "20-25 jours (2-3 plants/touffe)",
+        "rowSpacing": "20x20 cm ou 25x25 cm",
+        "depth": "2-3 cm (repiquage)",
+        "waterManagement": "Lame 5-10 cm (tallage-floraison), drainage maturation",
+        "weedControl": "Sarclage 15-30 jours, herbicide sélectif",
+        "diseaseRisks": ["pyriculariose", "helminthosporiose"],
+        "pestRisks": ["foreurs de tiges", "criquets"]
+      },
+      "educational": {
+        "level": "intermediate",
+        "funFacts": [
+          "Aliment de base pour 3.5 milliards personnes",
+          "105-150 jours selon variété (courte/longue durée)",
+          "Riz irrigué : 50% production mondiale sur 25% surfaces",
+          "Photosynthèse maximale à 30-35°C"
+        ],
+        "commonMistakes": [
+          "Repiquage trop tardif (>30 jours = tallage faible)",
+          "Lame d'eau excessive (asphyxie racinaire)",
+          "Drainage maturation négligé (grains mal remplis)",
+          "Sur-fertilisation N (verse, maladies)"
+        ],
+        "tips": [
+          "Pépinière protégée 20-25 jours avant repiquage",
+          "Lame eau 5-10 cm tallage-floraison, drainage maturation",
+          "Fractionnement N crucial (3 apports)"
+        ]
+      }
+    },
+    {
+      "id": "cassava",
+      "names": {
+        "fr": "Manioc",
+        "en": "Cassava",
+        "local": {
+          "fon": "Agbeli",
+          "wolof": "Manioc"
+        }
+      },
+      "category": "tuber",
+      "icon": "/assets/icons/cassava.svg",
+      "difficulty": 1,
+      "yields": {
+        "min": 10.0,
+        "average": 17.0,
+        "max": 40.0,
+        "unit": "t/ha",
+        "context": {
+          "africa": 9.2,
+          "benin": 16.0,
+          "potential": 35.0
+        }
+      },
+      "growth": {
+        "durationDays": {
+          "min": 180,
+          "typical": 300,
+          "max": 365
+        },
+        "stages": [
+          {"name": "enracinement", "days": 30, "description": "Développement racines"},
+          {"name": "végétatif", "days": 90, "description": "Croissance aérienne"},
+          {"name": "tubérisation", "days": 120, "description": "Formation tubercules"},
+          {"name": "maturation", "days": 60, "description": "Accumulation amidon"}
+        ]
+      },
+      "waterRequirements": {
+        "totalMm": 1200,
+        "criticalStages": ["3-4 premiers mois"],
+        "irrigationStrategy": "Très tolérant sécheresse après établissement",
+        "droughtTolerance": "very high"
+      },
+      "nutrients": {
+        "NPK": {
+          "N": {
+            "min": 80,
+            "optimal": 100,
+            "max": 120,
+            "unit": "kg/ha",
+            "splitApplications": 2,
+            "timing": ["plantation", "3 mois"]
+          },
+          "P": {
+            "min": 40,
+            "optimal": 60,
+            "max": 80,
+            "unit": "kg/ha",
+            "splitApplications": 1,
+            "timing": ["plantation"]
+          },
+          "K": {
+            "min": 120,
+            "optimal": 150,
+            "max": 180,
+            "unit": "kg/ha",
+            "splitApplications": 2,
+            "timing": ["plantation", "3 mois"],
+            "note": "Extractif élevé en K"
+          }
+        },
+        "micronutrients": ["Mg", "Zn"],
+        "organicAlternatives": {
+          "compost": "15-25 t/ha",
+          "manure": "10-20 t/ha",
+          "tithonia": "5-10 t/ha (Afrique)"
+        }
+      },
+      "climate": {
+        "temperature": {
+          "min": 18,
+          "optimal": 27,
+          "max": 35,
+          "unit": "°C",
+          "soil": "30°C optimal"
+        },
+        "rainfall": {
+          "min": 800,
+          "optimal": 1250,
+          "max": 2000,
+          "unit": "mm"
+        },
+        "altitude": "0-1500m",
+        "sunlight": "full ou mi-ombre"
+      },
+      "soil": {
+        "pH": {
+          "min": 4.5,
+          "optimal": 6.0,
+          "max": 8.0
+        },
+        "types": ["limoneux (préféré)", "sableux", "argileux léger"],
+        "texture": "Sols pauvres tolérés, drainage essentiel",
+        "organicMatter": "1-3%"
+      },
+      "practices": {
+        "rotation": {
+          "previous": ["jachère", "légumineuses"],
+          "following": ["céréales", "légumineuses"],
+          "benefits": "Culture nettoyante, améliore structure"
+        },
+        "plantingMaterial": "Boutures 20-25 cm (tiges matures)",
+        "plantingDensity": "10,000 plants/ha (1m x 1m)",
+        "depth": "5-10 cm incliné",
+        "weedControl": "Sarclage 1-2 fois (3 premiers mois)",
+        "hilling": "Buttage favorise tubérisation",
+        "harvest": "9-12 mois (max amidon 10-12 mois)",
+        "diseaseRisks": ["mosaïque", "bactériose"],
+        "pestRisks": ["acariens", "cochenilles"]
+      },
+      "educational": {
+        "level": "beginner",
+        "funFacts": [
+          "Culture pérenne africaine majeure (50% production mondiale)",
+          "Très tolérant sécheresse et sols pauvres",
+          "Potentiel 30-40 t/ha (variétés améliorées)",
+          "Récolte flexible 6-18 mois selon besoin"
+        ],
+        "commonMistakes": [
+          "Boutures trop jeunes ou trop vieilles",
+          "Plantation trop profonde (>10 cm)",
+          "Négliger buttage (tubérisation faible)",
+          "Récolte précoce (<9 mois = faible rendement)"
+        ],
+        "tips": [
+          "Boutures de tiges matures (6-12 mois)",
+          "Plantation début saison pluies",
+          "Buttage améliore rendement +30%",
+          "Récolte échelonnée possible"
+        ]
+      }
+    },
+    {
+      "id": "potato",
+      "names": {
+        "fr": "Pomme de terre",
+        "en": "Potato",
+        "local": {
+          "fon": "Patata",
+          "wolof": "Pomme"
+        }
+      },
+      "category": "tuber",
+      "icon": "/assets/icons/potato.svg",
+      "difficulty": 3,
+      "yields": {
+        "min": 15.0,
+        "average": 30.0,
+        "max": 70.0,
+        "unit": "t/ha",
+        "context": {
+          "beginner": 25.0,
+          "experienced": 50.0
+        }
+      },
+      "growth": {
+        "durationDays": {
+          "min": 60,
+          "typical": 100,
+          "max": 130
+        },
+        "stages": [
+          {"name": "germination", "days": 15, "description": "Levée"},
+          {"name": "végétatif", "days": 30, "description": "Croissance fanes"},
+          {"name": "tubérisation", "days": 35, "description": "Formation tubercules"},
+          {"name": "maturation", "days": 20, "description": "Grossissement"}
+        ]
+      },
+      "waterRequirements": {
+        "totalMm": 600,
+        "criticalStages": ["tubérisation", "grossissement"],
+        "irrigationStrategy": "Régularité cruciale, éviter stress hydrique",
+        "droughtTolerance": "low"
+      },
+      "nutrients": {
+        "NPK": {
+          "N": {
+            "min": 120,
+            "optimal": 150,
+            "max": 180,
+            "unit": "kg/ha",
+            "splitApplications": 2,
+            "timing": ["plantation", "buttage"]
+          },
+          "P": {
+            "min": 80,
+            "optimal": 100,
+            "max": 120,
+            "unit": "kg/ha",
+            "splitApplications": 1,
+            "timing": ["plantation"]
+          },
+          "K": {
+            "min": 150,
+            "optimal": 200,
+            "max": 250,
+            "unit": "kg/ha",
+            "splitApplications": 2,
+            "timing": ["plantation", "buttage"],
+            "note": "Très gourmand en potassium"
+          }
+        },
+        "micronutrients": ["Mg", "Ca", "B"],
+        "formule": "15-15-15 au semis courante"
+      },
+      "climate": {
+        "temperature": {
+          "min": 5,
+          "optimal": 18,
+          "max": 25,
+          "unit": "°C",
+          "soil": "15°C minimum plantation"
+        },
+        "rainfall": {
+          "min": 400,
+          "optimal": 600,
+          "max": 800,
+          "unit": "mm"
+        },
+        "sunlight": "full",
+        "frost": "Sensible gel"
+      },
+      "soil": {
+        "pH": {
+          "min": 5.0,
+          "optimal": 6.0,
+          "max": 6.5
+        },
+        "types": ["limoneux-sableux", "sableux"],
+        "texture": "Meuble, bien drainé, profond",
+        "organicMatter": "3-5%"
+      },
+      "practices": {
+        "rotation": {
+          "previous": ["céréales", "prairies"],
+          "following": ["céréales", "légumes"],
+          "avoidAfter": ["solanacées (tomate, aubergine)"],
+          "minRotation": "3-4 ans"
+        },
+        "plantingMaterial": "Plants certifiés sans virus",
+        "plantingDensity": "40,000-50,000 tubercules/ha",
+        "rowSpacing": "70-80 cm",
+        "plantSpacing": "25-35 cm",
+        "depth": "10-15 cm",
+        "hilling": "Buttage progressif (protection lumière)",
+        "harvest": "Fanes sèches, peau résistante",
+        "diseaseRisks": ["mildiou", "alternariose", "virus"],
+        "pestRisks": ["doryphore", "nématodes"]
+      },
+      "educational": {
+        "level": "intermediate",
+        "funFacts": [
+          "4ème culture alimentaire mondiale",
+          "Tubercule = tige souterraine modifiée",
+          "Lumière → verdissement (solanine toxique)",
+          "Plants certifiés essentiels (sans virus)"
+        ],
+        "commonMistakes": [
+          "Plantation sol <15°C (germination lente)",
+          "Buttage insuffisant (tubercules verts)",
+          "Irrigation irrégulière (tubercules difformes)",
+          "Rotation <3 ans (maladies sol)"
+        ],
+        "tips": [
+          "Buttage progressif empêche verdissement",
+          "Plants certifiés = +30% rendement",
+          "Récolte fanes sèches pour conservation"
+        ]
+      }
+    }
+  ],
+
+  "gameLevels": [
+    {
+      "id": 1,
+      "name": "Apprenti Agriculteur",
+      "crop": "maize",
+      "difficulty": "beginner",
+      "unlockCost": 0,
+      "targetYield": {
+        "min": 3.0,
+        "good": 4.0,
+        "excellent": 5.0,
+        "unit": "t/ha"
+      },
+      "parameters": {
+        "irrigation": "simplified",
+        "npk": "fixed_dose",
+        "pH": "auto"
+      },
+      "rewards": {
+        "baseCoins": 50,
+        "bonusGood": 20,
+        "bonusExcellent": 40,
+        "xp": 100
+      },
+      "tutorial": true
+    },
+    {
+      "id": 2,
+      "name": "Cultivateur",
+      "crop": "cowpea",
+      "difficulty": "beginner",
+      "unlockCost": 100,
+      "targetYield": {
+        "min": 0.8,
+        "good": 1.2,
+        "excellent": 1.5,
+        "unit": "t/ha"
+      },
+      "parameters": {
+        "irrigation": "simplified",
+        "npk": "split_2",
+        "pH": "manual"
+      },
+      "rewards": {
+        "baseCoins": 70,
+        "bonusGood": 30,
+        "bonusExcellent": 50,
+        "xp": 150
+      }
+    },
+    {
+      "id": 3,
+      "name": "Producteur",
+      "crop": "rice",
+      "difficulty": "intermediate",
+      "unlockCost": 300,
+      "targetYield": {
+        "min": 3.0,
+        "good": 4.5,
+        "excellent": 6.0,
+        "unit": "t/ha"
+      },
+      "parameters": {
+        "irrigation": "advanced",
+        "npk": "split_3",
+        "pH": "manual",
+        "waterManagement": "precise"
+      },
+      "rewards": {
+        "baseCoins": 100,
+        "bonusGood": 50,
+        "bonusExcellent": 80,
+        "xp": 250
+      }
+    },
+    {
+      "id": 4,
+      "name": "Fermier Confirmé",
+      "crop": "cassava",
+      "difficulty": "intermediate",
+      "unlockCost": 500,
+      "targetYield": {
+        "min": 15.0,
+        "good": 20.0,
+        "excellent": 25.0,
+        "unit": "t/ha"
+      },
+      "parameters": {
+        "irrigation": "moderate",
+        "npk": "split_2",
+        "pH": "auto",
+        "longCycle": true
+      },
+      "rewards": {
+        "baseCoins": 150,
+        "bonusGood": 70,
+        "bonusExcellent": 100,
+        "xp": 300
+      }
+    },
+    {
+      "id": 5,
+      "name": "Expert Maraîcher",
+      "crop": "potato",
+      "difficulty": "expert",
+      "unlockCost": 800,
+      "targetYield": {
+        "min": 25.0,
+        "good": 40.0,
+        "excellent": 60.0,
+        "unit": "t/ha"
+      },
+      "parameters": {
+        "irrigation": "precision",
+        "npk": "custom",
+        "pH": "dynamic",
+        "hillingRequired": true
+      },
+      "rewards": {
+        "baseCoins": 200,
+        "bonusGood": 100,
+        "bonusExcellent": 150,
+        "xp": 500
+      }
+    }
+  ],
+
+  "scoreCalculation": {
+    "formula": "(yield/optimal)*800 + waterEfficiency*100 + npkEfficiency*100 - stressPenalty*50",
+    "maxScore": 1000,
+    "components": {
+      "yieldRatio": {
+        "weight": 0.8,
+        "max": 800,
+        "calculation": "(actualYield / targetYield) * 800"
+      },
+      "waterEfficiency": {
+        "weight": 0.1,
+        "max": 100,
+        "calculation": "100 - (waterUsed - waterOptimal) / waterOptimal * 100"
+      },
+      "npkEfficiency": {
+        "weight": 0.1,
+        "max": 100,
+        "calculation": "100 - (npkUsed - npkOptimal) / npkOptimal * 100"
+      },
+      "stressPenalty": {
+        "waterStress": -50,
+        "nutrientStress": -50,
+        "pHStress": -30,
+        "tempStress": -40
+      }
+    },
+    "stars": {
+      "1star": {"min": 500, "message": "Bon début !"},
+      "2stars": {"min": 700, "message": "Bien joué !"},
+      "3stars": {"min": 900, "message": "Excellent travail !"}
+    }
+  }
+}

@@ -1,0 +1,66 @@
+[
+  {
+    "id": "step_1",
+    "title": "Bienvenue dans IleRise",
+    "icon": "🌍",
+    "content": "<p><strong>Bienvenue, agriculteur spatial !</strong></p><p>AgriVerse est en danger : les cultures échouent et les récoltes sont insuffisantes. Vous êtes la seule personne capable de sauver la planète !</p><p><strong>Votre mission :</strong> Utilisez les données satellites de la NASA pour optimiser vos cultures et nourrir la population d'AgriVerse.</p><p class='tutorial-highlight-text'>💡 Les données NASA sont votre super-pouvoir pour cultiver intelligemment !</p>",
+    "target": null,
+    "pointerPosition": null
+  },
+  {
+    "id": "step_2",
+    "title": "Comprendre les données NASA",
+    "icon": "📡",
+    "content": "<p><strong>La NASA collecte des données satellites en temps réel sur toute la Terre.</strong></p><p>Dans IleRise, vous utiliserez 3 sources principales :</p><ul class='tutorial-list'><li><strong>🌡️ MODIS Terra</strong> - Température de surface</li><li><strong>💧 SMAP L4</strong> - Humidité du sol</li><li><strong>🌾 MODIS NDVI</strong> - Santé de la végétation</li></ul><p>Ces données vous aident à prendre les bonnes décisions agricoles !</p>",
+    "target": ".nasa-panel-enhanced",
+    "pointerPosition": "left"
+  },
+  {
+    "id": "step_3",
+    "title": "Les 5 compétences agricoles",
+    "icon": "🎯",
+    "content": "<p>Pour réussir, vous devez maîtriser <strong>5 compétences clés</strong> :</p><ul class='tutorial-list'><li><strong>💧 Water Management</strong> - Irrigation optimale</li><li><strong>🌿 NPK Management</strong> - Fertilisation équilibrée</li><li><strong>🪨 Soil Management</strong> - Santé du sol</li><li><strong>🔄 Crop Rotation</strong> - Rotation des cultures</li><li><strong>📊 NASA Data Usage</strong> - Interprétation des données</li></ul><p>Chaque décision que vous prenez améliore vos compétences !</p>",
+    "target": null,
+    "pointerPosition": null
+  },
+  {
+    "id": "step_4",
+    "title": "Les curseurs de contrôle",
+    "icon": "🎛️",
+    "content": "<p><strong>Ajustez les paramètres de culture avec les curseurs.</strong></p><p>Vous contrôlez :</p><ul class='tutorial-list'><li><strong>💧 Irrigation</strong> - Quantité d'eau (mm/jour)</li><li><strong>🌿 NPK</strong> - Engrais (kg/ha)</li><li><strong>🌱 Densité</strong> - Plants par hectare</li><li><strong>⏱️ Durée</strong> - Jours de croissance</li></ul><p class='tutorial-highlight-text'>💡 Consultez les recommandations NASA avant d'ajuster !</p>",
+    "target": ".controls-panel",
+    "pointerPosition": "top"
+  },
+  {
+    "id": "step_5",
+    "title": "Lancer la simulation",
+    "icon": "🚀",
+    "content": "<p><strong>Une fois vos paramètres configurés, lancez la simulation !</strong></p><p>Le moteur de simulation calcule :</p><ul class='tutorial-list'><li>📈 L'évolution de la culture sur toute la saison</li><li>🌾 Le rendement final (tonnes/hectare)</li><li>💰 Les pièces gagnées selon votre performance</li><li>⭐ Votre score (max 1000 points)</li></ul><p>La simulation prend en compte les données NASA en temps réel !</p>",
+    "target": "#btn-simulate",
+    "pointerPosition": "top"
+  },
+  {
+    "id": "step_6",
+    "title": "Interpréter les résultats",
+    "icon": "📊",
+    "content": "<p><strong>Après la simulation, analysez vos résultats :</strong></p><ul class='tutorial-list'><li><strong>Avant/Après</strong> - Comparez l'état initial et final</li><li><strong>Timeline</strong> - Évolution jour par jour (NDVI, humidité, NPK)</li><li><strong>Diagnostic</strong> - Identifiez ce qui a bien ou mal fonctionné</li><li><strong>Score</strong> - 1-3 étoiles selon votre performance</li></ul><p class='tutorial-highlight-text'>💡 Utilisez le diagnostic pour vous améliorer au prochain essai !</p>",
+    "target": null,
+    "pointerPosition": null
+  },
+  {
+    "id": "step_7",
+    "title": "Système de vies",
+    "icon": "❤️",
+    "content": "<p><strong>Vous disposez de 5 vies au départ.</strong></p><p>Vous perdez 1 vie si :</p><ul class='tutorial-list'><li>❌ Votre rendement est inférieur à 50% de l'objectif</li><li>❌ Vous ne suivez pas les recommandations NASA critiques</li><li>❌ Votre culture meurt (NDVI < 0.2)</li></ul><p>💰 <strong>Récupérez des vies</strong> en dépensant 50 pièces.</p><p class='tutorial-highlight-text'>⚠️ À 0 vie, la partie est terminée !</p>",
+    "target": "#game-lives",
+    "pointerPosition": "bottom"
+  },
+  {
+    "id": "step_8",
+    "title": "Déverrouillage des niveaux",
+    "icon": "🔓",
+    "content": "<p><strong>Progressez pour débloquer de nouvelles cultures !</strong></p><ul class='tutorial-list'><li>🌽 <strong>Maïs</strong> - Débloqué (gratuit)</li><li>🌾 <strong>Blé</strong> - 100 pièces</li><li>🥔 <strong>Pomme de terre</strong> - 200 pièces</li><li>🌻 <strong>Tournesol</strong> - 300 pièces</li></ul><p>Chaque culture a 3 niveaux de difficulté (Débutant, Intermédiaire, Expert).</p><p class='tutorial-highlight-text'>🎉 Vous êtes maintenant prêt à sauver AgriVerse ! Bonne chance !</p>",
+    "target": null,
+    "pointerPosition": null
+  }
+]
