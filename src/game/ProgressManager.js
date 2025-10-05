@@ -7,6 +7,7 @@
 import { CompetenceSystem } from './CompetenceSystem.js';
 import { UnlockSystem } from './UnlockSystem.js';
 import { LivesSystem } from './LivesSystem.js';
+import apiService from '../services/api.js';
 
 export class ProgressManager {
   constructor() {
@@ -19,6 +20,8 @@ export class ProgressManager {
       progress: 'ilerise_progress',
       stats: 'ilerise_stats'
     };
+
+    this.syncPending = false;
   }
 
   /**
@@ -32,6 +35,13 @@ export class ProgressManager {
     }
 
     // Nouvelle progression
+    return this.getDefaultProgress();
+  }
+
+  /**
+   * Obtenir la progression par défaut
+   */
+  getDefaultProgress() {
     return {
       // Historique des parties par niveau
       // Format: { "maize_1": [game1, game2, ...], "maize_2": [...] }
@@ -64,6 +74,112 @@ export class ProgressManager {
   }
 
   /**
+   * Charger la progression depuis le backend
+   */
+  async loadFromBackend() {
+    if (!apiService.isAuthenticated()) {
+      console.log('Non connecté, utilisation du localStorage uniquement');
+      return this.loadPlayerProgress();
+    }
+
+    try {
+      const response = await apiService.getProfile();
+
+      if (response.success && response.data) {
+        const backendProgress = this.convertBackendToLocalProgress(response.data);
+
+        // Sauvegarder en local pour la cohérence
+        this.saveProgress(backendProgress);
+
+        console.log('✅ Progression chargée depuis le backend');
+        return backendProgress;
+      }
+    } catch (error) {
+      console.warn('⚠️ Erreur chargement backend, utilisation du localStorage:', error.message);
+      return this.loadPlayerProgress();
+    }
+
+    return this.loadPlayerProgress();
+  }
+
+  /**
+   * Convertir les données backend au format local
+   */
+  convertBackendToLocalProgress(backendData) {
+    const progress = this.getDefaultProgress();
+
+    // Extraire la progression globale
+    const globalProgress = backendData.progress?.find(p => p.cropId === null);
+
+    if (globalProgress) {
+      // Niveaux débloqués
+      if (globalProgress.completedLevels?.length > 0) {
+        progress.unlockedLevels = [...new Set([
+          'maize_1',
+          ...globalProgress.completedLevels
+        ])];
+      }
+
+      // Stats de compétences
+      if (globalProgress.competenceStats) {
+        Object.keys(globalProgress.competenceStats).forEach(comp => {
+          if (progress.competenceStats[comp]) {
+            const backendStats = globalProgress.competenceStats[comp];
+            progress.competenceStats[comp] = {
+              best: backendStats.best || 0,
+              average: backendStats.average || 0,
+              total: backendStats.total || 0
+            };
+          }
+        });
+      }
+    }
+
+    // Historique depuis History
+    if (backendData.history?.length > 0) {
+      backendData.history.forEach(entry => {
+        if (entry.action === 'game_played' && entry.details) {
+          const { cropId, levelId, score, stars, yield: yieldValue, coinsEarned, duration } = entry.details;
+          const levelKey = `${cropId}_${levelId}`;
+
+          if (!progress.levelHistory[levelKey]) {
+            progress.levelHistory[levelKey] = [];
+          }
+
+          progress.levelHistory[levelKey].push({
+            timestamp: new Date(entry.timestamp).getTime(),
+            levelKey,
+            scores: {}, // Scores détaillés non disponibles dans History
+            globalScore: score || 0,
+            stars: stars || 0,
+            details: entry.details,
+            yieldValue: yieldValue || 0,
+            duration: duration || 0
+          });
+        }
+      });
+
+      // Calculer stats globales
+      progress.totalGamesPlayed = backendData.history.filter(h => h.action === 'game_played').length;
+      progress.totalStarsEarned = backendData.history.reduce((sum, h) =>
+        sum + (h.details?.stars || 0), 0
+      );
+    }
+
+    // Cultures débloquées basées sur les niveaux
+    const unlockedCrops = new Set(['maize']);
+    progress.unlockedLevels.forEach(levelKey => {
+      const cropId = levelKey.split('_')[0];
+      unlockedCrops.add(cropId);
+    });
+    progress.unlockedCrops = Array.from(unlockedCrops);
+
+    progress.lastUpdated = Date.now();
+
+    return progress;
+  }
+
+  /**
    * Sauvegarder la progression
    */
   saveProgress(progress) {
@@ -77,7 +193,7 @@ export class ProgressManager {
    * @param {Object} gameData - Donnees de la partie
    * @returns {Object} Resultats et progression mise a jour
    */
-  recordGame(levelKey, gameData) {
+  async recordGame(levelKey, gameData) {
     const progress = this.loadPlayerProgress();
 
     // Utiliser le score et les étoiles déjà calculés si disponibles
@@ -119,14 +235,54 @@ export class ProgressManager {
     // Verifier deverrouillages
     const unlockResults = this.checkUnlocks(progress, levelKey);
 
-    // Sauvegarder
+    // Sauvegarder en local d'abord
     this.saveProgress(progress);
+
+    // Synchroniser avec le backend (non bloquant)
+    this.syncGameToBackend(levelKey, gameRecord, gameData).catch(err =>
+      console.warn('⚠️ Sync backend échouée:', err.message)
+    );
 
     return {
       game: gameRecord,
       unlocks: unlockResults,
       progress: this.getProgressSummary(progress)
     };
+  }
+
+  /**
+   * Synchroniser une partie avec le backend
+   */
+  async syncGameToBackend(levelKey, gameRecord, originalGameData) {
+    if (!apiService.isAuthenticated()) {
+      return;
+    }
+
+    try {
+      const [cropId, levelId] = levelKey.split('_');
+
+      // Sauvegarder la session de jeu
+      await apiService.saveGameSession({
+        cropId,
+        levelId: parseInt(levelId),
+        location: originalGameData.location || 'unknown',
+        score: gameRecord.globalScore,
+        stars: gameRecord.stars,
+        yieldValue: gameRecord.yieldValue,
+        parameters: originalGameData.parameters || {},
+        stressFactors: originalGameData.stressFactors || {},
+        coinsEarned: originalGameData.coinsEarned || 0,
+        duration: gameRecord.duration
+      });
+
+      // Synchroniser le profil complet
+      await this.syncWithBackend();
+
+      console.log('✅ Partie synchronisée avec le backend');
+    } catch (error) {
+      console.error('❌ Erreur sync partie:', error);
+      throw error;
+    }
   }
 
   /**
@@ -368,15 +524,111 @@ export class ProgressManager {
   }
 
   /**
-   * Synchroniser avec l'API backend (futur)
+   * Synchroniser avec l'API backend
    */
-  async syncWithBackend(userId) {
-    // TODO: Implementation API
-    console.log('Backend sync not yet implemented');
+  async syncWithBackend() {
+    if (!apiService.isAuthenticated()) {
+      console.log('Non connecté, synchronisation ignorée');
+      return { success: false, message: 'Non connecté' };
+    }
+
+    if (this.syncPending) {
+      console.log('Synchronisation déjà en cours');
+      return { success: false, message: 'Sync en cours' };
+    }
+
+    this.syncPending = true;
+
+    try {
+      const progress = this.loadPlayerProgress();
+      const profileData = this.convertLocalToBackendFormat(progress);
+
+      const response = await apiService.syncProfile(profileData);
+
+      if (response.success) {
+        console.log('✅ Progression synchronisée avec le backend');
+        this.syncPending = false;
+        return { success: true, data: response.data };
+      }
+
+      this.syncPending = false;
+      return { success: false, message: 'Erreur de synchronisation' };
+    } catch (error) {
+      console.error('❌ Erreur sync backend:', error);
+      this.syncPending = false;
+      return { success: false, message: error.message };
+    }
+  }
+
+  /**
+   * Convertir la progression locale au format backend
+   */
+  convertLocalToBackendFormat(progress) {
+    // Créer la liste des niveaux complétés
+    const completedLevels = [];
+    Object.keys(progress.levelHistory).forEach(levelKey => {
+      const history = progress.levelHistory[levelKey];
+      const hasWon = history.some(game => game.stars >= 2);
+
+      if (hasWon) {
+        completedLevels.push(levelKey);
+      }
+    });
+
+    // Formater les stats de compétences pour le backend
+    const competenceStats = {};
+    Object.keys(progress.competenceStats).forEach(comp => {
+      const stats = progress.competenceStats[comp];
+      competenceStats[comp] = {
+        best: stats.best || 0,
+        average: stats.average || 0,
+        total: stats.total || 0,
+        goodScores: progress.totalGamesPlayed > 0 ?
+          Math.round((stats.average / 100) * progress.totalGamesPlayed) : 0,
+        totalGames: progress.totalGamesPlayed
+      };
+    });
+
     return {
-      success: false,
-      message: 'Backend API en cours de developpement'
+      completedLevels,
+      competenceStats,
+      highScores: this.extractHighScores(progress),
+      coins: this.getTotalCoins(progress)
     };
+  }
+
+  /**
+   * Extraire les meilleurs scores par niveau
+   */
+  extractHighScores(progress) {
+    const highScores = {};
+
+    Object.keys(progress.levelHistory).forEach(levelKey => {
+      const history = progress.levelHistory[levelKey];
+      const bestGame = history.reduce((best, game) =>
+        game.globalScore > (best?.globalScore || 0) ? game : best
+      , null);
+
+      if (bestGame) {
+        highScores[levelKey] = {
+          score: bestGame.globalScore,
+          stars: bestGame.stars,
+          yield: bestGame.yieldValue,
+          timestamp: bestGame.timestamp
+        };
+      }
+    });
+
+    return highScores;
+  }
+
+  /**
+   * Calculer le total de pièces gagnées (estimation)
+   */
+  getTotalCoins(progress) {
+    // Les pièces sont gérées ailleurs, retourner 0 pour éviter les conflits
+    // Le backend utilisera sa propre source de vérité pour les pièces
+    return 0;
   }
 }
 

@@ -2332,6 +2332,21 @@ class IleRiseApp {
     // 💚 Initialiser le système de vies avec synchronisation backend
     if (token) {
       await this.engine.livesSystem.initialize();
+
+      // 🔄 Charger la progression depuis le backend
+      try {
+        await this.engine.progressManager.loadFromBackend();
+        console.log('✅ Progression chargée depuis le serveur');
+      } catch (error) {
+        console.warn('⚠️ Impossible de charger la progression depuis le serveur:', error.message);
+      }
+
+      // 💰 Synchroniser les pièces du joueur depuis le backend
+      try {
+        await this.engine.syncPlayerFromBackend();
+      } catch (error) {
+        console.warn('⚠️ Impossible de synchroniser les pièces:', error.message);
+      }
     }
 
     // Mettre à jour l'UI
@@ -2364,6 +2379,21 @@ class IleRiseApp {
 
           // 💚 Initialiser le système de vies avec synchronisation backend
           await this.engine.livesSystem.initialize();
+
+          // 🔄 Charger la progression depuis le backend
+          try {
+            await this.engine.progressManager.loadFromBackend();
+            console.log('✅ Progression restaurée depuis le serveur');
+          } catch (error) {
+            console.warn('⚠️ Impossible de charger la progression:', error.message);
+          }
+
+          // 💰 Synchroniser les pièces du joueur depuis le backend
+          try {
+            await this.engine.syncPlayerFromBackend();
+          } catch (error) {
+            console.warn('⚠️ Impossible de synchroniser les pièces:', error.message);
+          }
         } catch (error) {
           console.error('❌ Token invalide ou expiré:', error.message);
           // Le token sera nettoyé par l'événement auth:expired

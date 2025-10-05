@@ -99,6 +99,38 @@ export class GameEngine {
   }
 
   /**
+   * Synchroniser les données du joueur depuis le backend
+   */
+  async syncPlayerFromBackend() {
+    if (!apiService.isAuthenticated()) {
+      console.log('Non connecté, synchronisation joueur ignorée');
+      return false;
+    }
+
+    try {
+      const response = await apiService.getProfile();
+
+      if (response.success && response.data && response.data.user) {
+        const backendUser = response.data.user;
+
+        // Mettre à jour les pièces depuis le backend
+        this.player.coins = backendUser.coins || 0;
+
+        // Sauvegarder localement
+        this.savePlayerData();
+
+        console.log('✅ Pièces synchronisées depuis le backend:', this.player.coins);
+        return true;
+      }
+
+      return false;
+    } catch (error) {
+      console.error('❌ Erreur sync joueur depuis backend:', error);
+      return false;
+    }
+  }
+
+  /**
    * Charger données NASA
    */
   async loadNASAData() {
@@ -331,17 +363,22 @@ export class GameEngine {
 
     console.log('🎮 completeLevel - fullGameData fusionné:', fullGameData);
 
-    // Enregistrer la partie dans ProgressManager
-    const result = this.progressManager.recordGame(
+    // Calculer recompenses en pieces AVANT recordGame pour l'inclure dans la sync
+    const coins = this.calculateCoinsReward(fullGameData.globalScore || 0, fullGameData.stars || 0);
+    console.log('💰 Pièces calculées:', coins, 'depuis score:', fullGameData.globalScore, 'stars:', fullGameData.stars);
+
+    // Ajouter les pièces gagnées aux données
+    fullGameData.coinsEarned = coins;
+
+    // Enregistrer la partie dans ProgressManager (avec await car c'est async maintenant)
+    const result = await this.progressManager.recordGame(
       this.currentGame.levelKey,
       fullGameData
     );
 
     console.log('🎮 completeLevel - result de recordGame:', result);
 
-    // Calculer recompenses en pieces
-    const coins = this.calculateCoinsReward(result.game.globalScore, result.game.stars);
-    console.log('💰 Pièces calculées:', coins, 'depuis score:', result.game.globalScore, 'stars:', result.game.stars);
+    // Ajouter les pièces au joueur local
     this.addCoins(coins);
 
     // 🆕 Vérifier les succès consécutifs pour carte de savoir
