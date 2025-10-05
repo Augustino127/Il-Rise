@@ -1,0 +1,14 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/game.html",
+      "destination": "/game.html"
+    },
+    {
+      "source": "/game-v3.html",
+      "destination": "/gameV3.html"
+    }
+  ]
+}
