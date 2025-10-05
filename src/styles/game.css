@@ -608,6 +608,30 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-md);
+  position: sticky;
+  top: 20px;
+  align-self: flex-start;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--vert-principal) transparent;
+}
+
+.game-left-column::-webkit-scrollbar {
+  width: 6px;
+}
+
+.game-left-column::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.game-left-column::-webkit-scrollbar-thumb {
+  background: var(--vert-principal);
+  border-radius: 3px;
+}
+
+.game-left-column::-webkit-scrollbar-thumb:hover {
+  background: var(--vert-fonce);
 }
 
 .canvas-wrapper {

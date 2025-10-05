@@ -34,6 +34,10 @@ export class LivesSystem {
       this.startAutoSync();
     } else {
       console.log('💾 LivesSystem - Mode local');
+      // Charger et régénérer les vies localement
+      const data = this.loadLivesData();
+      this.regenerateLives(data);
+      console.log(`💾 Vies locales: ${data.lives}/${this.MAX_LIVES}`);
     }
   }
 

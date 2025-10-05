@@ -109,7 +109,7 @@ export class FarmV3Adapter {
    * Initialiser la scène 3D
    */
   init3DScene() {
-    const container = document.getElementById('farm-scene-container-v3');
+    const container = document.getElementById('farm-scene-container');
     if (!container) {
       console.warn('⚠️ Conteneur 3D non trouvé');
       return;
@@ -133,12 +133,12 @@ export class FarmV3Adapter {
    */
   setupEventListeners() {
     // Bouton retour
-    document.getElementById('btn-back-farm-v3')?.addEventListener('click', () => {
+    document.getElementById('btn-back-farm')?.addEventListener('click', () => {
       this.exitFarmMode();
     });
 
     // Sélecteur de culture
-    document.getElementById('crop-select-v3')?.addEventListener('change', (e) => {
+    document.getElementById('crop-select')?.addEventListener('change', (e) => {
       const cropId = e.target.value;
       if (cropId) {
         this.selectedCropId = cropId;
@@ -148,26 +148,26 @@ export class FarmV3Adapter {
     });
 
     // Contrôles temps
-    document.getElementById('btn-pause-v3')?.addEventListener('click', () => {
+    document.getElementById('btn-pause')?.addEventListener('click', () => {
       this.farmGame.togglePause();
     });
 
-    document.getElementById('btn-next-day-v3')?.addEventListener('click', () => {
+    document.getElementById('btn-next-day')?.addEventListener('click', () => {
       this.farmGame.skipToNextDay();
     });
 
     // Vitesse simulation
-    document.querySelectorAll('#screen-farm-v3 .speed-btn').forEach(btn => {
+    document.querySelectorAll('#screen-farm .speed-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const speed = parseInt(e.target.dataset.speed);
         this.farmGame.timeSimulation.setSpeed(speed);
-        document.querySelectorAll('#screen-farm-v3 .speed-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('#screen-farm .speed-btn').forEach(b => b.classList.remove('active'));
         e.target.classList.add('active');
       });
     });
 
     // Sélection parcelle
-    document.querySelectorAll('#screen-farm-v3 .plot-mini').forEach(plotBtn => {
+    document.querySelectorAll('#screen-farm .plot-mini').forEach(plotBtn => {
       plotBtn.addEventListener('click', (e) => {
         const plotId = parseInt(e.currentTarget.dataset.plotId);
         this.selectPlot(plotId);
@@ -175,7 +175,7 @@ export class FarmV3Adapter {
     });
 
     // Navigation sections
-    document.querySelectorAll('#screen-farm-v3 .nav-btn').forEach(btn => {
+    document.querySelectorAll('#screen-farm .nav-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const section = e.currentTarget.dataset.section;
         this.switchSection(section);
@@ -183,11 +183,16 @@ export class FarmV3Adapter {
     });
 
     // Actions agricoles
-    document.querySelectorAll('#screen-farm-v3 .action-btn').forEach(btn => {
+    document.querySelectorAll('#screen-farm .action-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const actionId = e.currentTarget.dataset.action;
         this.executeAction(actionId);
       });
+    });
+
+    // Déblocage poulailler
+    document.getElementById('btn-unlock-coop')?.addEventListener('click', () => {
+      this.unlockCoop();
     });
   }
 
@@ -208,7 +213,7 @@ export class FarmV3Adapter {
 
     document.addEventListener('keydown', (e) => {
       // Uniquement si on est dans l'écran ferme V3
-      const farmScreen = document.getElementById('screen-farm-v3');
+      const farmScreen = document.getElementById('screen-farm');
       if (!farmScreen || !farmScreen.classList.contains('active')) return;
 
       // Ignorer si dans un input, textarea ou select
@@ -273,8 +278,8 @@ export class FarmV3Adapter {
     this.activePlotId = plotId;
     this.farmGame.plotManager.setActivePlot(plotId);
 
-    document.querySelectorAll('#screen-farm-v3 .plot-mini').forEach(p => p.classList.remove('active'));
-    document.querySelector(`#screen-farm-v3 [data-plot-id="${plotId}"]`)?.classList.add('active');
+    document.querySelectorAll('#screen-farm .plot-mini').forEach(p => p.classList.remove('active'));
+    document.querySelector(`#screen-farm [data-plot-id="${plotId}"]`)?.classList.add('active');
 
     this.updatePlotInfo();
     this.updateSoilDisplay();
@@ -316,6 +321,7 @@ export class FarmV3Adapter {
     this.updateInventoryDisplay();
     this.updateActionsAvailability();
     this.updateEventsDisplay();
+    this.updateNASARecommendations();
   }
 
   /**
@@ -323,9 +329,9 @@ export class FarmV3Adapter {
    */
   updateTimeDisplay() {
     const time = this.farmGame.timeSimulation;
-    document.getElementById('display-day-v3').textContent = `Jour ${time.currentDay}`;
-    document.getElementById('display-time-v3').textContent = `${time.currentHour}:00`;
-    document.getElementById('display-season-v3').textContent = time.currentSeason;
+    document.getElementById('display-day').textContent = `Jour ${time.currentDay}`;
+    document.getElementById('display-time').textContent = `${time.currentHour}:00`;
+    document.getElementById('display-season').textContent = time.currentSeason;
   }
 
   /**
@@ -333,8 +339,8 @@ export class FarmV3Adapter {
    */
   updateResourcesDisplay() {
     const resources = this.farmGame.resourceManager.resources;
-    document.getElementById('display-money-v3').textContent = Math.floor(resources.money);
-    document.getElementById('display-water-v3').textContent = `${Math.floor(resources.water)}L`;
+    document.getElementById('display-money').textContent = Math.floor(resources.money);
+    document.getElementById('display-water').textContent = `${Math.floor(resources.water)}L`;
   }
 
   /**
@@ -344,13 +350,13 @@ export class FarmV3Adapter {
     const plot = this.farmGame.plotManager.getActivePlot();
     if (!plot) return;
 
-    document.getElementById('plot-crop-v3').textContent = plot.crop?.name?.fr || 'Vide';
-    document.getElementById('plot-progress-v3').textContent = plot.crop
+    document.getElementById('plot-crop').textContent = plot.crop?.name?.fr || 'Vide';
+    document.getElementById('plot-progress').textContent = plot.crop
       ? `${plot.daysSincePlant}/${plot.crop.growthDuration} jours`
       : '-';
-    document.getElementById('plot-health-v3').querySelector('span:last-child').textContent = `${Math.round(plot.health)}%`;
-    document.getElementById('plot-health-v3').querySelector('.health-fill').style.width = `${plot.health}%`;
-    document.getElementById('plot-stage-v3').textContent = this.farmGame.plotManager.getGrowthStageName(plot.growthStage);
+    document.getElementById('plot-health').querySelector('span:last-child').textContent = `${Math.round(plot.health)}%`;
+    document.getElementById('plot-health').querySelector('.health-fill').style.width = `${plot.health}%`;
+    document.getElementById('plot-stage').textContent = this.farmGame.plotManager.getGrowthStageName(plot.growthStage);
   }
 
   /**
@@ -360,19 +366,19 @@ export class FarmV3Adapter {
     const plot = this.farmGame.plotManager.getActivePlot();
     if (!plot) return;
 
-    document.getElementById('soil-moisture-value-v3').textContent = `${Math.round(plot.soilMoisture)}%`;
-    document.getElementById('soil-moisture-fill-v3').style.width = `${plot.soilMoisture}%`;
+    document.getElementById('soil-moisture-value').textContent = `${Math.round(plot.soilMoisture)}%`;
+    document.getElementById('soil-moisture-fill').style.width = `${plot.soilMoisture}%`;
 
     const npkPercent = (plot.npkLevel / 150) * 100;
-    document.getElementById('soil-npk-value-v3').textContent = `${Math.round(npkPercent)}%`;
-    document.getElementById('soil-npk-fill-v3').style.width = `${npkPercent}%`;
+    document.getElementById('soil-npk-value').textContent = `${Math.round(npkPercent)}%`;
+    document.getElementById('soil-npk-fill').style.width = `${npkPercent}%`;
 
     const phPercent = ((plot.ph - 4) / 4) * 100;
-    document.getElementById('soil-ph-value-v3').textContent = plot.ph.toFixed(1);
-    document.getElementById('soil-ph-fill-v3').style.width = `${phPercent}%`;
+    document.getElementById('soil-ph-value').textContent = plot.ph.toFixed(1);
+    document.getElementById('soil-ph-fill').style.width = `${phPercent}%`;
 
-    document.getElementById('soil-weed-value-v3').textContent = `${Math.round(plot.weedLevel)}%`;
-    document.getElementById('soil-weed-fill-v3').style.width = `${plot.weedLevel}%`;
+    document.getElementById('soil-weed-value').textContent = `${Math.round(plot.weedLevel)}%`;
+    document.getElementById('soil-weed-fill').style.width = `${plot.weedLevel}%`;
 
     if (this.farmScene) {
       this.farmScene.updatePlantConditions(plot.soilMoisture, plot.npkLevel, plot.ph);
@@ -386,19 +392,135 @@ export class FarmV3Adapter {
     const resources = this.farmGame.resourceManager.resources;
 
     const totalSeeds = Object.values(resources.seeds).reduce((a, b) => a + b, 0);
-    document.getElementById('inv-seeds-total-v3').textContent = totalSeeds;
-    document.getElementById('inv-npk-v3').textContent = `${resources.fertilizers.npk}kg`;
-    document.getElementById('inv-compost-v3').textContent = `${resources.fertilizers.organic}kg`;
+    document.getElementById('inv-seeds-total').textContent = totalSeeds;
+    document.getElementById('inv-npk').textContent = `${resources.fertilizers.npk}kg`;
+    document.getElementById('inv-compost').textContent = `${resources.fertilizers.organic}kg`;
 
     const totalHarvest = Object.values(resources.harvest).reduce((a, b) => a + b, 0);
-    document.getElementById('inv-harvest-v3').textContent = `${totalHarvest.toFixed(1)}t`;
+    document.getElementById('inv-harvest').textContent = `${totalHarvest.toFixed(1)}t`;
   }
 
   /**
    * Mettre à jour disponibilité des actions
    */
   updateActionsAvailability() {
-    // À implémenter si besoin
+    const plot = this.farmGame.plotManager.getActivePlot();
+    const resources = this.farmGame.resourceManager.resources;
+
+    if (!plot) return;
+
+    // Parcourir tous les boutons d'actions
+    document.querySelectorAll('#screen-farm .action-btn').forEach(btn => {
+      const actionId = btn.dataset.action;
+      let canExecute = true;
+      let reason = '';
+
+      // Vérifier selon le type d'action
+      switch(actionId) {
+        case 'plow':
+          if (plot.isPlanted) {
+            canExecute = false;
+            reason = 'Parcelle déjà plantée';
+          } else if (resources.money < 20) {
+            canExecute = false;
+            reason = 'Pas assez d\'argent (20💰)';
+          }
+          break;
+
+        case 'plant':
+          if (!plot.isPlowed) {
+            canExecute = false;
+            reason = 'Labour requis';
+          } else if (plot.isPlanted) {
+            canExecute = false;
+            reason = 'Déjà planté';
+          } else if (!this.selectedCropId) {
+            canExecute = false;
+            reason = 'Sélectionnez une culture';
+          }
+          break;
+
+        case 'water':
+          if (!plot.isPlanted) {
+            canExecute = false;
+            reason = 'Aucune culture';
+          } else if (resources.water < 100) {
+            canExecute = false;
+            reason = 'Pas assez d\'eau (100L)';
+          } else if (plot.soilMoisture >= 80) {
+            canExecute = false;
+            reason = 'Sol déjà humide';
+          }
+          break;
+
+        case 'fertilize_npk':
+          if (!plot.isPlanted) {
+            canExecute = false;
+            reason = 'Aucune culture';
+          } else if (resources.fertilizers.npk < 20) {
+            canExecute = false;
+            reason = 'Pas assez de NPK (20kg)';
+          }
+          break;
+
+        case 'fertilize_organic':
+          if (!plot.isPlanted) {
+            canExecute = false;
+            reason = 'Aucune culture';
+          } else if (resources.fertilizers.organic < 30) {
+            canExecute = false;
+            reason = 'Pas assez de compost (30kg)';
+          }
+          break;
+
+        case 'weed':
+          if (!plot.isPlanted) {
+            canExecute = false;
+            reason = 'Aucune culture';
+          } else if (plot.weedLevel < 10) {
+            canExecute = false;
+            reason = 'Pas de mauvaises herbes';
+          } else if (resources.money < 10) {
+            canExecute = false;
+            reason = 'Pas assez d\'argent (10💰)';
+          }
+          break;
+
+        case 'spray_pesticide_natural':
+          if (!plot.isPlanted) {
+            canExecute = false;
+            reason = 'Aucune culture';
+          } else if (resources.pesticides?.natural < 2) {
+            canExecute = false;
+            reason = 'Pas assez de pesticide (2L)';
+          }
+          break;
+
+        case 'harvest':
+          if (!plot.isPlanted) {
+            canExecute = false;
+            reason = 'Aucune culture';
+          } else if (plot.growthStage !== 'mature') {
+            canExecute = false;
+            reason = 'Culture pas mature';
+          } else if (resources.money < 20) {
+            canExecute = false;
+            reason = 'Pas assez d\'argent (20💰)';
+          }
+          break;
+      }
+
+      // Appliquer l'état au bouton
+      if (canExecute) {
+        btn.disabled = false;
+        btn.classList.remove('disabled');
+        btn.title = '';
+      } else {
+        btn.disabled = true;
+        btn.classList.add('disabled');
+        btn.title = reason;
+      }
+    });
   }
 
   /**
@@ -406,7 +528,7 @@ export class FarmV3Adapter {
    */
   updateEventsDisplay() {
     const events = this.farmGame.timeSimulation.getUpcomingEvents();
-    const container = document.getElementById('events-list-v3');
+    const container = document.getElementById('events-list');
     if (!container) return;
 
     container.innerHTML = '';
@@ -430,7 +552,230 @@ export class FarmV3Adapter {
    * Mettre à jour parcelles
    */
   updatePlotsDisplay() {
-    // Mise à jour visuelle des parcelles
+    const plots = this.farmGame.plotManager.plots;
+
+    plots.forEach(plot => {
+      const plotBtn = document.querySelector(`#screen-farm [data-plot-id="${plot.id}"]`);
+      if (!plotBtn) return;
+
+      const iconSpan = plotBtn.querySelector('.plot-icon');
+      if (!iconSpan) return;
+
+      // Mettre à jour l'icône selon l'état
+      if (!plot.unlocked) {
+        iconSpan.textContent = '🔒';
+        plotBtn.classList.add('locked');
+        plotBtn.classList.remove('active');
+      } else if (plot.crop) {
+        // Afficher l'icône de la culture
+        const cropIcons = {
+          'maize': '🌽',
+          'cowpea': '🫘',
+          'rice': '🍚',
+          'cassava': '🥔',
+          'cacao': '🍫',
+          'cotton': '☁️'
+        };
+        iconSpan.textContent = cropIcons[plot.crop.id] || '🌾';
+        plotBtn.classList.remove('locked');
+      } else if (plot.isPlowed) {
+        iconSpan.textContent = '🚜';
+        plotBtn.classList.remove('locked');
+      } else {
+        iconSpan.textContent = '🟫';
+        plotBtn.classList.remove('locked');
+      }
+    });
+  }
+
+  /**
+   * Mettre à jour recommandations NASA
+   */
+  updateNASARecommendations() {
+    const plot = this.farmGame.plotManager.getActivePlot();
+    const nasaData = this.farmGame.nasaData;
+    const container = document.getElementById('nasa-recommendations-content');
+
+    if (!container || !plot) return;
+
+    const recommendations = [];
+
+    // Analyser humidité du sol
+    if (plot.soilMoisture < 30) {
+      recommendations.push({
+        icon: '💧',
+        text: 'Sol sec détecté - Irrigation recommandée',
+        priority: 'high'
+      });
+    } else if (plot.soilMoisture > 80) {
+      recommendations.push({
+        icon: '⚠️',
+        text: 'Sol trop humide - Risque de pourriture',
+        priority: 'medium'
+      });
+    }
+
+    // Analyser NPK
+    if (plot.npkLevel < 50) {
+      recommendations.push({
+        icon: '🧪',
+        text: 'Niveau NPK faible - Fertilisation conseillée',
+        priority: 'high'
+      });
+    }
+
+    // Analyser pH
+    if (plot.ph < 5.5) {
+      recommendations.push({
+        icon: '⚗️',
+        text: 'Sol acide - Application de chaux recommandée',
+        priority: 'medium'
+      });
+    } else if (plot.ph > 7.5) {
+      recommendations.push({
+        icon: '⚗️',
+        text: 'Sol alcalin - Ajout de soufre recommandé',
+        priority: 'medium'
+      });
+    }
+
+    // Analyser mauvaises herbes
+    if (plot.weedLevel > 40) {
+      recommendations.push({
+        icon: '🌿',
+        text: 'Mauvaises herbes élevées - Désherbage urgent',
+        priority: 'high'
+      });
+    }
+
+    // Analyser NDVI (vigueur végétative)
+    if (nasaData.ndvi < 0.3 && plot.isPlanted) {
+      recommendations.push({
+        icon: '🛰️',
+        text: 'NDVI faible - Culture en stress',
+        priority: 'high'
+      });
+    }
+
+    // Analyser température
+    if (nasaData.temperature > 35) {
+      recommendations.push({
+        icon: '🌡️',
+        text: 'Température élevée - Augmenter fréquence d\'arrosage',
+        priority: 'medium'
+      });
+    }
+
+    // Afficher les recommandations
+    container.innerHTML = '';
+
+    if (recommendations.length === 0) {
+      container.innerHTML = `
+        <p class="recommendation-item">
+          <span class="rec-icon">✅</span>
+          <span class="rec-text">Conditions optimales - Continuez ainsi !</span>
+        </p>
+      `;
+    } else {
+      // Trier par priorité (high d'abord)
+      recommendations.sort((a, b) => a.priority === 'high' ? -1 : 1);
+
+      recommendations.forEach(rec => {
+        const recDiv = document.createElement('p');
+        recDiv.className = 'recommendation-item';
+        recDiv.innerHTML = `
+          <span class="rec-icon">${rec.icon}</span>
+          <span class="rec-text">${rec.text}</span>
+        `;
+        container.appendChild(recDiv);
+      });
+    }
+  }
+
+  /**
+   * Débloquer le poulailler
+   */
+  unlockCoop() {
+    const cost = 100;
+    const resources = this.farmGame.resourceManager.resources;
+
+    if (resources.money < cost) {
+      this.showToast('❌ Pas assez d\'argent (100💰 requis)', 'error');
+      return;
+    }
+
+    if (this.farmGame.livestockManager.coopUnlocked) {
+      this.showToast('⚠️ Poulailler déjà débloqué', 'warning');
+      return;
+    }
+
+    // Débiter l'argent
+    this.farmGame.resourceManager.spend('money', cost);
+
+    // Débloquer le poulailler
+    this.farmGame.livestockManager.unlockCoop();
+
+    // Mettre à jour l'affichage
+    const livestockContent = document.getElementById('livestock-content');
+    if (livestockContent) {
+      livestockContent.innerHTML = `
+        <div class="livestock-stats">
+          <div class="stat-card">
+            <span class="stat-icon">🐔</span>
+            <div class="stat-details">
+              <span class="stat-label">Poules</span>
+              <span class="stat-value" id="chicken-count">0</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <span class="stat-icon">🥚</span>
+            <div class="stat-details">
+              <span class="stat-label">Œufs/jour</span>
+              <span class="stat-value" id="eggs-per-day">0</span>
+            </div>
+          </div>
+        </div>
+        <button class="btn-primary" id="btn-buy-chicken">Acheter une poule (50💰)</button>
+      `;
+
+      // Ajouter écouteur pour acheter des poules
+      document.getElementById('btn-buy-chicken')?.addEventListener('click', () => {
+        this.buyChicken();
+      });
+    }
+
+    this.showToast('✅ Poulailler débloqué !', 'success');
+    this.updateResourcesDisplay();
+  }
+
+  /**
+   * Acheter une poule
+   */
+  buyChicken() {
+    const cost = 50;
+    const resources = this.farmGame.resourceManager.resources;
+
+    if (resources.money < cost) {
+      this.showToast('❌ Pas assez d\'argent (50💰)', 'error');
+      return;
+    }
+
+    this.farmGame.resourceManager.spend('money', cost);
+    this.farmGame.livestockManager.addChicken();
+
+    // Mettre à jour l'affichage
+    const chickenCount = document.getElementById('chicken-count');
+    const eggsPerDay = document.getElementById('eggs-per-day');
+
+    if (chickenCount) {
+      chickenCount.textContent = this.farmGame.livestockManager.livestock.chicken.count;
+    }
+    if (eggsPerDay) {
+      eggsPerDay.textContent = this.farmGame.livestockManager.livestock.chicken.count * 0.8;
+    }
+
+    this.showToast('🐔 Poule ajoutée !', 'success');
+    this.updateResourcesDisplay();
   }
 
   /**
