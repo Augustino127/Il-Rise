@@ -1,14 +1,112 @@
 /**
  * LivesSystem.js
- * Systeme de gestion des vies
+ * Systeme de gestion des vies avec synchronisation backend
  * NASA Space Apps Challenge 2025
  */
+
+import apiService from '../services/api.js';
 
 export class LivesSystem {
   constructor() {
     this.MAX_LIVES = 5;
-    this.REGENERATION_TIME = 15 * 60 * 1000; // 15 minutes en ms
+    this.REGENERATION_TIME = 30 * 60 * 1000; // 30 minutes en ms (comme backend)
     this.RESET_HOUR = 0; // Minuit (00:00)
+
+    // État backend
+    this.useBackendSync = false;
+    this.lastServerSync = null;
+    this.syncInterval = null;
+  }
+
+  /**
+   * Initialiser le système de vies
+   * Charge depuis le serveur si authentifié
+   */
+  async initialize() {
+    this.useBackendSync = apiService.isAuthenticated();
+
+    if (this.useBackendSync) {
+      console.log('💚 LivesSystem - Mode synchronisé avec serveur');
+      await this.syncFromServer();
+      this.startAutoSync();
+    } else {
+      console.log('💾 LivesSystem - Mode local');
+    }
+  }
+
+  /**
+   * Synchroniser depuis le serveur
+   */
+  async syncFromServer() {
+    try {
+      const response = await apiService.getProfile();
+
+      if (response.success && response.data.user) {
+        const serverLives = response.data.user.lives;
+        const serverLastRegen = new Date(response.data.user.lastLifeRegen);
+
+        // Mettre à jour localStorage avec données serveur
+        const data = {
+          lives: serverLives,
+          lastRegenTime: serverLastRegen.getTime(),
+          lastResetDate: new Date().toDateString(),
+          syncedFromServer: true
+        };
+
+        this.saveLivesData(data);
+        this.lastServerSync = new Date();
+
+        console.log(`💚 Vies synchronisées depuis serveur: ${serverLives}/${this.MAX_LIVES}`);
+        return data;
+      }
+    } catch (error) {
+      console.error('❌ Erreur sync vies depuis serveur:', error);
+      // Fallback sur localStorage
+    }
+  }
+
+  /**
+   * Synchroniser vers le serveur
+   */
+  async syncToServer(lives) {
+    if (!this.useBackendSync) return;
+
+    try {
+      // Le backend gère automatiquement via User.save()
+      // On met juste à jour le profil
+      await apiService.syncProfile({
+        // Les vies sont gérées côté serveur
+        // On envoie juste un ping pour trigger la régénération
+      });
+
+      this.lastServerSync = new Date();
+    } catch (error) {
+      console.error('❌ Erreur sync vies vers serveur:', error);
+    }
+  }
+
+  /**
+   * Démarrer la synchronisation automatique
+   */
+  startAutoSync() {
+    if (this.syncInterval) {
+      clearInterval(this.syncInterval);
+    }
+
+    // Sync toutes les 60 secondes
+    this.syncInterval = setInterval(async () => {
+      await this.syncFromServer();
+    }, 60000);
+  }
+
+  /**
+   * Arrêter la synchronisation
+   */
+  stopAutoSync() {
+    if (this.syncInterval) {
+      clearInterval(this.syncInterval);
+      this.syncInterval = null;
+    }
   }
 
   /**
@@ -29,10 +127,28 @@ export class LivesSystem {
   }
 
   /**
+   * Obtenir la clé localStorage spécifique à l'utilisateur
+   */
+  getLivesStorageKey() {
+    // Utiliser l'email de l'utilisateur connecté ou 'guest'
+    const userStr = localStorage.getItem('ilerise_user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        return `ilerise_lives_${user.email || user.id || 'guest'}`;
+      } catch (e) {
+        return 'ilerise_lives_guest';
+      }
+    }
+    return 'ilerise_lives_guest';
+  }
+
+  /**
    * Charger donnees de vies depuis localStorage
    */
   loadLivesData() {
-    const saved = localStorage.getItem('ilerise_lives');
+    const storageKey = this.getLivesStorageKey();
+    const saved = localStorage.getItem(storageKey);
 
     if (saved) {
       return JSON.parse(saved);
@@ -50,7 +166,8 @@ export class LivesSystem {
    * Sauvegarder donnees de vies
    */
   saveLivesData(data) {
-    localStorage.setItem('ilerise_lives', JSON.stringify(data));
+    const storageKey = this.getLivesStorageKey();
+    localStorage.setItem(storageKey, JSON.stringify(data));
   }
 
   /**
@@ -86,7 +203,37 @@ export class LivesSystem {
    * Utiliser une vie
    * @returns {boolean} True si vie utilisee, false si plus de vies
    */
-  useLife() {
+  async useLife() {
+    // Si mode backend, utiliser l'endpoint dédié
+    if (this.useBackendSync) {
+      try {
+        const response = await fetch('http://localhost:5000/api/user/use-life', {
+          method: 'POST',
+          headers: apiService.getHeaders()
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          // Mettre à jour localStorage
+          const data = this.loadLivesData();
+          data.lives = result.data.lives;
+          data.lastRegenTime = new Date(result.data.lastLifeRegen).getTime();
+          this.saveLivesData(data);
+
+          console.log(`💚 Vie utilisée (serveur): ${data.lives}/${this.MAX_LIVES}`);
+          return true;
+        } else {
+          console.warn('⚠️ Pas assez de vies sur le serveur');
+          return false;
+        }
+      } catch (error) {
+        console.error('❌ Erreur utilisation vie serveur, fallback local:', error);
+        // Fallback sur local
+      }
+    }
+
+    // Mode local ou fallback
     const data = this.loadLivesData();
     this.regenerateLives(data);
 

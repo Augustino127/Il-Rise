@@ -95,7 +95,7 @@ export class GameManager {
   /**
    * Jouer niveau actuel
    */
-  playLevel() {
+  async playLevel() {
     if (!this.currentLevel) {
       return {
         success: false,
@@ -104,7 +104,8 @@ export class GameManager {
     }
 
     // Consommer une vie
-    if (!this.engine.useLife()) {
+    const lifeUsed = await this.engine.useLife();
+    if (!lifeUsed) {
       return {
         success: false,
         message: 'Plus de vies disponibles'

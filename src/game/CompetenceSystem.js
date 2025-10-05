@@ -14,10 +14,11 @@ export class CompetenceSystem {
       nasa: { name: 'NASA Data Usage', weight: 0.15, emoji: '🛰️' }
     };
 
+    // 🆕 Seuils ajustés pour une meilleure accessibilité
     this.starThresholds = {
-      1: { min: 0, max: 50 },   // 1 etoile - Echec
-      2: { min: 50, max: 75 },  // 2 etoiles - Moyen
-      3: { min: 75, max: 100 }  // 3 etoiles - Excellent
+      1: { min: 0, max: 45 },   // 1 étoile - Débutant (0-44%)
+      2: { min: 45, max: 70 },  // 2 étoiles - Bon (45-69%)
+      3: { min: 70, max: 100 }  // 3 étoiles - Excellent (70-100%)
     };
   }
 

@@ -80,8 +80,20 @@ export class ProgressManager {
   recordGame(levelKey, gameData) {
     const progress = this.loadPlayerProgress();
 
-    // Calculer le score par competences
-    const scoreResult = this.competenceSystem.calculateCompetenceScore(gameData);
+    // Utiliser le score et les étoiles déjà calculés si disponibles
+    let scoreResult;
+    if (gameData.globalScore !== undefined && gameData.stars !== undefined) {
+      // Utiliser directement les données passées
+      scoreResult = {
+        scores: gameData.scores || {},
+        globalScore: gameData.globalScore,
+        stars: gameData.stars,
+        details: gameData.details || {}
+      };
+    } else {
+      // Calculer le score par competences (ancien comportement)
+      scoreResult = this.competenceSystem.calculateCompetenceScore(gameData);
+    }
 
     // Creer l'entree de partie
     const gameRecord = {
@@ -90,7 +102,9 @@ export class ProgressManager {
       scores: scoreResult.scores,
       globalScore: scoreResult.globalScore,
       stars: scoreResult.stars,
-      details: scoreResult.details
+      details: scoreResult.details,
+      yieldValue: gameData.actualYield || gameData.yieldValue || 0,
+      duration: gameData.duration || 0
     };
 
     // Ajouter a l'historique

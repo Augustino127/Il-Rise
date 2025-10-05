@@ -5,9 +5,10 @@
  */
 
 export class NASARecommendations {
-  constructor(crop, nasaData) {
+  constructor(crop, nasaData, levelData = null) {
     this.crop = crop;
     this.nasaData = nasaData;
+    this.levelData = levelData;
   }
 
   /**
@@ -76,6 +77,17 @@ export class NASARecommendations {
     const optimalMoisture = this.crop.waterNeed.optimal;
     const gap = currentMoisture - optimalMoisture;
 
+    // Calculer le multiplicateur de difficulté basé sur targetYield
+    let difficultyMultiplier = 1.0;
+    if (this.levelData?.targetYield) {
+      // Utiliser levelData.maxYield si disponible, sinon crop.maxYield
+      const levelMaxYield = this.levelData.maxYield || this.crop.maxYield;
+      const targetRatio = this.levelData.targetYield / levelMaxYield;
+      if (targetRatio >= 0.75) difficultyMultiplier = 1.4; // Niveau très difficile (>75% du max)
+      else if (targetRatio >= 0.65) difficultyMultiplier = 1.25; // Niveau difficile (65-75%)
+      else if (targetRatio >= 0.50) difficultyMultiplier = 1.15; // Niveau moyen (50-65%)
+    }
+
     let status = 'optimal';
     let action = 'Humidité du sol parfaite';
     let badge = 'optimal';
@@ -90,7 +102,7 @@ export class NASARecommendations {
       status = 'warning';
       badge = 'warning';
       action = `Sol légèrement sec. Irrigation modérée nécessaire.`;
-      irrigationRecommended = Math.abs(gap) * 2; // Conversion en %
+      irrigationRecommended = Math.abs(gap) * 2 * difficultyMultiplier; // Conversion en %
     } else if (gap < -10) {
       status = 'critical';
       badge = 'critical';
@@ -168,23 +180,34 @@ export class NASARecommendations {
     const currentNDVI = this.nasaData?.ndvi?.current || 0.2;
     const optimalNPK = this.crop.npkNeed.optimal;
 
-    let recommendedNPK = optimalNPK;
-    let action = `Appliquer ${optimalNPK} kg/ha selon besoins de la culture`;
+    // Calculer le multiplicateur de difficulté basé sur targetYield
+    let difficultyMultiplier = 1.0;
+    if (this.levelData?.targetYield) {
+      // Utiliser levelData.maxYield si disponible, sinon crop.maxYield
+      const levelMaxYield = this.levelData.maxYield || this.crop.maxYield;
+      const targetRatio = this.levelData.targetYield / levelMaxYield;
+      if (targetRatio >= 0.75) difficultyMultiplier = 1.3; // Niveau très difficile (>75% du max)
+      else if (targetRatio >= 0.65) difficultyMultiplier = 1.2; // Niveau difficile (65-75%)
+      else if (targetRatio >= 0.50) difficultyMultiplier = 1.1; // Niveau moyen (50-65%)
+    }
+
+    let recommendedNPK = optimalNPK * difficultyMultiplier;
+    let action = `Appliquer ${Math.round(recommendedNPK)} kg/ha selon besoins de la culture`;
 
     // Ajuster selon NDVI (indicateur de santé)
     if (currentNDVI < 0.3) {
       // Végétation faible = besoin élevé en NPK
-      recommendedNPK = Math.min(this.crop.npkNeed.max, optimalNPK * 1.2);
+      recommendedNPK = Math.min(this.crop.npkNeed.max, optimalNPK * 1.2 * difficultyMultiplier);
       action = `NDVI faible détecté. Augmenter NPK à ${Math.round(recommendedNPK)} kg/ha pour stimuler croissance.`;
     } else if (currentNDVI >= 0.3 && currentNDVI < 0.5) {
-      recommendedNPK = optimalNPK;
-      action = `Appliquer dose standard de ${recommendedNPK} kg/ha. Végétation en développement.`;
+      recommendedNPK = optimalNPK * difficultyMultiplier;
+      action = `Appliquer dose de ${Math.round(recommendedNPK)} kg/ha. Végétation en développement.`;
     } else if (currentNDVI >= 0.5 && currentNDVI < 0.7) {
-      recommendedNPK = optimalNPK * 0.9;
-      action = `Végétation en bonne santé. Dose légèrement réduite à ${Math.round(recommendedNPK)} kg/ha suffit.`;
+      recommendedNPK = optimalNPK * 0.9 * difficultyMultiplier;
+      action = `Végétation en bonne santé. Dose de ${Math.round(recommendedNPK)} kg/ha recommandée.`;
     } else {
       // NDVI excellent = maintenance uniquement
-      recommendedNPK = optimalNPK * 0.8;
+      recommendedNPK = optimalNPK * 0.8 * difficultyMultiplier;
       action = `Excellente santé végétale ! Dose d'entretien de ${Math.round(recommendedNPK)} kg/ha recommandée.`;
     }
 

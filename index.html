@@ -4,18 +4,379 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IleRise - NASA Space Apps Challenge 2025</title>
-    <link rel="stylesheet" href="/style.css">
     <style>
-        body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        #info { text-align: center; }
-        button { background-color: #82CC68; color: #2E1F03; padding: 12px 24px; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            /* Background dégradé qui se fond avec l'image */
+            background: radial-gradient(ellipse at center, #B8E6F5 0%, #87CEEB 50%, #A8D5A3 100%);
+        }
+
+        .menu-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .menu-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Affichage de base */
+            object-position: center;
+            /* Effets pour fondre dans le décor */
+            filter: drop-shadow(0 10px 40px rgba(0, 0, 0, 0.15));
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .menu-background {
+                object-fit: contain;
+            }
+        }
+
+        /* Zone cliquable JOUER - Position centrale haute */
+        .btn-zone {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-zone:hover {
+            transform: scale(1.05);
+        }
+
+        #btn-jouer {
+            top: 35%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 80px;
+        }
+
+        #btn-parametres {
+            top: 47%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 80px;
+        }
+
+        #btn-credits {
+            top: 59%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 80px;
+        }
+
+        #btn-quitter {
+            top: 71%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 80px;
+        }
+
+        /* Stats en haut à droite */
+        .player-stats {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 100;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #2E1F03;
+        }
+
+        .stat-icon {
+            font-size: 24px;
+        }
+
+        /* Responsive Mobile */
+        @media (max-width: 768px) {
+            .menu-container {
+                background-size: contain;
+                background-position: top center;
+            }
+
+            #btn-jouer {
+                top: 38%;
+                width: 70%;
+                max-width: 300px;
+                height: 60px;
+            }
+
+            #btn-parametres {
+                top: 49%;
+                width: 70%;
+                max-width: 300px;
+                height: 60px;
+            }
+
+            #btn-credits {
+                top: 60%;
+                width: 70%;
+                max-width: 300px;
+                height: 60px;
+            }
+
+            #btn-quitter {
+                top: 71%;
+                width: 70%;
+                max-width: 300px;
+                height: 60px;
+            }
+
+            .player-stats {
+                top: 10px;
+                right: 10px;
+                padding: 8px 15px;
+                gap: 10px;
+            }
+
+            .stat-item {
+                font-size: 14px;
+            }
+
+            .stat-icon {
+                font-size: 18px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #btn-jouer {
+                top: 40%;
+                height: 50px;
+            }
+
+            #btn-parametres {
+                top: 50%;
+                height: 50px;
+            }
+
+            #btn-credits {
+                top: 60%;
+                height: 50px;
+            }
+
+            #btn-quitter {
+                top: 70%;
+                height: 50px;
+            }
+
+            .player-stats {
+                flex-direction: column;
+                gap: 5px;
+                padding: 8px 12px;
+            }
+
+            .stat-item {
+                font-size: 12px;
+            }
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #2E1F03;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+            color: #555;
+        }
+
+        .modal-footer {
+            text-align: center;
+        }
+
+        .btn-modal {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-modal:hover {
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
-    <div id="info">
-        <h1>IleRise - Farm Navigators</h1>
-        <p>NASA Space Apps Challenge 2025</p>
-        <a href="game.html"><button>Entrer dans le Jeu</button></a>
+    <!-- Modal -->
+    <div id="custom-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header" id="modal-title">Titre</div>
+            <div class="modal-body" id="modal-body">Contenu</div>
+            <div class="modal-footer">
+                <button class="btn-modal" onclick="closeModal()">OK</button>
+            </div>
+        </div>
     </div>
+
+    <div class="menu-container">
+        <!-- Image de fond -->
+        <img src="/public/menu-bg.png" alt="Menu IleRise" class="menu-background">
+
+        <!-- Zones cliquables invisibles -->
+        <div id="btn-jouer" class="btn-zone" title="Jouer"></div>
+        <div id="btn-parametres" class="btn-zone" title="Paramètres"></div>
+        <div id="btn-credits" class="btn-zone" title="Crédits"></div>
+        <div id="btn-quitter" class="btn-zone" title="Quitter"></div>
+
+        <!-- Stats joueur -->
+        <div class="player-stats">
+            <div class="stat-item">
+                <span class="stat-icon">❤️</span>
+                <span id="lives">5</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-icon">💰</span>
+                <span id="coins">0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Fonctions modal
+        function showModal(title, content) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-body').innerHTML = content;
+            document.getElementById('custom-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('custom-modal').style.display = 'none';
+        }
+
+        // Fermer modal en cliquant en dehors
+        document.getElementById('custom-modal').addEventListener('click', (e) => {
+            if (e.target.id === 'custom-modal') {
+                closeModal();
+            }
+        });
+
+        // Événements des boutons
+        document.getElementById('btn-jouer').addEventListener('click', () => {
+            window.location.href = 'game.html';
+        });
+
+        document.getElementById('btn-parametres').addEventListener('click', () => {
+            showModal(
+                '⚙️ Paramètres',
+                '<div style="text-align: left; line-height: 2;">• Volume son: Activé<br>• Qualité graphique: Moyenne<br>• Langue: Français<br><br><em style="color: #888;">(Page de paramètres en développement)</em></div>'
+            );
+        });
+
+        document.getElementById('btn-credits').addEventListener('click', () => {
+            showModal(
+                '🏆 CRÉDITS - IleRise',
+                '<div style="text-align: center; line-height: 1.8;"><h3 style="margin: 10px 0; color: #667eea;">📡 NASA Space Apps Challenge 2025</h3><h4 style="margin: 20px 0 10px 0; color: #555;">👥 Équipe IleRise:</h4><div style="text-align: left; max-width: 400px; margin: 0 auto;">• Développement: Équipe Farm Navigators<br>• Données NASA: MODIS, SMAP, POWER<br>• Technologies: Three.js, Express, MongoDB</div><div style="margin-top: 30px; font-size: 14px; color: #666;"><div style="margin: 10px 0;">🌍 Powered by NASA Earth Data</div><div style="margin: 10px 0;">🎮 Made with ❤️ for AgriVerse</div></div></div>'
+            );
+        });
+
+        document.getElementById('btn-quitter').addEventListener('click', () => {
+            if (confirm('Voulez-vous vraiment quitter IleRise ?')) {
+                window.close();
+                if (!window.closed) {
+                    alert('Fermez cet onglet pour quitter le jeu.');
+                }
+            }
+        });
+
+        // Charger stats depuis localStorage
+        const savedLives = localStorage.getItem('ilerise_lives');
+        const savedCoins = localStorage.getItem('ilerise_coins');
+
+        if (savedLives) {
+            document.getElementById('lives').textContent = JSON.parse(savedLives).lives || 5;
+        }
+        if (savedCoins) {
+            document.getElementById('coins').textContent = savedCoins;
+        }
+    </script>
 </body>
 </html>

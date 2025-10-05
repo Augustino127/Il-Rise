@@ -39,9 +39,10 @@ export class SimulationEngine {
    * @param {number} waterInput - Irrigation (0-100%)
    * @param {number} npkInput - Fertilisation NPK (0-150 kg/ha)
    * @param {number} phInput - pH du sol (4.0-8.0)
+   * @param {number} targetYield - Rendement cible du niveau (optionnel)
    * @returns {Object} - Résultats simulation
    */
-  calculateYield(waterInput, npkInput, phInput) {
+  calculateYield(waterInput, npkInput, phInput, targetYield = null) {
     // Facteurs de stress (0-1, où 1 = optimal)
     const waterStress = this.calculateWaterStress(waterInput);
     const nutrientStress = this.calculateNutrientStress(npkInput);
@@ -73,7 +74,7 @@ export class SimulationEngine {
         temperature: Math.round(tempStress * 100),
         overall: Math.round(waterStress * nutrientStress * phStress * tempStress * 100)
       },
-      diagnosis: this.generateDiagnosis(waterStress, nutrientStress, phStress, tempStress)
+      diagnosis: this.generateDiagnosis(waterStress, nutrientStress, phStress, tempStress, actualYield, targetYield)
     };
   }
 
@@ -199,7 +200,7 @@ export class SimulationEngine {
   /**
    * Générer diagnostic textuel
    */
-  generateDiagnosis(waterStress, nutrientStress, phStress, tempStress) {
+  generateDiagnosis(waterStress, nutrientStress, phStress, tempStress, actualYield = null, targetYield = null) {
     const issues = [];
     const recommendations = [];
 
@@ -238,16 +239,41 @@ export class SimulationEngine {
     return {
       issues: issues.length > 0 ? issues : ['Aucun problème majeur'],
       recommendations,
-      summary: this.getSummary(waterStress, nutrientStress, phStress, tempStress)
+      summary: this.getSummary(waterStress, nutrientStress, phStress, tempStress, actualYield, targetYield)
     };
   }
 
   /**
    * Résumé général
    */
-  getSummary(waterStress, nutrientStress, phStress, tempStress) {
+  getSummary(waterStress, nutrientStress, phStress, tempStress, actualYield = null, targetYield = null) {
     const overallStress = (waterStress + nutrientStress + phStress + tempStress) / 4;
 
+    // Si targetYield disponible, vérifier si atteint AVANT d'évaluer la gestion
+    if (actualYield !== null && targetYield !== null && actualYield < targetYield) {
+      // Rendement insuffisant malgré bonne gestion
+      if (overallStress >= 0.85) {
+        return {
+          text: `Bonne gestion des facteurs (${Math.round(overallStress * 100)}%), mais rendement insuffisant (${actualYield}/${targetYield} t/ha). Augmentez les apports.`,
+          emoji: '⚠️',
+          audio: 'good_management_insufficient_yield'
+        };
+      } else if (overallStress >= 0.7) {
+        return {
+          text: `Gestion correcte, mais rendement trop faible (${actualYield}/${targetYield} t/ha). Optimisez eau et NPK.`,
+          emoji: '⚠️',
+          audio: 'acceptable_management'
+        };
+      } else {
+        return {
+          text: `Rendement insuffisant (${actualYield}/${targetYield} t/ha). Plusieurs facteurs de stress détectés.`,
+          emoji: '❌',
+          audio: 'poor_management'
+        };
+      }
+    }
+
+    // Évaluation normale (pas de target ou target atteint)
     if (overallStress >= 0.9) {
       return {
         text: 'Excellente gestion ! Conditions optimales.',

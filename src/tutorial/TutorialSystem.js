@@ -91,9 +91,30 @@ export class TutorialSystem {
      * Attache les event listeners
      */
     attachEventListeners() {
-        document.getElementById('tutorial-next').addEventListener('click', () => this.nextStep());
-        document.getElementById('tutorial-prev').addEventListener('click', () => this.prevStep());
-        document.getElementById('tutorial-skip').addEventListener('click', () => this.skip());
+        const nextBtn = this.stepContainer.querySelector('#tutorial-next');
+        const prevBtn = this.stepContainer.querySelector('#tutorial-prev');
+        const skipBtn = this.stepContainer.querySelector('#tutorial-skip');
+
+        console.log('📚 Tutorial buttons found:', { nextBtn: !!nextBtn, prevBtn: !!prevBtn, skipBtn: !!skipBtn });
+
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                console.log('➡️ Next button clicked');
+                this.nextStep();
+            });
+        }
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                console.log('⬅️ Prev button clicked');
+                this.prevStep();
+            });
+        }
+        if (skipBtn) {
+            skipBtn.addEventListener('click', () => {
+                console.log('✕ Skip button clicked');
+                this.skip();
+            });
+        }
 
         // Navigation clavier
         document.addEventListener('keydown', (e) => {
@@ -114,11 +135,24 @@ export class TutorialSystem {
      */
     start() {
         if (this.hasCompletedTutorial) {
-            // Demander si l'utilisateur veut refaire le tutoriel
-            const restart = confirm('Vous avez déjà terminé le tutoriel. Voulez-vous le refaire ?');
-            if (!restart) return;
+            // Demander si l'utilisateur veut refaire le tutoriel via le modal de l'app
+            if (window.app) {
+                window.app.showConfirm(
+                    'Tutoriel déjà terminé',
+                    'Vous avez déjà terminé le tutoriel. Voulez-vous le refaire ?',
+                    (confirmed) => {
+                        if (confirmed) {
+                            this.continueStart();
+                        }
+                    }
+                );
+                return;
+            }
         }
+        this.continueStart();
+    }
 
+    continueStart() {
         this.isActive = true;
         this.currentStepIndex = 0;
         this.overlay.classList.remove('hidden');
@@ -275,8 +309,17 @@ export class TutorialSystem {
      * Passe le tutoriel
      */
     skip() {
-        const confirm = window.confirm('Êtes-vous sûr de vouloir passer le tutoriel ?');
-        if (confirm) {
+        if (window.app) {
+            window.app.showConfirm(
+                'Passer le tutoriel',
+                'Êtes-vous sûr de vouloir passer le tutoriel ?',
+                (confirmed) => {
+                    if (confirmed) {
+                        this.close();
+                    }
+                }
+            );
+        } else {
             this.close();
         }
     }
@@ -288,8 +331,14 @@ export class TutorialSystem {
         this.hasCompletedTutorial = true;
         this.saveProgress();
 
-        // Message de félicitations
-        alert('🎉 Félicitations ! Vous avez terminé le tutoriel.\n\nVous êtes maintenant prêt à sauver AgriVerse avec les données NASA !');
+        // Message de félicitations via le modal de l'app
+        if (window.app) {
+            window.app.showMessage(
+                '🎉 Félicitations !',
+                'Vous avez terminé le tutoriel.\n\nVous êtes maintenant prêt à sauver AgriVerse avec les données NASA !',
+                'success'
+            );
+        }
 
         this.close();
 

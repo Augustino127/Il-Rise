@@ -5,13 +5,15 @@
  */
 
 import { SimulationEngine } from './SimulationEngine.js';
+import { NASARecommendations } from './NASARecommendations.js';
 
 export class Level {
-  constructor(levelId, crop, cityName, nasaData) {
+  constructor(levelId, crop, cityName, nasaData, levelData = null) {
     this.levelId = levelId;
     this.crop = crop;
     this.cityName = cityName;
     this.nasaData = nasaData;
+    this.levelData = levelData; // 🆕 Stocker les données du niveau (targetYield, etc.)
 
     // État curseurs
     this.cursors = {
@@ -22,6 +24,7 @@ export class Level {
 
     // Simulation
     this.simulationEngine = new SimulationEngine(crop, nasaData);
+    this.nasaRecommendations = new NASARecommendations(crop, nasaData, levelData);
     this.results = null;
     this.isCompleted = false;
   }
@@ -55,69 +58,39 @@ export class Level {
   }
 
   /**
-   * Obtenir recommandations NASA
+   * Obtenir recommandations NASA (utilise NASARecommendations.js)
    */
   getRecommendations() {
+    const nasaRecs = this.nasaRecommendations.generateRecommendations();
     const recommendations = [];
 
-    // Recommandation eau (basée SMAP)
-    const soilMoisture = this.nasaData?.soilMoisture?.current_percent || 20;
-
-    if (soilMoisture < 20) {
-      recommendations.push({
-        type: 'water',
-        level: 'urgent',
-        message: `Sol très sec (${soilMoisture}%). Irrigation urgente recommandée.`,
-        suggestion: this.crop.waterNeed.optimal - soilMoisture
-      });
-    } else if (soilMoisture < this.crop.waterNeed.min) {
-      recommendations.push({
-        type: 'water',
-        level: 'warning',
-        message: `Sol sec (${soilMoisture}%). Irrigation recommandée.`,
-        suggestion: this.crop.waterNeed.optimal - soilMoisture
-      });
-    } else {
-      recommendations.push({
-        type: 'water',
-        level: 'ok',
-        message: `Humidité du sol acceptable (${soilMoisture}%).`,
-        suggestion: Math.max(0, this.crop.waterNeed.optimal - soilMoisture)
-      });
-    }
+    // Recommandation eau (basée SMAP + analyse intelligente)
+    const moistureAnalysis = nasaRecs.moisture;
+    recommendations.push({
+      type: 'water',
+      level: moistureAnalysis.status === 'critical' ? 'urgent' :
+             moistureAnalysis.status === 'warning' ? 'warning' : 'ok',
+      message: moistureAnalysis.action,
+      suggestion: moistureAnalysis.irrigationRecommended
+    });
 
     // Recommandation température (basée MODIS)
-    const currentTemp = this.nasaData?.temperature?.current_c || 28;
+    const tempAnalysis = nasaRecs.temperature;
+    recommendations.push({
+      type: 'temperature',
+      level: tempAnalysis.status === 'critical' ? 'urgent' :
+             tempAnalysis.status === 'warning' ? 'warning' : 'ok',
+      message: tempAnalysis.action,
+      suggestion: null
+    });
 
-    if (currentTemp > this.crop.tempRange.max) {
-      recommendations.push({
-        type: 'temperature',
-        level: 'warning',
-        message: `Température élevée (${currentTemp}°C). Augmenter irrigation pour compenser stress thermique.`,
-        suggestion: null
-      });
-    } else if (currentTemp < this.crop.tempRange.min) {
-      recommendations.push({
-        type: 'temperature',
-        level: 'warning',
-        message: `Température basse (${currentTemp}°C). Croissance ralentie possible.`,
-        suggestion: null
-      });
-    } else {
-      recommendations.push({
-        type: 'temperature',
-        level: 'ok',
-        message: `Température idéale (${currentTemp}°C) pour ${this.crop.name.fr}.`,
-        suggestion: null
-      });
-    }
-
-    // Recommandation NPK
+    // Recommandation NPK (basée NDVI + besoins culture)
+    const npkAnalysis = nasaRecs.npk;
     recommendations.push({
       type: 'npk',
       level: 'info',
-      message: `Apport optimal pour ${this.crop.name.fr} : ${this.crop.npkNeed.optimal} kg/ha.`,
-      suggestion: this.crop.npkNeed.optimal
+      message: npkAnalysis.action,
+      suggestion: npkAnalysis.recommended
     });
 
     // Recommandation pH
@@ -135,10 +108,24 @@ export class Level {
    * Lancer simulation
    */
   runSimulation() {
+    const targetYield = this.levelData?.targetYield;
+    const maxYield = this.levelData?.maxYield || this.crop?.maxYield;
+
+    if (!targetYield) {
+      console.error('⚠️ targetYield manquant dans levelData');
+    }
+
+    // ⚠️ IMPORTANT : Utiliser levelData.maxYield si disponible (change par niveau)
+    // Sinon fallback sur crop.maxYield (valeur de base)
+    if (maxYield && maxYield !== this.simulationEngine.crop.maxYield) {
+      this.simulationEngine.crop.maxYield = maxYield;
+    }
+
     this.results = this.simulationEngine.calculateYield(
       this.cursors.water,
       this.cursors.npk,
-      this.cursors.ph
+      this.cursors.ph,
+      targetYield
     );
 
     this.isCompleted = true;
@@ -159,7 +146,14 @@ export class Level {
   isSuccess() {
     if (!this.results) return false;
 
-    return this.results.actualYield >= this.crop.targetYield;
+    // ⚠️ IMPORTANT : Toujours utiliser levelData.targetYield (requis)
+    // crop.targetYield est obsolète et ne correspond pas aux niveaux individuels
+    const targetYield = this.levelData?.targetYield;
+    if (!targetYield) {
+      console.error('⚠️ targetYield manquant dans levelData');
+      return false;
+    }
+    return this.results.actualYield >= targetYield;
   }
 
   /**

@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IleRise V3 - Ferme Interactive | NASA Space Apps 2025</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="/src/styles/game.css">
+    <link rel="stylesheet" href="/src/styles/location.css">
+    <link rel="stylesheet" href="/src/styles/farm-v3.css">
+</head>
+<body style="background: radial-gradient(ellipse at center, #B8E6F5 0%, #87CEEB 50%, #A8D5A3 100%);">
+
+    <!-- ========== ÉCRAN SÉLECTION LOCALITÉ ========== -->
+    <div id="screen-location" class="screen active">
+        <div class="location-container">
+            <div class="location-header">
+                <h1>🗺️ Choisissez votre localité</h1>
+                <p>Sélectionnez une région du Bénin pour démarrer votre ferme</p>
+            </div>
+
+            <div class="location-main">
+                <!-- Carte satellite -->
+                <div class="location-map-container">
+                    <div id="satellite-map" class="satellite-map"></div>
+                </div>
+
+                <!-- Info localité sélectionnée -->
+                <div id="location-selected" class="location-info-panel" style="display: none;">
+                    <h3>📍 <span id="selected-city-name">-</span></h3>
+                    <div class="location-stats">
+                        <div class="location-stat">
+                            <span class="stat-icon">🌱</span>
+                            <span class="stat-label">NDVI</span>
+                            <span class="stat-value" id="selected-ndvi">-</span>
+                        </div>
+                        <div class="location-stat">
+                            <span class="stat-icon">🌡️</span>
+                            <span class="stat-label">Température</span>
+                            <span class="stat-value" id="selected-temp">-</span>
+                        </div>
+                        <div class="location-stat">
+                            <span class="stat-icon">💧</span>
+                            <span class="stat-label">Humidité Sol</span>
+                            <span class="stat-value" id="selected-moisture">-</span>
+                        </div>
+                        <div class="location-stat">
+                            <span class="stat-icon">🌧️</span>
+                            <span class="stat-label">Précipitations</span>
+                            <span class="stat-value" id="selected-precip">-</span>
+                        </div>
+                    </div>
+                    <div class="location-status" id="selected-status">-</div>
+                    <button class="btn-primary" id="btn-confirm-location">Commencer dans cette région</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== ÉCRAN FERME V3 ========== -->
+    <div id="screen-farm" class="screen">
+
+        <!-- Header avec ressources -->
+        <div class="farm-header">
+            <div class="header-left">
+                <button class="btn-back" id="btn-back-farm">← Menu</button>
+                <h1>🌾 IleRise Farm</h1>
+            </div>
+            <div class="header-center">
+                <div class="time-display">
+                    <span class="time-icon" id="weather-icon">☀️</span>
+                    <span id="display-day">Jour 1</span>
+                    <span id="display-time">06:00</span>
+                    <span id="display-season" class="season-badge">Sèche</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="resources-bar">
+                    <div class="resource-item">
+                        <span class="resource-icon">💰</span>
+                        <span class="resource-value" id="display-money">500</span>
+                    </div>
+                    <div class="resource-item">
+                        <span class="resource-icon">💧</span>
+                        <span class="resource-value" id="display-water">1000L</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Layout principal 3 colonnes -->
+        <div class="farm-main-layout">
+
+            <!-- Colonne Gauche: Mini-map et Navigation -->
+            <div class="farm-left-column">
+
+                <!-- Mini-map parcelles -->
+                <div class="card plots-minimap">
+                    <h3>🗺️ Parcelles</h3>
+                    <div class="plots-grid-mini">
+                        <div class="plot-mini active" data-plot-id="1">
+                            <span class="plot-icon" id="plot-icon-1">🌽</span>
+                            <span class="plot-number">1</span>
+                        </div>
+                        <div class="plot-mini locked" data-plot-id="2">
+                            <span class="plot-icon">🔒</span>
+                            <span class="plot-number">2</span>
+                        </div>
+                        <div class="plot-mini locked" data-plot-id="3">
+                            <span class="plot-icon">🔒</span>
+                            <span class="plot-number">3</span>
+                        </div>
+                        <div class="plot-mini locked" data-plot-id="4">
+                            <span class="plot-icon">🔒</span>
+                            <span class="plot-number">4</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation sections -->
+                <div class="card navigation-menu">
+                    <button class="nav-btn active" data-section="farm">
+                        <span class="nav-icon">🌾</span>
+                        <span class="nav-label">Ferme</span>
+                    </button>
+                    <button class="nav-btn" data-section="livestock">
+                        <span class="nav-icon">🐔</span>
+                        <span class="nav-label">Élevage</span>
+                    </button>
+                    <button class="nav-btn" data-section="market">
+                        <span class="nav-icon">🏪</span>
+                        <span class="nav-label">Marché</span>
+                    </button>
+                    <button class="nav-btn" data-section="stats">
+                        <span class="nav-icon">📊</span>
+                        <span class="nav-label">Stats</span>
+                    </button>
+                </div>
+
+                <!-- Inventaire rapide -->
+                <div class="card inventory-quick">
+                    <h4>📦 Inventaire</h4>
+                    <div class="inventory-items">
+                        <div class="inv-item">
+                            <span>🌱 Graines</span>
+                            <span id="inv-seeds-total">50</span>
+                        </div>
+                        <div class="inv-item">
+                            <span>🧪 NPK</span>
+                            <span id="inv-npk">50kg</span>
+                        </div>
+                        <div class="inv-item">
+                            <span>💩 Compost</span>
+                            <span id="inv-compost">100kg</span>
+                        </div>
+                        <div class="inv-item">
+                            <span>🌾 Récoltes</span>
+                            <span id="inv-harvest">0t</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Colonne Centrale: Vue parcelle active -->
+            <div class="farm-center-column">
+
+                <!-- Section Ferme (active par défaut) -->
+                <div class="section-content active" id="section-farm">
+
+                    <!-- Sélection de culture -->
+                    <div class="card crop-selection">
+                        <h3>🌾 Culture à Planter</h3>
+                        <select id="crop-select" class="crop-selector">
+                            <option value="">-- Choisir une culture --</option>
+                            <option value="maize">🌽 Maïs (90 jours)</option>
+                            <option value="cowpea">🫘 Niébé (60 jours)</option>
+                            <option value="rice">🍚 Riz (120 jours)</option>
+                            <option value="cassava">🥔 Manioc (300 jours)</option>
+                            <option value="cacao">🍫 Cacao (365 jours)</option>
+                            <option value="cotton">☁️ Coton (150 jours)</option>
+                        </select>
+                        <p class="crop-hint">Sélectionnez une culture avant de planter</p>
+                    </div>
+
+                    <!-- Info parcelle -->
+                    <div class="card plot-info">
+                        <div class="plot-header">
+                            <h2>
+                                <span id="active-plot-icon">🌽</span>
+                                <span id="active-plot-name">Parcelle 1</span>
+                            </h2>
+                            <span class="plot-size" id="active-plot-size">100m²</span>
+                        </div>
+
+                        <div class="plot-status-grid">
+                            <div class="status-col">
+                                <div class="status-label">Culture</div>
+                                <div class="status-value" id="plot-crop">Maïs</div>
+                            </div>
+                            <div class="status-col">
+                                <div class="status-label">Progression</div>
+                                <div class="status-value" id="plot-progress">15/90 jours</div>
+                            </div>
+                            <div class="status-col">
+                                <div class="status-label">Santé</div>
+                                <div class="status-value" id="plot-health">
+                                    <span class="health-bar">
+                                        <span class="health-fill" style="width: 85%"></span>
+                                    </span>
+                                    <span>85%</span>
+                                </div>
+                            </div>
+                            <div class="status-col">
+                                <div class="status-label">Stade</div>
+                                <div class="status-value" id="plot-stage">🌱 Végétatif</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visualisation parcelle 3D -->
+                    <div class="card plot-visual">
+                        <div class="plot-field-3d" id="farm-scene-container"></div>
+                    </div>
+
+                    <!-- État du sol -->
+                    <div class="card soil-status">
+                        <h3>🌍 État du Sol</h3>
+                        <div class="soil-indicators">
+                            <div class="soil-indicator">
+                                <div class="indicator-header">
+                                    <span>💧 Humidité</span>
+                                    <span id="soil-moisture-value">75%</span>
+                                </div>
+                                <div class="indicator-bar">
+                                    <div class="indicator-fill water" id="soil-moisture-fill" style="width: 75%"></div>
+                                </div>
+                            </div>
+                            <div class="soil-indicator">
+                                <div class="indicator-header">
+                                    <span>🧪 NPK</span>
+                                    <span id="soil-npk-value">60%</span>
+                                </div>
+                                <div class="indicator-bar">
+                                    <div class="indicator-fill npk" id="soil-npk-fill" style="width: 60%"></div>
+                                </div>
+                            </div>
+                            <div class="soil-indicator">
+                                <div class="indicator-header">
+                                    <span>⚗️ pH</span>
+                                    <span id="soil-ph-value">6.5</span>
+                                </div>
+                                <div class="indicator-bar">
+                                    <div class="indicator-fill ph" id="soil-ph-fill" style="width: 80%"></div>
+                                </div>
+                            </div>
+                            <div class="soil-indicator">
+                                <div class="indicator-header">
+                                    <span>🌿 Mauvaises herbes</span>
+                                    <span id="soil-weed-value">20%</span>
+                                </div>
+                                <div class="indicator-bar">
+                                    <div class="indicator-fill weed" id="soil-weed-fill" style="width: 20%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Section Élevage -->
+                <div class="section-content" id="section-livestock">
+                    <div class="card">
+                        <h2>🐔 Poulailler</h2>
+                        <div id="livestock-content">
+                            <p class="unlock-message">Débloquez le poulailler pour 100💰</p>
+                            <button class="btn-primary" id="btn-unlock-coop">Débloquer Poulailler</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Marché -->
+                <div class="section-content" id="section-market">
+                    <div class="card">
+                        <h2>🏪 Marché Agricole</h2>
+                        <div class="market-tabs">
+                            <button class="market-tab active" data-tab="buy">Acheter</button>
+                            <button class="market-tab" data-tab="sell">Vendre</button>
+                        </div>
+                        <div id="market-content"></div>
+                    </div>
+                </div>
+
+                <!-- Section Stats -->
+                <div class="section-content" id="section-stats">
+                    <div class="card">
+                        <h2>📊 Statistiques</h2>
+                        <div id="stats-content"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Colonne Droite: Actions et contrôles -->
+            <div class="farm-right-column">
+
+                <!-- Contrôles temps -->
+                <div class="card time-controls">
+                    <h3>⏰ Temps</h3>
+                    <div class="speed-controls">
+                        <button class="speed-btn" data-speed="1">1x</button>
+                        <button class="speed-btn active" data-speed="2">2x</button>
+                        <button class="speed-btn" data-speed="4">4x</button>
+                        <button class="speed-btn" data-speed="8">8x</button>
+                    </div>
+                    <div class="time-actions">
+                        <button class="btn-secondary btn-icon" id="btn-pause">
+                            <span>⏸️</span> Pause
+                        </button>
+                        <button class="btn-primary btn-icon" id="btn-next-day">
+                            <span>⏭️</span> Jour Suivant
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Actions disponibles -->
+                <div class="card actions-panel">
+                    <h3>🎮 Actions</h3>
+                    <div class="actions-grid" id="actions-grid">
+
+                        <button class="action-btn" data-action="plow">
+                            <span class="action-icon">🚜</span>
+                            <span class="action-name">Labourer</span>
+                            <span class="action-cost">20💰</span>
+                            <span class="action-hotkey">L</span>
+                        </button>
+
+                        <button class="action-btn" data-action="plant">
+                            <span class="action-icon">🌱</span>
+                            <span class="action-name">Planter</span>
+                            <span class="action-cost">Graines</span>
+                            <span class="action-hotkey">S</span>
+                        </button>
+
+                        <button class="action-btn" data-action="water">
+                            <span class="action-icon">💧</span>
+                            <span class="action-name">Arroser</span>
+                            <span class="action-cost">100L</span>
+                            <span class="action-hotkey">W</span>
+                        </button>
+
+                        <button class="action-btn" data-action="fertilize_npk">
+                            <span class="action-icon">🧪</span>
+                            <span class="action-name">NPK</span>
+                            <span class="action-cost">20kg</span>
+                            <span class="action-hotkey">F</span>
+                        </button>
+
+                        <button class="action-btn" data-action="fertilize_organic">
+                            <span class="action-icon">💩</span>
+                            <span class="action-name">Compost</span>
+                            <span class="action-cost">30kg</span>
+                            <span class="action-hotkey">C</span>
+                        </button>
+
+                        <button class="action-btn" data-action="weed">
+                            <span class="action-icon">🌿</span>
+                            <span class="action-name">Désherber</span>
+                            <span class="action-cost">10💰</span>
+                            <span class="action-hotkey">D</span>
+                        </button>
+
+                        <button class="action-btn" data-action="spray_pesticide_natural">
+                            <span class="action-icon">🪲</span>
+                            <span class="action-name">Pesticide</span>
+                            <span class="action-cost">2L</span>
+                            <span class="action-hotkey">P</span>
+                        </button>
+
+                        <button class="action-btn" data-action="harvest">
+                            <span class="action-icon">🌾</span>
+                            <span class="action-name">Récolter</span>
+                            <span class="action-cost">20💰</span>
+                            <span class="action-hotkey">H</span>
+                        </button>
+
+                    </div>
+                </div>
+
+                <!-- Recommandations NASA -->
+                <div class="card nasa-recommendations">
+                    <h3>🛰️ Aide NASA</h3>
+                    <div id="nasa-recommendations-content">
+                        <p class="recommendation-item">
+                            <span class="rec-icon">⚠️</span>
+                            <span class="rec-text">Sol sec détecté - Irrigation recommandée</span>
+                        </p>
+                    </div>
+                    <button class="btn-secondary btn-small" id="btn-refresh-nasa">
+                        🔄 Actualiser données
+                    </button>
+                </div>
+
+                <!-- Événements à venir -->
+                <div class="card upcoming-events">
+                    <h4>📅 Événements</h4>
+                    <div id="events-list">
+                        <div class="event-item">
+                            <span class="event-day">J+17</span>
+                            <span class="event-desc">Fin compostage</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Toast notifications -->
+    <div id="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.159.0/build/three.module.js",
+        "three/examples/jsm/": "https://unpkg.com/three@0.159.0/examples/jsm/",
+        "leaflet": "https://unpkg.com/leaflet@1.9.4/dist/leaflet-src.esm.js"
+      }
+    }
+    </script>
+    <script type="module" src="/src/app-v3.js"></script>
+</body>
+</html>

@@ -220,8 +220,8 @@ export const CROPS = {
     level: 5,
     unlockCost: 1000,
 
-    maxYield: 1.2, // kg/arbre
-    targetYield: 0.8,
+    maxYield: 1.6, // t/ha (aligné avec LevelSystem niveau 3)
+    targetYield: 0.6, // Aligné avec niveau 1
     growthDuration: 365, // Culture pérenne
 
     waterNeed: {
