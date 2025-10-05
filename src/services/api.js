@@ -3,7 +3,7 @@
  * Gère toutes les communications avec le serveur backend
  */
 
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://ilerise.onrender.com/api';
 
 class APIService {
   constructor() {

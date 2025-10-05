@@ -18,6 +18,9 @@ import { I18nManager } from './i18n/I18nManager.js';
 import { FarmV3Adapter } from './farm-v3-adapter.js';
 import apiService from './services/api.js';
 
+// Configuration API
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://ilerise.onrender.com/api';
+
 class IleRiseApp {
   constructor() {
     this.engine = new GameEngine();
@@ -2187,7 +2190,7 @@ class IleRiseApp {
 
     try {
       // Call backend API
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -2246,7 +2249,7 @@ class IleRiseApp {
 
     try {
       // Call backend API
-      const response = await fetch('http://localhost:5000/api/auth/register', {
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
