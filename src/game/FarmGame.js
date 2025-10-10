@@ -41,6 +41,7 @@ export class FarmGame {
     this.onDayChangeCallback = null;
     this.onResourceChangeCallback = null;
     this.onActionCompleteCallback = null;
+    this.onSyncErrorCallback = null; // Callback pour afficher les erreurs de sync
 
     // Synchronisation backend
     this.useBackendSync = apiService.isAuthenticated();
@@ -459,6 +460,12 @@ export class FarmGame {
       return response;
     } catch (error) {
       console.error('❌ Erreur sauvegarde serveur, fallback localStorage:', error);
+
+      // Notifier l'utilisateur de l'échec de synchronisation
+      if (this.onSyncErrorCallback) {
+        this.onSyncErrorCallback('Échec de la sauvegarde en ligne. Vos données sont sauvegardées localement.', 'warning');
+      }
+
       // Fallback sur localStorage en cas d'erreur
       this.save();
       throw error;
@@ -479,9 +486,42 @@ export class FarmGame {
         return true;
       }
 
+      // Pas de ferme sur le serveur - initialiser pour la première fois
+      console.log('🌱 Aucune ferme trouvée sur le serveur, initialisation...');
+
+      try {
+        const initResponse = await apiService.initializeFarm({
+          city: this.nasaData.location,
+          ndvi: this.nasaData.ndvi,
+          temperature: this.nasaData.temperature,
+          precipitation: this.nasaData.precipitation,
+          soilMoisture: this.nasaData.soilMoisture?.current_percent
+        });
+
+        if (initResponse.success) {
+          console.log('✅ Ferme initialisée sur le serveur');
+          // Sauvegarder l'état initial
+          await this.saveToServer();
+          return true;
+        }
+      } catch (initError) {
+        console.warn('⚠️ Impossible d\'initialiser la ferme sur le serveur:', initError.message);
+
+        // Notifier l'utilisateur
+        if (this.onSyncErrorCallback) {
+          this.onSyncErrorCallback('Impossible d\'initialiser la ferme en ligne. Mode local activé.', 'warning');
+        }
+      }
+
       return false;
     } catch (error) {
       console.error('❌ Erreur chargement serveur, fallback localStorage:', error);
+
+      // Notifier l'utilisateur
+      if (this.onSyncErrorCallback) {
+        this.onSyncErrorCallback('Échec du chargement en ligne. Utilisation des données locales.', 'warning');
+      }
+
       // Fallback sur localStorage
       return this.load();
     }

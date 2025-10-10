@@ -57,6 +57,11 @@ export class FarmV3Adapter {
       // Configurer callbacks
       this.setupCallbacks();
 
+      // Configurer callback pour les erreurs de sync
+      this.farmGame.onSyncErrorCallback = (message, type) => {
+        this.showToast(message, type || 'error', 5000);
+      };
+
       // Initialiser (charge sauvegarde si dispo)
       await this.farmGame.initialize({ loadSave: true });
 

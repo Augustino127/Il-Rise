@@ -2201,8 +2201,11 @@ class IleRiseApp {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        // Success
-        await this.setAuthUser(data.data.user, data.data.accessToken, remember);
+        // Success - pass both accessToken and refreshToken
+        await this.setAuthUser(data.data.user, {
+          accessToken: data.data.accessToken,
+          refreshToken: data.data.refreshToken
+        }, remember);
         this.showAuthMessage('success', '✅ Connexion réussie !');
 
         setTimeout(() => {
@@ -2260,8 +2263,11 @@ class IleRiseApp {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        // Success
-        await this.setAuthUser(data.data.user, data.data.accessToken, false);
+        // Success - pass both accessToken and refreshToken
+        await this.setAuthUser(data.data.user, {
+          accessToken: data.data.accessToken,
+          refreshToken: data.data.refreshToken
+        }, false);
         this.showAuthMessage('success', '✅ Compte créé avec succès !');
 
         setTimeout(() => {
@@ -2310,15 +2316,25 @@ class IleRiseApp {
     this.currentUser = user;
 
     if (token) {
+      // Support both string (legacy) and object format
+      const accessToken = typeof token === 'string' ? token : token.accessToken;
+      const refreshToken = typeof token === 'object' ? token.refreshToken : null;
+
       if (remember) {
-        localStorage.setItem('ilerise_token', token);
+        localStorage.setItem('ilerise_token', accessToken);
+        if (refreshToken) {
+          localStorage.setItem('ilerise_refresh_token', refreshToken);
+        }
       } else {
-        sessionStorage.setItem('ilerise_token', token);
+        sessionStorage.setItem('ilerise_token', accessToken);
+        if (refreshToken) {
+          sessionStorage.setItem('ilerise_refresh_token', refreshToken);
+        }
       }
       localStorage.setItem('ilerise_user', JSON.stringify(user));
 
       // Définir le token dans le service API
-      apiService.setToken(token);
+      apiService.setToken(accessToken);
     } else {
       // Guest mode
       localStorage.setItem('ilerise_guest', 'true');
@@ -2458,7 +2474,9 @@ class IleRiseApp {
 
     // Effacer les tokens et informations utilisateur
     localStorage.removeItem('ilerise_token');
+    localStorage.removeItem('ilerise_refresh_token');
     sessionStorage.removeItem('ilerise_token');
+    sessionStorage.removeItem('ilerise_refresh_token');
     localStorage.removeItem('ilerise_guest');
     localStorage.removeItem('ilerise_user');
 
@@ -2668,6 +2686,77 @@ class IleRiseApp {
     } else if (type === 'confirm') {
       this.modalConfirm.style.display = 'none';
     }
+  }
+
+  /**
+   * Afficher une notification toast
+   * @param {string} message - Message à afficher
+   * @param {string} type - Type: 'info', 'success', 'error', 'warning'
+   * @param {number} duration - Durée en millisecondes (défaut: 3000)
+   */
+  showToast(message, type = 'info', duration = 3000) {
+    // Créer l'élément toast s'il n'existe pas
+    let toastContainer = document.getElementById('toast-container');
+    if (!toastContainer) {
+      toastContainer = document.createElement('div');
+      toastContainer.id = 'toast-container';
+      toastContainer.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      `;
+      document.body.appendChild(toastContainer);
+    }
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.style.cssText = `
+      padding: 12px 20px;
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      animation: slideInRight 0.3s ease-out;
+      max-width: 350px;
+      word-wrap: break-word;
+    `;
+
+    // Couleurs selon le type
+    const colors = {
+      info: '#3498db',
+      success: '#27ae60',
+      error: '#e74c3c',
+      warning: '#f39c12'
+    };
+
+    const icons = {
+      info: 'ℹ️',
+      success: '✅',
+      error: '❌',
+      warning: '⚠️'
+    };
+
+    toast.style.backgroundColor = colors[type] || colors.info;
+    toast.textContent = `${icons[type] || icons.info} ${message}`;
+
+    toastContainer.appendChild(toast);
+
+    // Supprimer après la durée spécifiée
+    setTimeout(() => {
+      toast.style.animation = 'slideOutRight 0.3s ease-in';
+      setTimeout(() => {
+        toast.remove();
+        // Supprimer le container s'il est vide
+        if (toastContainer.children.length === 0) {
+          toastContainer.remove();
+        }
+      }, 300);
+    }, duration);
   }
 
   /**

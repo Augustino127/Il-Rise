@@ -8,6 +8,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://ilerise.onrender.c
 class APIService {
   constructor() {
     this.token = localStorage.getItem('authToken');
+    this.refreshing = false; // Flag pour éviter les refreshs multiples
   }
 
   /**
@@ -17,9 +18,75 @@ class APIService {
     this.token = token;
     if (token) {
       localStorage.setItem('authToken', token);
+
+      // Calculer et stocker l'expiration du token (JWT standard: exp en secondes)
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        if (payload.exp) {
+          localStorage.setItem('authToken_expiry', payload.exp * 1000); // Convertir en millisecondes
+        }
+      } catch (e) {
+        console.warn('⚠️ Impossible de parser le token JWT');
+      }
     } else {
       localStorage.removeItem('authToken');
+      localStorage.removeItem('authToken_expiry');
     }
+  }
+
+  /**
+   * Vérifier si le token est expiré ou expire bientôt
+   * @param {Number} bufferMinutes - Minutes avant expiration pour considérer le token comme expirant
+   * @returns {Boolean}
+   */
+  isTokenExpiring(bufferMinutes = 5) {
+    const expiry = localStorage.getItem('authToken_expiry');
+    if (!expiry) return false;
+
+    const expiryTime = parseInt(expiry);
+    const now = Date.now();
+    const bufferMs = bufferMinutes * 60 * 1000;
+
+    // Retourne true si le token expire dans moins de bufferMinutes
+    return (expiryTime - now) < bufferMs;
+  }
+
+  /**
+   * Rafraîchir automatiquement le token si nécessaire
+   * @returns {Promise<Boolean>} - True si refresh réussi ou non nécessaire
+   */
+  async ensureValidToken() {
+    // Si pas de token, pas besoin de refresh
+    if (!this.isAuthenticated()) return true;
+
+    // Si déjà en cours de refresh, attendre
+    if (this.refreshing) {
+      await new Promise(resolve => {
+        const checkInterval = setInterval(() => {
+          if (!this.refreshing) {
+            clearInterval(checkInterval);
+            resolve();
+          }
+        }, 100);
+      });
+      return true;
+    }
+
+    // Vérifier si le token expire bientôt
+    if (this.isTokenExpiring()) {
+      this.refreshing = true;
+      try {
+        await this.refreshToken();
+        this.refreshing = false;
+        return true;
+      } catch (error) {
+        this.refreshing = false;
+        console.error('❌ Auto-refresh failed:', error);
+        return false;
+      }
+    }
+
+    return true;
   }
 
   /**
@@ -124,11 +191,58 @@ class APIService {
   }
 
   /**
+   * POST /api/auth/refresh
+   * Rafraîchir le token d'accès avec le refresh token
+   */
+  async refreshToken() {
+    try {
+      const refreshToken = localStorage.getItem('ilerise_refresh_token') ||
+                          sessionStorage.getItem('ilerise_refresh_token');
+
+      if (!refreshToken) {
+        throw new Error('No refresh token available');
+      }
+
+      const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken })
+      });
+
+      const data = await this.handleResponse(response);
+
+      if (data.success && data.data.accessToken) {
+        // Mettre à jour le token
+        this.setToken(data.data.accessToken);
+
+        // Mettre à jour dans le storage approprié
+        if (localStorage.getItem('ilerise_token')) {
+          localStorage.setItem('ilerise_token', data.data.accessToken);
+        } else if (sessionStorage.getItem('ilerise_token')) {
+          sessionStorage.setItem('ilerise_token', data.data.accessToken);
+        }
+
+        console.log('✅ Token rafraîchi avec succès');
+        return data;
+      }
+
+      throw new Error('Failed to refresh token');
+    } catch (error) {
+      console.error('❌ Refresh token error:', error);
+      // En cas d'échec, déclencher déconnexion
+      window.dispatchEvent(new CustomEvent('auth:expired'));
+      throw error;
+    }
+  }
+
+  /**
    * POST /api/sync/profile
    * Synchroniser le profil complet vers le backend
    */
   async syncProfile(profileData) {
     try {
+      await this.ensureValidToken();
+
       const response = await fetch(`${API_BASE_URL}/sync/profile`, {
         method: 'POST',
         headers: this.getHeaders(),
@@ -148,6 +262,8 @@ class APIService {
    */
   async getProfile() {
     try {
+      await this.ensureValidToken();
+
       const response = await fetch(`${API_BASE_URL}/sync/profile`, {
         method: 'GET',
         headers: this.getHeaders()
@@ -166,6 +282,8 @@ class APIService {
    */
   async saveGameSession(gameData) {
     try {
+      await this.ensureValidToken();
+
       const response = await fetch(`${API_BASE_URL}/sync/game`, {
         method: 'POST',
         headers: this.getHeaders(),
@@ -187,6 +305,30 @@ class APIService {
   }
 
   // ============================================
+  // USER API Methods
+  // ============================================
+
+  /**
+   * POST /api/user/use-life
+   * Utiliser une vie
+   */
+  async useLife() {
+    try {
+      await this.ensureValidToken();
+
+      const response = await fetch(`${API_BASE_URL}/user/use-life`, {
+        method: 'POST',
+        headers: this.getHeaders()
+      });
+
+      return await this.handleResponse(response);
+    } catch (error) {
+      console.error('❌ Use life error:', error);
+      throw error;
+    }
+  }
+
+  // ============================================
   // FARM V3 API Methods
   // ============================================
 
@@ -196,6 +338,8 @@ class APIService {
    */
   async initializeFarm(locationData) {
     try {
+      await this.ensureValidToken();
+
       const response = await fetch(`${API_BASE_URL}/farm/init`, {
         method: 'POST',
         headers: this.getHeaders(),
@@ -215,6 +359,8 @@ class APIService {
    */
   async saveFarm(farmState) {
     try {
+      await this.ensureValidToken();
+
       const response = await fetch(`${API_BASE_URL}/farm/save`, {
         method: 'POST',
         headers: this.getHeaders(),
@@ -234,6 +380,8 @@ class APIService {
    */
   async loadFarm() {
     try {
+      await this.ensureValidToken();
+
       const response = await fetch(`${API_BASE_URL}/farm/load`, {
         method: 'GET',
         headers: this.getHeaders()
@@ -252,6 +400,8 @@ class APIService {
    */
   async updateFarm(updates) {
     try {
+      await this.ensureValidToken();
+
       const response = await fetch(`${API_BASE_URL}/farm/update`, {
         method: 'PATCH',
         headers: this.getHeaders(),
@@ -271,6 +421,8 @@ class APIService {
    */
   async logFarmAction(actionType, actionData) {
     try {
+      await this.ensureValidToken();
+
       const response = await fetch(`${API_BASE_URL}/farm/action`, {
         method: 'POST',
         headers: this.getHeaders(),
@@ -290,6 +442,8 @@ class APIService {
    */
   async recordHarvest(cropId, yieldAmount, revenue) {
     try {
+      await this.ensureValidToken();
+
       const response = await fetch(`${API_BASE_URL}/farm/harvest`, {
         method: 'POST',
         headers: this.getHeaders(),
@@ -309,6 +463,8 @@ class APIService {
    */
   async getFarmStats() {
     try {
+      await this.ensureValidToken();
+
       const response = await fetch(`${API_BASE_URL}/farm/stats`, {
         method: 'GET',
         headers: this.getHeaders()
@@ -327,6 +483,8 @@ class APIService {
    */
   async resetFarm() {
     try {
+      await this.ensureValidToken();
+
       const response = await fetch(`${API_BASE_URL}/farm/reset`, {
         method: 'DELETE',
         headers: this.getHeaders()

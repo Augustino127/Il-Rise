@@ -6,9 +6,6 @@
 
 import apiService from '../services/api.js';
 
-// Configuration API
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://ilerise.onrender.com/api';
-
 export class LivesSystem {
   constructor() {
     this.MAX_LIVES = 5;
@@ -214,12 +211,7 @@ export class LivesSystem {
     // Si mode backend, utiliser l'endpoint dédié
     if (this.useBackendSync) {
       try {
-        const response = await fetch(`${API_BASE_URL}/user/use-life`, {
-          method: 'POST',
-          headers: apiService.getHeaders()
-        });
-
-        const result = await response.json();
+        const result = await apiService.useLife();
 
         if (result.success) {
           // Mettre à jour localStorage
