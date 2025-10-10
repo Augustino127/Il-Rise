@@ -4,6 +4,20 @@
  * IleRise V3 - NASA Space Apps Challenge 2025
  */
 
+/**
+ * Mode test rapide pour invités - Divise les durées par 10
+ */
+function adjustActionDuration(baseDuration) {
+  if (typeof localStorage !== 'undefined') {
+    const isGuest = localStorage.getItem('ilerise_guest') === 'true';
+    if (isGuest) {
+      // Actions instantanées pour invités (ou presque)
+      return Math.max(0.1, baseDuration * 0.1);
+    }
+  }
+  return baseDuration;
+}
+
 export class FarmActionSystem {
   constructor(resourceManager) {
     this.resourceManager = resourceManager;
@@ -27,7 +41,7 @@ export class FarmActionSystem {
         name: { fr: 'Labourer le champ', fon: 'Gbɛ́ɖóhun', wolof: 'Leep' },
         icon: '🚜',
         category: 'preparation',
-        duration: 2, // jours
+        get duration() { return adjustActionDuration(2); }, // 2 jours normaux, 0.2 jours pour invités
         cost: { money: 20 },
         effect: { soilQuality: +10, weedLevel: -30 },
         unlockLevel: 1,
@@ -39,7 +53,7 @@ export class FarmActionSystem {
         name: { fr: 'Ajouter du compost', fon: 'Sɔ́ɖó gbɛ́ɖóhun', wolof: 'Defar kompos' },
         icon: '💩',
         category: 'preparation',
-        duration: 1,
+        get duration() { return adjustActionDuration(1); },
         cost: { fertilizers: { organic: 50 } },
         effect: { soilOrganic: +15, ph: +0.3, soilQuality: +5 },
         unlockLevel: 1,
@@ -161,7 +175,7 @@ export class FarmActionSystem {
         name: { fr: 'Désherber', fon: 'Ko gbɛ́ azɔ́n', wolof: 'Leen xaj' },
         icon: '🌿',
         category: 'maintenance',
-        duration: 2,
+        get duration() { return adjustActionDuration(2); },
         cost: { money: 10 }, // Main d'œuvre
         effect: { weedLevel: -50 },
         repeatable: true,

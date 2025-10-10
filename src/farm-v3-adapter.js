@@ -137,68 +137,120 @@ export class FarmV3Adapter {
    * Setup event listeners
    */
   setupEventListeners() {
+    console.log('🎮 [FarmV3Adapter] Configuration des event listeners...');
+
     // Bouton retour
-    document.getElementById('btn-back-farm')?.addEventListener('click', () => {
-      this.exitFarmMode();
-    });
+    const btnBack = document.getElementById('btn-back-farm');
+    if (btnBack) {
+      btnBack.addEventListener('click', () => {
+        this.exitFarmMode();
+      });
+      console.log('✅ Bouton retour configuré');
+    } else {
+      console.warn('⚠️ Bouton retour non trouvé');
+    }
 
     // Sélecteur de culture
-    document.getElementById('crop-select')?.addEventListener('change', (e) => {
-      const cropId = e.target.value;
-      if (cropId) {
-        this.selectedCropId = cropId;
-        const cropName = e.target.options[e.target.selectedIndex].text;
-        this.showToast(`🌾 ${cropName} sélectionné`, 'info');
-      }
-    });
+    const cropSelect = document.getElementById('crop-select');
+    if (cropSelect) {
+      cropSelect.addEventListener('change', (e) => {
+        const cropId = e.target.value;
+        if (cropId) {
+          this.selectedCropId = cropId;
+          const cropName = e.target.options[e.target.selectedIndex].text;
+          this.showToast(`🌾 ${cropName} sélectionné`, 'info');
+          console.log(`🌾 Culture sélectionnée: ${cropId}`);
+        }
+      });
+      console.log('✅ Sélecteur de culture configuré');
+    }
 
     // Contrôles temps
-    document.getElementById('btn-pause')?.addEventListener('click', () => {
-      this.farmGame.togglePause();
-    });
+    const btnPause = document.getElementById('btn-pause');
+    if (btnPause) {
+      btnPause.addEventListener('click', () => {
+        this.farmGame.togglePause();
+        console.log('⏸️ Pause toggled');
+      });
+      console.log('✅ Bouton pause configuré');
+    }
 
-    document.getElementById('btn-next-day')?.addEventListener('click', () => {
-      this.farmGame.skipToNextDay();
-    });
+    const btnNextDay = document.getElementById('btn-next-day');
+    if (btnNextDay) {
+      btnNextDay.addEventListener('click', () => {
+        this.farmGame.skipToNextDay();
+        console.log('⏭️ Jour suivant');
+      });
+      console.log('✅ Bouton jour suivant configuré');
+    }
 
     // Vitesse simulation
-    document.querySelectorAll('#screen-farm .speed-btn').forEach(btn => {
+    const speedBtns = document.querySelectorAll('#screen-farm-v3 .speed-btn, #screen-farm .speed-btn');
+    console.log(`📊 Boutons de vitesse trouvés: ${speedBtns.length}`);
+    speedBtns.forEach(btn => {
       btn.addEventListener('click', (e) => {
         const speed = parseInt(e.target.dataset.speed);
         this.farmGame.timeSimulation.setSpeed(speed);
-        document.querySelectorAll('#screen-farm .speed-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
         e.target.classList.add('active');
+        console.log(`⏱️ Vitesse changée à ${speed}x`);
       });
     });
 
     // Sélection parcelle
-    document.querySelectorAll('#screen-farm .plot-mini').forEach(plotBtn => {
+    const plotBtns = document.querySelectorAll('#screen-farm-v3 .plot-mini, #screen-farm .plot-mini');
+    console.log(`🗺️ Boutons de parcelle trouvés: ${plotBtns.length}`);
+    plotBtns.forEach(plotBtn => {
       plotBtn.addEventListener('click', (e) => {
         const plotId = parseInt(e.currentTarget.dataset.plotId);
+        console.log(`🗺️ Clic sur parcelle ${plotId}`);
         this.selectPlot(plotId);
       });
     });
 
     // Navigation sections
-    document.querySelectorAll('#screen-farm .nav-btn').forEach(btn => {
+    const navBtns = document.querySelectorAll('#screen-farm-v3 .nav-btn, #screen-farm .nav-btn');
+    console.log(`🧭 Boutons de navigation trouvés: ${navBtns.length}`);
+    navBtns.forEach(btn => {
       btn.addEventListener('click', (e) => {
         const section = e.currentTarget.dataset.section;
+        console.log(`🧭 Navigation vers: ${section}`);
         this.switchSection(section);
       });
     });
 
     // Actions agricoles
-    document.querySelectorAll('#screen-farm .action-btn').forEach(btn => {
+    const actionBtns = document.querySelectorAll('#screen-farm-v3 .action-btn, #screen-farm .action-btn');
+    console.log(`🎬 Boutons d'action trouvés: ${actionBtns.length}`);
+    actionBtns.forEach((btn, index) => {
+      const actionId = btn.dataset.action;
+      console.log(`  ✓ Action #${index + 1}: ${actionId || 'UNDEFINED'}`);
+
       btn.addEventListener('click', (e) => {
-        const actionId = e.currentTarget.dataset.action;
-        this.executeAction(actionId);
+        e.preventDefault();
+        const clickedActionId = e.currentTarget.dataset.action;
+        console.log(`🎯 [CLIC] Action: ${clickedActionId}`);
+
+        if (!clickedActionId) {
+          console.error('❌ Action ID manquant sur le bouton');
+          this.showToast('⚠️ Erreur: action non définie', 'error');
+          return;
+        }
+
+        this.executeAction(clickedActionId);
       });
     });
 
     // Déblocage poulailler
-    document.getElementById('btn-unlock-coop')?.addEventListener('click', () => {
-      this.unlockCoop();
-    });
+    const btnUnlockCoop = document.getElementById('btn-unlock-coop');
+    if (btnUnlockCoop) {
+      btnUnlockCoop.addEventListener('click', () => {
+        this.unlockCoop();
+      });
+      console.log('✅ Bouton poulailler configuré');
+    }
+
+    console.log('✅ Tous les event listeners configurés');
   }
 
   /**
@@ -236,37 +288,83 @@ export class FarmV3Adapter {
    * Exécuter une action agricole
    */
   executeAction(actionId) {
-    // Si c'est une action de plantation
-    if (actionId === 'plant') {
-      if (!this.selectedCropId) {
-        this.showToast('⚠️ Veuillez d\'abord sélectionner une culture', 'warning');
+    console.log(`🎬 [FarmV3Adapter] Exécution action: ${actionId} sur parcelle ${this.activePlotId}`);
+
+    try {
+      // Vérifier que le jeu est initialisé
+      if (!this.farmGame || !this.farmGame.isInitialized) {
+        console.error('❌ Jeu non initialisé');
+        this.showToast('⚠️ Jeu non initialisé', 'error');
         return;
       }
 
-      const success = this.farmGame.plotManager.plantCrop(this.selectedCropId, this.activePlotId);
-      if (!success) {
-        this.showToast('❌ Impossible de planter cette culture', 'error');
+      // Vérifier qu'une parcelle est active
+      const activePlot = this.farmGame.plotManager.getActivePlot();
+      if (!activePlot) {
+        console.error('❌ Aucune parcelle active');
+        this.showToast('⚠️ Veuillez sélectionner une parcelle', 'warning');
         return;
       }
 
-      if (this.farmScene) {
-        this.farmScene.clearPlants();
-        this.farmScene.plantCrop(this.selectedCropId, 49);
-        this.farmScene.animateGrowth(2000);
+      console.log(`📦 Parcelle active: ${activePlot.id}, plantée: ${activePlot.isPlanted}, labourée: ${activePlot.isPlowed}`);
+      console.log(`💰 Ressources avant action:`, this.farmGame.resourceManager.resources);
+
+      // Si c'est une action de plantation
+      if (actionId === 'plant') {
+        if (!this.selectedCropId) {
+          console.warn('⚠️ Aucune culture sélectionnée');
+          this.showToast('⚠️ Veuillez d\'abord sélectionner une culture', 'warning');
+          return;
+        }
+
+        console.log(`🌱 Tentative de plantation: ${this.selectedCropId} sur parcelle ${this.activePlotId}`);
+
+        // IMPORTANT: plantCrop(plotId, cropId) - L'ORDRE DES PARAMÈTRES EST IMPORTANT!
+        const success = this.farmGame.plotManager.plantCrop(this.activePlotId, this.selectedCropId);
+        if (!success) {
+          console.error('❌ Échec plantation');
+          this.showToast('❌ Impossible de planter cette culture', 'error');
+          return;
+        }
+
+        if (this.farmScene) {
+          this.farmScene.clearPlants();
+          this.farmScene.plantCrop(this.selectedCropId, 49);
+          this.farmScene.animateGrowth(2000);
+        }
+
+        console.log('✅ Plantation réussie');
+        this.showToast(`🌱 ${this.selectedCropId.toUpperCase()} planté !`, 'success');
+        this.updateUI();
+        return;
       }
 
-      this.showToast(`🌱 ${this.selectedCropId.toUpperCase()} planté !`, 'success');
-      this.updateUI();
-      return;
-    }
+      // Exécuter autres actions
+      console.log(`🎯 Exécution action via FarmGame.executeAction`);
+      const result = this.farmGame.executeAction(actionId, this.activePlotId);
+      console.log(`📊 Résultat:`, result);
+      console.log(`💰 Ressources après action:`, this.farmGame.resourceManager.resources);
 
-    // Exécuter autres actions
-    const result = this.farmGame.executeAction(actionId, this.activePlotId);
+      if (result.success) {
+        this.showToast(`✅ Action "${actionId}" effectuée`, 'success');
 
-    if (result.success) {
-      this.showToast(`✅ Action terminée`, 'success');
-    } else {
-      this.showToast(`❌ ${result.error || 'Action impossible'}`, 'error');
+        // Si action terminera dans X jours
+        if (result.completionDay) {
+          const daysRemaining = result.completionDay - this.farmGame.timeSimulation.currentDay;
+          if (daysRemaining > 0) {
+            this.showToast(`⏰ Terminera dans ${daysRemaining} jour(s)`, 'info');
+          }
+        }
+
+        // Mettre à jour l'UI
+        this.updateUI();
+      } else {
+        console.warn(`⚠️ Action échouée: ${result.error}`);
+        this.showToast(`❌ ${result.error || 'Action impossible'}`, 'error');
+      }
+    } catch (error) {
+      console.error('❌ Erreur lors de l\'exécution de l\'action:', error);
+      this.showToast(`❌ Erreur: ${error.message}`, 'error');
     }
   }
 
@@ -306,12 +404,19 @@ export class FarmV3Adapter {
    */
   switchSection(section) {
     this.currentSection = section;
+    console.log(`🔀 Changement de section vers: ${section}`);
 
     document.querySelectorAll('#screen-farm-v3 .nav-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelector(`#screen-farm-v3 .nav-btn[data-section="${section}"]`)?.classList.add('active');
 
     document.querySelectorAll('#screen-farm-v3 .section-content').forEach(s => s.classList.remove('active'));
-    document.getElementById(`section-${section}-v3`)?.classList.add('active');
+    const sectionElement = document.getElementById(`section-${section}`);
+    if (sectionElement) {
+      sectionElement.classList.add('active');
+      console.log(`✅ Section "${section}" activée`);
+    } else {
+      console.warn(`⚠️ Section "${section}" non trouvée`);
+    }
   }
 
   /**

@@ -162,6 +162,13 @@ class IleRiseApp {
   attachEventListeners() {
     // Écouter expiration du token
     window.addEventListener('auth:expired', () => {
+      // Ne pas déconnecter les invités
+      const isGuest = localStorage.getItem('ilerise_guest');
+      if (isGuest === 'true') {
+        console.log('👤 Mode invité - Ignorer expiration de token');
+        return;
+      }
+
       console.warn('🔴 Token expiré - Déconnexion automatique');
       this.logout();
       this.showMessage(
@@ -196,12 +203,22 @@ class IleRiseApp {
     const btnQuitter = document.getElementById('btn-quitter');
     if (btnQuitter) {
       btnQuitter.addEventListener('click', () => {
+        const isGuest = localStorage.getItem('ilerise_guest') === 'true';
+
         this.showConfirm(
           'Quitter IleRise',
-          'Voulez-vous vraiment quitter le jeu ?',
+          isGuest
+            ? 'Voulez-vous revenir à l\'écran de connexion ?'
+            : 'Voulez-vous vraiment quitter le jeu ?',
           (confirmed) => {
             if (confirmed) {
-              window.close();
+              if (isGuest) {
+                // Pour les invités, revenir à l'écran de connexion
+                this.logout();
+              } else {
+                // Pour les utilisateurs normaux, essayer de fermer
+                window.close();
+              }
             }
           }
         );
@@ -2381,6 +2398,12 @@ class IleRiseApp {
       this.isAuthenticated = true;
       if (user) {
         this.currentUser = JSON.parse(user);
+      }
+
+      // Mode invité - pas de validation de token
+      if (isGuest === 'true') {
+        console.log('👤 Mode invité - Authentification locale seulement');
+        return true;
       }
 
       // 🆕 Définir le token dans apiService si disponible

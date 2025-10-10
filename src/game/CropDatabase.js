@@ -4,6 +4,25 @@
  * NASA Space Apps Challenge 2025
  */
 
+/**
+ * Mode test rapide pour invités - Divise les durées de croissance par 10
+ */
+function getTestModeMultiplier() {
+  if (typeof localStorage !== 'undefined') {
+    const isGuest = localStorage.getItem('ilerise_guest') === 'true';
+    return isGuest ? 0.1 : 1; // 10x plus rapide pour invités
+  }
+  return 1;
+}
+
+/**
+ * Ajuster la durée selon le mode
+ */
+function adjustDuration(baseDuration) {
+  const multiplier = getTestModeMultiplier();
+  return Math.max(1, Math.round(baseDuration * multiplier));
+}
+
 export const CROPS = {
   maize: {
     id: 'maize',
@@ -20,8 +39,8 @@ export const CROPS = {
     maxYield: 5.0, // tonnes/hectare
     targetYield: 3.0, // Objectif minimum
 
-    // Cycle de vie
-    growthDuration: 90, // jours
+    // Cycle de vie (90 jours normaux, ~9 jours en mode test)
+    get growthDuration() { return adjustDuration(90); },
 
     // Besoins en eau (%)
     waterNeed: {
@@ -75,7 +94,7 @@ export const CROPS = {
 
     maxYield: 2.0,
     targetYield: 1.5,
-    growthDuration: 70,
+    get growthDuration() { return adjustDuration(70); },
 
     waterNeed: {
       min: 30,
@@ -124,7 +143,7 @@ export const CROPS = {
 
     maxYield: 6.0,
     targetYield: 5.0,
-    growthDuration: 120,
+    get growthDuration() { return adjustDuration(120); },
 
     waterNeed: {
       min: 70, // Besoin d'inondation
@@ -173,7 +192,7 @@ export const CROPS = {
 
     maxYield: 20.0,
     targetYield: 15.0,
-    growthDuration: 300, // 10 mois
+    get growthDuration() { return adjustDuration(300); }, // 10 mois normaux, 30 jours en mode test
 
     waterNeed: {
       min: 25,
@@ -222,7 +241,7 @@ export const CROPS = {
 
     maxYield: 1.6, // t/ha (aligné avec LevelSystem niveau 3)
     targetYield: 0.6, // Aligné avec niveau 1
-    growthDuration: 365, // Culture pérenne
+    get growthDuration() { return adjustDuration(365); }, // 1 an normalement, 37 jours en mode test
 
     waterNeed: {
       min: 60,
@@ -271,7 +290,7 @@ export const CROPS = {
 
     maxYield: 3.0,
     targetYield: 2.5,
-    growthDuration: 150,
+    get growthDuration() { return adjustDuration(150); },
 
     waterNeed: {
       min: 45,

@@ -10,6 +10,123 @@
   "lastUpdate": "2025-10-04",
   "locations": [
     {
+      "city": "Cotonou",
+      "country": "Benin",
+      "latitude": 6.3667,
+      "longitude": 2.3833,
+      "temperature": {
+        "average_c": 32.15,
+        "min_c": 30.87,
+        "max_c": 33.75,
+        "current_c": 32.45
+      },
+      "timeseries": [
+        {
+          "date": "2024-12-26",
+          "temperature_c": 33.12,
+          "raw_value": 15313
+        },
+        {
+          "date": "2025-01-01",
+          "temperature_c": 32.87,
+          "raw_value": 15300
+        },
+        {
+          "date": "2025-01-09",
+          "temperature_c": 30.87,
+          "raw_value": 15200
+        },
+        {
+          "date": "2025-01-17",
+          "temperature_c": 33.75,
+          "raw_value": 15345
+        },
+        {
+          "date": "2025-01-25",
+          "temperature_c": 32.45,
+          "raw_value": 15279
+        }
+      ]
+    },
+    {
+      "city": "Porto-Novo",
+      "country": "Benin",
+      "latitude": 6.4969,
+      "longitude": 2.6289,
+      "temperature": {
+        "average_c": 31.89,
+        "min_c": 30.65,
+        "max_c": 33.42,
+        "current_c": 31.97
+      },
+      "timeseries": [
+        {
+          "date": "2024-12-26",
+          "temperature_c": 32.76,
+          "raw_value": 15295
+        },
+        {
+          "date": "2025-01-01",
+          "temperature_c": 32.13,
+          "raw_value": 15263
+        },
+        {
+          "date": "2025-01-09",
+          "temperature_c": 30.65,
+          "raw_value": 15189
+        },
+        {
+          "date": "2025-01-17",
+          "temperature_c": 33.42,
+          "raw_value": 15329
+        },
+        {
+          "date": "2025-01-25",
+          "temperature_c": 31.97,
+          "raw_value": 15258
+        }
+      ]
+    },
+    {
+      "city": "Abomey-Calavi",
+      "country": "Benin",
+      "latitude": 6.4489,
+      "longitude": 2.3553,
+      "temperature": {
+        "average_c": 32.04,
+        "min_c": 30.78,
+        "max_c": 33.58,
+        "current_c": 32.21
+      },
+      "timeseries": [
+        {
+          "date": "2024-12-26",
+          "temperature_c": 32.94,
+          "raw_value": 15304
+        },
+        {
+          "date": "2025-01-01",
+          "temperature_c": 32.49,
+          "raw_value": 15282
+        },
+        {
+          "date": "2025-01-09",
+          "temperature_c": 30.78,
+          "raw_value": 15195
+        },
+        {
+          "date": "2025-01-17",
+          "temperature_c": 33.58,
+          "raw_value": 15337
+        },
+        {
+          "date": "2025-01-25",
+          "temperature_c": 32.21,
+          "raw_value": 15268
+        }
+      ]
+    },
+    {
       "city": "Parakou",
       "country": "Benin",
       "latitude": 9.3372,

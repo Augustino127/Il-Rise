@@ -128,12 +128,19 @@ class APIService {
     if (!response.ok) {
       // Si erreur 401, token invalide - déconnecter
       if (response.status === 401) {
-        this.setToken(null);
+        // Ne pas déclencher pour les invités
+        const isGuest = localStorage.getItem('ilerise_guest');
+        if (isGuest !== 'true') {
+          this.setToken(null);
 
-        // Déclencher événement de déconnexion
-        window.dispatchEvent(new CustomEvent('auth:expired'));
+          // Déclencher événement de déconnexion
+          window.dispatchEvent(new CustomEvent('auth:expired'));
 
-        throw new Error('Session expirée. Veuillez vous reconnecter.');
+          throw new Error('Session expirée. Veuillez vous reconnecter.');
+        } else {
+          // En mode invité, ignorer l'erreur 401
+          throw new Error('Opération non disponible en mode invité');
+        }
       }
 
       throw new Error(data.message || data.error || 'Erreur serveur');
@@ -229,8 +236,11 @@ class APIService {
       throw new Error('Failed to refresh token');
     } catch (error) {
       console.error('❌ Refresh token error:', error);
-      // En cas d'échec, déclencher déconnexion
-      window.dispatchEvent(new CustomEvent('auth:expired'));
+      // En cas d'échec, déclencher déconnexion (sauf pour invités)
+      const isGuest = localStorage.getItem('ilerise_guest');
+      if (isGuest !== 'true') {
+        window.dispatchEvent(new CustomEvent('auth:expired'));
+      }
       throw error;
     }
   }

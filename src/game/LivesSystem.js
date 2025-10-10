@@ -23,6 +23,20 @@ export class LivesSystem {
    * Charge depuis le serveur si authentifié
    */
   async initialize() {
+    // Mode invité - Vies illimitées pour tests rapides
+    const isGuest = localStorage.getItem('ilerise_guest') === 'true';
+    if (isGuest) {
+      console.log('👤 LivesSystem - Mode invité (vies illimitées)');
+      const data = {
+        lives: this.MAX_LIVES,
+        lastRegenTime: Date.now(),
+        lastResetDate: new Date().toDateString(),
+        isGuest: true
+      };
+      this.saveLivesData(data);
+      return;
+    }
+
     this.useBackendSync = apiService.isAuthenticated();
 
     if (this.useBackendSync) {
@@ -151,6 +165,17 @@ export class LivesSystem {
    * Charger donnees de vies depuis localStorage
    */
   loadLivesData() {
+    // Mode invité - Toujours max vies
+    const isGuest = localStorage.getItem('ilerise_guest') === 'true';
+    if (isGuest) {
+      return {
+        lives: this.MAX_LIVES,
+        lastRegenTime: Date.now(),
+        lastResetDate: new Date().toDateString(),
+        isGuest: true
+      };
+    }
+
     const storageKey = this.getLivesStorageKey();
     const saved = localStorage.getItem(storageKey);
 
@@ -208,6 +233,13 @@ export class LivesSystem {
    * @returns {boolean} True si vie utilisee, false si plus de vies
    */
   async useLife() {
+    // Mode invité - Vies illimitées
+    const isGuest = localStorage.getItem('ilerise_guest') === 'true';
+    if (isGuest) {
+      console.log('👤 Vie utilisée (invité - illimitée)');
+      return true; // Toujours true pour les invités
+    }
+
     // Si mode backend, utiliser l'endpoint dédié
     if (this.useBackendSync) {
       try {

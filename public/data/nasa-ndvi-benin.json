@@ -6,6 +6,120 @@
   "lastUpdate": "2025-10-04",
   "locations": [
     {
+      "city": "Cotonou",
+      "country": "Benin",
+      "latitude": 6.3667,
+      "longitude": 2.3833,
+      "vegetation_health": {
+        "current_ndvi": 0.2847,
+        "average_ndvi": 0.2756,
+        "min_ndvi": 0.2543,
+        "max_ndvi": 0.2951,
+        "status": "poor",
+        "health_description": "Végétation faible",
+        "color": "orange"
+      },
+      "timeseries": [
+        {
+          "date": "2024-12-18",
+          "ndvi": 0.2543,
+          "health": "Végétation faible",
+          "status": "poor",
+          "raw_value": 2543
+        },
+        {
+          "date": "2025-01-01",
+          "ndvi": 0.2951,
+          "health": "Végétation faible",
+          "status": "poor",
+          "raw_value": 2951
+        },
+        {
+          "date": "2025-01-17",
+          "ndvi": 0.2847,
+          "health": "Végétation faible",
+          "status": "poor",
+          "raw_value": 2847
+        }
+      ]
+    },
+    {
+      "city": "Porto-Novo",
+      "country": "Benin",
+      "latitude": 6.4969,
+      "longitude": 2.6289,
+      "vegetation_health": {
+        "current_ndvi": 0.2654,
+        "average_ndvi": 0.2612,
+        "min_ndvi": 0.2489,
+        "max_ndvi": 0.2742,
+        "status": "poor",
+        "health_description": "Végétation faible",
+        "color": "orange"
+      },
+      "timeseries": [
+        {
+          "date": "2024-12-18",
+          "ndvi": 0.2489,
+          "health": "Végétation faible",
+          "status": "poor",
+          "raw_value": 2489
+        },
+        {
+          "date": "2025-01-01",
+          "ndvi": 0.2742,
+          "health": "Végétation faible",
+          "status": "poor",
+          "raw_value": 2742
+        },
+        {
+          "date": "2025-01-17",
+          "ndvi": 0.2654,
+          "health": "Végétation faible",
+          "status": "poor",
+          "raw_value": 2654
+        }
+      ]
+    },
+    {
+      "city": "Abomey-Calavi",
+      "country": "Benin",
+      "latitude": 6.4489,
+      "longitude": 2.3553,
+      "vegetation_health": {
+        "current_ndvi": 0.2723,
+        "average_ndvi": 0.2698,
+        "min_ndvi": 0.2556,
+        "max_ndvi": 0.2815,
+        "status": "poor",
+        "health_description": "Végétation faible",
+        "color": "orange"
+      },
+      "timeseries": [
+        {
+          "date": "2024-12-18",
+          "ndvi": 0.2556,
+          "health": "Végétation faible",
+          "status": "poor",
+          "raw_value": 2556
+        },
+        {
+          "date": "2025-01-01",
+          "ndvi": 0.2815,
+          "health": "Végétation faible",
+          "status": "poor",
+          "raw_value": 2815
+        },
+        {
+          "date": "2025-01-17",
+          "ndvi": 0.2723,
+          "health": "Végétation faible",
+          "status": "poor",
+          "raw_value": 2723
+        }
+      ]
+    },
+    {
       "city": "Parakou",
       "country": "Benin",
       "latitude": 9.3372,

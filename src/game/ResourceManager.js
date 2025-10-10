@@ -6,35 +6,39 @@
 
 export class ResourceManager {
   constructor(initialResources = {}) {
+    // Mode test rapide pour invités
+    const isGuest = typeof localStorage !== 'undefined' && localStorage.getItem('ilerise_guest') === 'true';
+    const testMode = isGuest;
+
     this.resources = {
-      // Ressources monétaires
-      money: initialResources.money || 500,
+      // Ressources monétaires (5x plus pour invités)
+      money: initialResources.money || (testMode ? 2500 : 500),
 
-      // Ressources liquides
-      water: initialResources.water || 1000, // Litres
+      // Ressources liquides (5x plus pour invités)
+      water: initialResources.water || (testMode ? 5000 : 1000), // Litres
 
-      // Graines par culture
+      // Graines par culture (10x plus pour invités)
       seeds: {
-        maize: initialResources.seeds?.maize || 50,
-        cowpea: initialResources.seeds?.cowpea || 30,
-        rice: initialResources.seeds?.rice || 20,
-        cassava: initialResources.seeds?.cassava || 15,
-        cacao: initialResources.seeds?.cacao || 10,
-        cotton: initialResources.seeds?.cotton || 25
+        maize: initialResources.seeds?.maize || (testMode ? 500 : 50),
+        cowpea: initialResources.seeds?.cowpea || (testMode ? 300 : 30),
+        rice: initialResources.seeds?.rice || (testMode ? 200 : 20),
+        cassava: initialResources.seeds?.cassava || (testMode ? 150 : 15),
+        cacao: initialResources.seeds?.cacao || (testMode ? 100 : 10),
+        cotton: initialResources.seeds?.cotton || (testMode ? 250 : 25)
       },
 
-      // Engrais et amendements
+      // Engrais et amendements (5x plus pour invités)
       fertilizers: {
-        organic: initialResources.fertilizers?.organic || 100, // kg compost
-        npk: initialResources.fertilizers?.npk || 50,           // kg NPK chimique
-        urea: initialResources.fertilizers?.urea || 30,         // kg urée (azote)
-        phosphate: initialResources.fertilizers?.phosphate || 20 // kg phosphate
+        organic: initialResources.fertilizers?.organic || (testMode ? 500 : 100), // kg compost
+        npk: initialResources.fertilizers?.npk || (testMode ? 250 : 50),           // kg NPK chimique
+        urea: initialResources.fertilizers?.urea || (testMode ? 150 : 30),         // kg urée (azote)
+        phosphate: initialResources.fertilizers?.phosphate || (testMode ? 100 : 20) // kg phosphate
       },
 
-      // Pesticides et traitements
+      // Pesticides et traitements (5x plus pour invités)
       pesticides: {
-        natural: initialResources.pesticides?.natural || 10,    // L pesticide bio
-        chemical: initialResources.pesticides?.chemical || 5     // L pesticide chimique
+        natural: initialResources.pesticides?.natural || (testMode ? 50 : 10),    // L pesticide bio
+        chemical: initialResources.pesticides?.chemical || (testMode ? 25 : 5)     // L pesticide chimique
       },
 
       // Outils et équipements
