@@ -25,8 +25,11 @@ export class FarmGame {
     this.playerLevel = playerLevel;
     this.nasaData = nasaData;
 
+    // Détecter le mode invité pour testMode
+    const isGuest = typeof localStorage !== 'undefined' && localStorage.getItem('ilerise_guest') === 'true';
+
     // Initialiser tous les systèmes
-    this.resourceManager = new ResourceManager();
+    this.resourceManager = new ResourceManager({}, isGuest);
     this.timeSimulation = new TimeSimulation();
     this.plotManager = new PlotManager(this.resourceManager, this.timeSimulation, nasaData);
     this.actionSystem = new FarmActionSystem(this.resourceManager);
@@ -42,6 +45,7 @@ export class FarmGame {
     this.onResourceChangeCallback = null;
     this.onActionCompleteCallback = null;
     this.onSyncErrorCallback = null; // Callback pour afficher les erreurs de sync
+    this.onNotificationCallback = null; // Callback pour afficher les notifications générales
 
     // Synchronisation backend
     this.useBackendSync = apiService.isAuthenticated();
@@ -182,10 +186,21 @@ export class FarmGame {
    * @param {Number} hour
    */
   handleHourChange(hour) {
-    // Logique spécifique aux heures si nécessaire
-    // Ex: collecte automatique des œufs à 6h
+    // Collecte automatique des œufs à 6h du matin
     if (hour === 6 && this.livestockManager.animals.chickens.count > 0) {
-      this.livestockManager.collectEggs();
+      const eggsCollected = this.livestockManager.collectEggs();
+
+      // Notifier l'utilisateur si des œufs ont été collectés
+      if (eggsCollected > 0) {
+        if (this.onNotificationCallback) {
+          this.onNotificationCallback(`🥚 Collecte automatique: ${eggsCollected} œuf(s) collecté(s)`, 'success');
+        }
+
+        // Mettre à jour l'affichage des ressources
+        if (this.onResourceChangeCallback) {
+          this.onResourceChangeCallback(this.resourceManager.getSummary());
+        }
+      }
     }
   }
 
@@ -228,17 +243,49 @@ export class FarmGame {
    * Planter une culture
    * @param {String} cropId
    * @param {Number} plotId
-   * @returns {Boolean}
+   * @returns {Object} { success: Boolean, message: String }
    */
   plantCrop(cropId, plotId = null) {
     const targetPlot = plotId
       ? this.plotManager.getPlot(plotId)
       : this.plotManager.getActivePlot();
 
-    if (!targetPlot) return false;
+    if (!targetPlot) {
+      return { success: false, error: 'Parcelle non trouvée' };
+    }
 
-    // Utiliser FarmActionSystem pour l'action 'plant'
-    return this.executeAction('plant', targetPlot.id);
+    if (!cropId) {
+      return { success: false, error: 'Culture non spécifiée' };
+    }
+
+    // Vérifier si la parcelle est labourée
+    if (!targetPlot.isPlowed) {
+      return { success: false, error: 'La parcelle doit être labourée avant de planter' };
+    }
+
+    // Vérifier si des graines sont disponibles
+    const seedsAvailable = this.resourceManager.get('seeds', cropId);
+    if (seedsAvailable < 10) {
+      return { success: false, error: 'Pas assez de graines (10 requis)' };
+    }
+
+    // Consommer les graines
+    this.resourceManager.consume(
+      { seeds: { [cropId]: 10 } },
+      `Plantation ${cropId}`
+    );
+
+    // Planter via PlotManager
+    const success = this.plotManager.plantCrop(targetPlot.id, cropId);
+
+    if (success) {
+      if (this.onResourceChangeCallback) {
+        this.onResourceChangeCallback(this.resourceManager.getSummary());
+      }
+      return { success: true, message: `${cropId} planté avec succès` };
+    }
+
+    return { success: false, error: 'Échec de la plantation' };
   }
 
   /**

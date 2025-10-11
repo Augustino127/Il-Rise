@@ -108,6 +108,10 @@ export class FarmV3Adapter {
       this.showToast(`✅ ${action.action.name.fr} terminé`);
       this.updateUI();
     };
+
+    this.farmGame.onNotificationCallback = (message, type) => {
+      this.showToast(message, type);
+    };
   }
 
   /**
@@ -185,7 +189,7 @@ export class FarmV3Adapter {
     }
 
     // Vitesse simulation
-    const speedBtns = document.querySelectorAll('#screen-farm-v3 .speed-btn, #screen-farm .speed-btn');
+    const speedBtns = document.querySelectorAll('#screen-farm-v3 .speed-btn');
     console.log(`📊 Boutons de vitesse trouvés: ${speedBtns.length}`);
     speedBtns.forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -198,7 +202,7 @@ export class FarmV3Adapter {
     });
 
     // Sélection parcelle
-    const plotBtns = document.querySelectorAll('#screen-farm-v3 .plot-mini, #screen-farm .plot-mini');
+    const plotBtns = document.querySelectorAll('#screen-farm-v3 .plot-mini');
     console.log(`🗺️ Boutons de parcelle trouvés: ${plotBtns.length}`);
     plotBtns.forEach(plotBtn => {
       plotBtn.addEventListener('click', (e) => {
@@ -209,7 +213,7 @@ export class FarmV3Adapter {
     });
 
     // Navigation sections
-    const navBtns = document.querySelectorAll('#screen-farm-v3 .nav-btn, #screen-farm .nav-btn');
+    const navBtns = document.querySelectorAll('#screen-farm-v3 .nav-btn');
     console.log(`🧭 Boutons de navigation trouvés: ${navBtns.length}`);
     navBtns.forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -220,7 +224,7 @@ export class FarmV3Adapter {
     });
 
     // Actions agricoles
-    const actionBtns = document.querySelectorAll('#screen-farm-v3 .action-btn, #screen-farm .action-btn');
+    const actionBtns = document.querySelectorAll('#screen-farm-v3 .action-btn');
     console.log(`🎬 Boutons d'action trouvés: ${actionBtns.length}`);
     actionBtns.forEach((btn, index) => {
       const actionId = btn.dataset.action;
@@ -270,7 +274,7 @@ export class FarmV3Adapter {
 
     document.addEventListener('keydown', (e) => {
       // Uniquement si on est dans l'écran ferme V3
-      const farmScreen = document.getElementById('screen-farm');
+      const farmScreen = document.getElementById('screen-farm-v3');
       if (!farmScreen || !farmScreen.classList.contains('active')) return;
 
       // Ignorer si dans un input, textarea ou select
@@ -319,11 +323,12 @@ export class FarmV3Adapter {
 
         console.log(`🌱 Tentative de plantation: ${this.selectedCropId} sur parcelle ${this.activePlotId}`);
 
-        // IMPORTANT: plantCrop(plotId, cropId) - L'ORDRE DES PARAMÈTRES EST IMPORTANT!
-        const success = this.farmGame.plotManager.plantCrop(this.activePlotId, this.selectedCropId);
-        if (!success) {
-          console.error('❌ Échec plantation');
-          this.showToast('❌ Impossible de planter cette culture', 'error');
+        // Utiliser la nouvelle méthode FarmGame.plantCrop() avec cropId
+        const result = this.farmGame.plantCrop(this.selectedCropId, this.activePlotId);
+
+        if (!result.success) {
+          console.error('❌ Échec plantation:', result.error);
+          this.showToast(`❌ ${result.error}`, 'error');
           return;
         }
 
@@ -381,8 +386,8 @@ export class FarmV3Adapter {
     this.activePlotId = plotId;
     this.farmGame.plotManager.setActivePlot(plotId);
 
-    document.querySelectorAll('#screen-farm .plot-mini').forEach(p => p.classList.remove('active'));
-    document.querySelector(`#screen-farm [data-plot-id="${plotId}"]`)?.classList.add('active');
+    document.querySelectorAll('#screen-farm-v3 .plot-mini').forEach(p => p.classList.remove('active'));
+    document.querySelector(`#screen-farm-v3 [data-plot-id="${plotId}"]`)?.classList.add('active');
 
     this.updatePlotInfo();
     this.updateSoilDisplay();
@@ -414,6 +419,11 @@ export class FarmV3Adapter {
     if (sectionElement) {
       sectionElement.classList.add('active');
       console.log(`✅ Section "${section}" activée`);
+
+      // Générer l'UI du marché si on navigue vers cette section
+      if (section === 'market') {
+        this.renderMarketUI();
+      }
     } else {
       console.warn(`⚠️ Section "${section}" non trouvée`);
     }
@@ -520,7 +530,7 @@ export class FarmV3Adapter {
     if (!plot) return;
 
     // Parcourir tous les boutons d'actions
-    document.querySelectorAll('#screen-farm .action-btn').forEach(btn => {
+    document.querySelectorAll('#screen-farm-v3 .action-btn').forEach(btn => {
       const actionId = btn.dataset.action;
       let canExecute = true;
       let reason = '';
@@ -665,7 +675,7 @@ export class FarmV3Adapter {
     const plots = this.farmGame.plotManager.plots;
 
     plots.forEach(plot => {
-      const plotBtn = document.querySelector(`#screen-farm [data-plot-id="${plot.id}"]`);
+      const plotBtn = document.querySelector(`#screen-farm-v3 [data-plot-id="${plot.id}"]`);
       if (!plotBtn) return;
 
       const iconSpan = plotBtn.querySelector('.plot-icon');
@@ -886,6 +896,227 @@ export class FarmV3Adapter {
 
     this.showToast('🐔 Poule ajoutée !', 'success');
     this.updateResourcesDisplay();
+  }
+
+  /**
+   * Afficher l'interface du marché
+   */
+  renderMarketUI() {
+    const container = document.getElementById('market-content');
+    if (!container) {
+      console.warn('⚠️ Conteneur marché non trouvé');
+      return;
+    }
+
+    const catalog = this.farmGame.marketSystem.getCatalog();
+    const resources = this.farmGame.resourceManager.resources;
+
+    // Tabs du marché
+    const tabs = document.querySelectorAll('.market-tab');
+    let activeTab = 'buy';
+    tabs.forEach(tab => {
+      if (tab.classList.contains('active')) {
+        activeTab = tab.dataset.tab;
+      }
+      tab.addEventListener('click', (e) => {
+        tabs.forEach(t => t.classList.remove('active'));
+        e.target.classList.add('active');
+        this.renderMarketUI();
+      });
+    });
+
+    // Noms français pour affichage
+    const itemNames = {
+      maize: 'Maïs', cowpea: 'Niébé', rice: 'Riz', cassava: 'Manioc', cacao: 'Cacao', cotton: 'Coton',
+      npk: 'Engrais NPK', organic: 'Compost', urea: 'Urée', phosphate: 'Phosphate',
+      natural: 'Pesticide naturel', chemical: 'Pesticide chimique',
+      chicken: 'Poule', goat: 'Chèvre',
+      eggs: 'Œufs', milk: 'Lait', manure: 'Fumier'
+    };
+
+    const emojis = {
+      maize: '🌽', cowpea: '🫘', rice: '🍚', cassava: '🥔', cacao: '🍫', cotton: '☁️',
+      npk: '🧪', organic: '💩', urea: '⚗️', phosphate: '🪨',
+      natural: '🌿', chemical: '☠️',
+      chicken: '🐔', goat: '🐐',
+      eggs: '🥚', milk: '🥛', manure: '💩'
+    };
+
+    let html = '';
+
+    if (activeTab === 'buy') {
+      // ONGLET ACHETER
+      html = '<div class="market-grid">';
+
+      // Graines
+      html += '<div class="market-category"><h4>🌱 Graines</h4><div class="market-items">';
+      catalog.seeds.forEach(item => {
+        const stock = resources.seeds[item.id] || 0;
+        html += `
+          <div class="market-item">
+            <div class="item-icon">${emojis[item.id]}</div>
+            <div class="item-info">
+              <div class="item-name">${itemNames[item.id]}</div>
+              <div class="item-price">${item.price}💰 / ${item.unit}</div>
+              <div class="item-stock">En stock: ${stock}</div>
+            </div>
+            <div class="item-actions">
+              <button class="btn-buy-item btn-secondary btn-small" data-category="seeds" data-item="${item.id}" data-price="${item.price}">
+                Acheter
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      html += '</div></div>';
+
+      // Engrais
+      html += '<div class="market-category"><h4>🧪 Engrais</h4><div class="market-items">';
+      catalog.fertilizers.forEach(item => {
+        const stock = resources.fertilizers[item.id] || 0;
+        html += `
+          <div class="market-item">
+            <div class="item-icon">${emojis[item.id]}</div>
+            <div class="item-info">
+              <div class="item-name">${itemNames[item.id]}</div>
+              <div class="item-price">${item.price}💰 / ${item.unit}</div>
+              <div class="item-stock">En stock: ${stock}kg</div>
+            </div>
+            <div class="item-actions">
+              <button class="btn-buy-item btn-secondary btn-small" data-category="fertilizers" data-item="${item.id}" data-price="${item.price}">
+                Acheter
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      html += '</div></div>';
+
+      // Pesticides
+      html += '<div class="market-category"><h4>🪲 Pesticides</h4><div class="market-items">';
+      catalog.pesticides.forEach(item => {
+        const stock = resources.pesticides?.[item.id] || 0;
+        html += `
+          <div class="market-item">
+            <div class="item-icon">${emojis[item.id]}</div>
+            <div class="item-info">
+              <div class="item-name">${itemNames[item.id]}</div>
+              <div class="item-price">${item.price}💰 / ${item.unit}</div>
+              <div class="item-stock">En stock: ${stock}L</div>
+            </div>
+            <div class="item-actions">
+              <button class="btn-buy-item btn-secondary btn-small" data-category="pesticides" data-item="${item.id}" data-price="${item.price}">
+                Acheter
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      html += '</div></div>';
+
+      html += '</div>';
+    } else {
+      // ONGLET VENDRE
+      html = '<div class="market-grid">';
+
+      // Récoltes
+      html += '<div class="market-category"><h4>🌾 Récoltes</h4><div class="market-items">';
+      catalog.harvest.forEach(item => {
+        const stock = item.stock || 0;
+        const canSell = stock > 0;
+        html += `
+          <div class="market-item ${!canSell ? 'disabled' : ''}">
+            <div class="item-icon">${emojis[item.id]}</div>
+            <div class="item-info">
+              <div class="item-name">${itemNames[item.id]}</div>
+              <div class="item-price">${item.price}💰 / ${item.unit}</div>
+              <div class="item-stock">Disponible: ${stock.toFixed(2)}t</div>
+            </div>
+            <div class="item-actions">
+              <button class="btn-sell-item btn-success btn-small" data-category="harvest" data-item="${item.id}" data-price="${item.price}" ${!canSell ? 'disabled' : ''}>
+                Vendre
+              </button>
+            </div>
+          </div>
+        `;
+      });
+      html += '</div></div>';
+
+      html += '</div>';
+    }
+
+    container.innerHTML = html;
+
+    // Attacher les événements
+    document.querySelectorAll('.btn-buy-item').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const category = e.target.dataset.category;
+        const item = e.target.dataset.item;
+        const price = parseInt(e.target.dataset.price);
+        this.buyMarketItem(category, item, price);
+      });
+    });
+
+    document.querySelectorAll('.btn-sell-item').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const category = e.target.dataset.category;
+        const item = e.target.dataset.item;
+        const price = parseInt(e.target.dataset.price);
+        this.sellMarketItem(category, item, price);
+      });
+    });
+  }
+
+  /**
+   * Acheter un article au marché
+   */
+  buyMarketItem(category, item, price) {
+    // Demander la quantité
+    const quantity = prompt(`Combien de ${item} voulez-vous acheter ?\n(Prix: ${price}💰 par unité)`);
+    if (!quantity || isNaN(quantity) || parseInt(quantity) <= 0) {
+      return;
+    }
+
+    const qty = parseInt(quantity);
+    const result = this.farmGame.marketSystem.buy(category, item, qty);
+
+    if (result.success) {
+      this.showToast(`✅ Acheté ${qty}x ${item} pour ${result.cost}💰`, 'success');
+      this.updateResourcesDisplay();
+      this.updateInventoryDisplay();
+      this.renderMarketUI();
+    } else {
+      this.showToast(`❌ ${result.error}`, 'error');
+    }
+  }
+
+  /**
+   * Vendre un article au marché
+   */
+  sellMarketItem(category, item, price) {
+    const available = this.farmGame.resourceManager.get(category, item);
+
+    if (available <= 0) {
+      this.showToast('❌ Aucun stock disponible', 'error');
+      return;
+    }
+
+    const quantity = prompt(`Combien de ${item} voulez-vous vendre ?\n(Prix: ${price}💰 par tonne)\nDisponible: ${available.toFixed(2)}t`);
+    if (!quantity || isNaN(quantity) || parseFloat(quantity) <= 0) {
+      return;
+    }
+
+    const qty = parseFloat(quantity);
+    const result = this.farmGame.marketSystem.sell(category, item, qty);
+
+    if (result.success) {
+      this.showToast(`✅ Vendu ${qty}t ${item} pour ${result.revenue}💰`, 'success');
+      this.updateResourcesDisplay();
+      this.updateInventoryDisplay();
+      this.renderMarketUI();
+    } else {
+      this.showToast(`❌ ${result.error}`, 'error');
+    }
   }
 
   /**

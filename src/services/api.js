@@ -7,30 +7,34 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://ilerise.onrender.c
 
 class APIService {
   constructor() {
-    this.token = localStorage.getItem('authToken');
+    this.token = localStorage.getItem('ilerise_token') || sessionStorage.getItem('ilerise_token');
     this.refreshing = false; // Flag pour éviter les refreshs multiples
   }
 
   /**
    * Sauvegarder le token d'authentification
    */
-  setToken(token) {
+  setToken(token, remember = true) {
     this.token = token;
     if (token) {
-      localStorage.setItem('authToken', token);
+      // Utiliser localStorage ou sessionStorage selon "se souvenir de moi"
+      const storage = remember ? localStorage : sessionStorage;
+      storage.setItem('ilerise_token', token);
 
       // Calculer et stocker l'expiration du token (JWT standard: exp en secondes)
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         if (payload.exp) {
-          localStorage.setItem('authToken_expiry', payload.exp * 1000); // Convertir en millisecondes
+          storage.setItem('ilerise_token_expiry', payload.exp * 1000); // Convertir en millisecondes
         }
       } catch (e) {
         console.warn('⚠️ Impossible de parser le token JWT');
       }
     } else {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('authToken_expiry');
+      localStorage.removeItem('ilerise_token');
+      localStorage.removeItem('ilerise_token_expiry');
+      sessionStorage.removeItem('ilerise_token');
+      sessionStorage.removeItem('ilerise_token_expiry');
     }
   }
 
@@ -40,7 +44,8 @@ class APIService {
    * @returns {Boolean}
    */
   isTokenExpiring(bufferMinutes = 5) {
-    const expiry = localStorage.getItem('authToken_expiry');
+    const expiry = localStorage.getItem('ilerise_token_expiry') ||
+                   sessionStorage.getItem('ilerise_token_expiry');
     if (!expiry) return false;
 
     const expiryTime = parseInt(expiry);
@@ -93,7 +98,7 @@ class APIService {
    * Récupérer le token actuel
    */
   getToken() {
-    return this.token || localStorage.getItem('authToken');
+    return this.token || localStorage.getItem('ilerise_token') || sessionStorage.getItem('ilerise_token');
   }
 
   /**

@@ -5,10 +5,11 @@
  */
 
 export class ResourceManager {
-  constructor(initialResources = {}) {
-    // Mode test rapide pour invités
-    const isGuest = typeof localStorage !== 'undefined' && localStorage.getItem('ilerise_guest') === 'true';
-    const testMode = isGuest;
+  constructor(initialResources = {}, testMode = false) {
+    // Si testMode n'est pas explicitement passé, le détecter depuis localStorage pour compatibilité
+    if (testMode === false && typeof localStorage !== 'undefined') {
+      testMode = localStorage.getItem('ilerise_guest') === 'true';
+    }
 
     this.resources = {
       // Ressources monétaires (5x plus pour invités)

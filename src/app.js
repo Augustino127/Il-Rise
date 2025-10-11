@@ -309,6 +309,14 @@ class IleRiseApp {
       });
     }
 
+    // Bouton ferme interactive depuis sélection culture
+    const btnFarmFromCropSelect = document.getElementById('btn-farm-from-crop-select');
+    if (btnFarmFromCropSelect) {
+      btnFarmFromCropSelect.addEventListener('click', () => {
+        this.switchToFarmMode();
+      });
+    }
+
     // Sélection niveau
     document.getElementById('btn-back-level').addEventListener('click', () => {
       this.showCropSelection();
@@ -453,6 +461,23 @@ class IleRiseApp {
     // Écran de jeu
     document.getElementById('game-lives').textContent = livesState.current;
     document.getElementById('game-coins').textContent = status.coins;
+
+    // Masquer/Afficher les boutons "Mon Profil" et "Se déconnecter" selon l'état de connexion
+    // Les invités ne doivent pas voir ces boutons car ils ne s'authentifient pas vraiment
+    const token = localStorage.getItem('ilerise_token') || sessionStorage.getItem('ilerise_token');
+    const isGuest = localStorage.getItem('ilerise_guest') === 'true';
+    const isAuthenticatedUser = !!token && !isGuest;
+
+    const btnProfile = document.getElementById('btn-profile');
+    const btnLogout = document.getElementById('btn-logout');
+
+    if (btnProfile) {
+      btnProfile.style.display = isAuthenticatedUser ? 'block' : 'none';
+    }
+
+    if (btnLogout) {
+      btnLogout.style.display = isAuthenticatedUser ? 'block' : 'none';
+    }
   }
 
   /**
