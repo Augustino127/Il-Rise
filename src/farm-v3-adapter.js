@@ -2,10 +2,31 @@
  * farm-v3-adapter.js
  * Adapter pour intégrer le système de Ferme V3 dans game.html
  * Adapte les ID pour éviter les conflits
+ * 🆕 INTEGRATED WITH AAA SYSTEMS
  */
 
 import { FarmGame } from './game/FarmGame.js';
 import { FarmScene } from './3d/FarmScene.js';
+
+// 🆕 Import AAA Systems
+import EventBus, { GameEvents } from './core/EventBus.js';
+import GameState from './core/GameStateManager.js';
+import NotificationSystem from './ui/NotificationSystem.js';
+import AudioManager from './audio/AudioManager.js';
+
+// 🆕 XP Rewards for farm actions
+const FARM_XP_REWARDS = {
+  plow: 5,
+  plant: 10,
+  water: 3,
+  fertilize_npk: 8,
+  fertilize_organic: 8,
+  weed: 5,
+  spray_pesticide_natural: 7,
+  harvest: 20,
+  unlock_plot: 50,
+  complete_season: 100
+};
 
 export class FarmV3Adapter {
   constructor(app) {
@@ -16,6 +37,18 @@ export class FarmV3Adapter {
     this.activePlotId = 1;
     this.selectedCropId = null;
     this.isInitialized = false;
+
+    // 🆕 Farm statistics for progression
+    this.farmStats = {
+      totalActionsPerformed: 0,
+      cropsPlanted: 0,
+      cropsHarvested: 0,
+      daysPlayed: 0,
+      moneyEarned: 0
+    };
+
+    // 🆕 Track session start time
+    this.sessionStartTime = Date.now();
   }
 
   /**
@@ -80,6 +113,12 @@ export class FarmV3Adapter {
 
       this.isInitialized = true;
       console.log('✅ Mode Ferme V3 initialisé');
+
+      // 🆕 Émettre événement d'initialisation
+      EventBus.emit('farm:initialized', {
+        hasNASAData: !!nasaData,
+        location: nasaData.location
+      });
 
     } catch (error) {
       console.error('❌ Erreur initialisation Mode Ferme:', error);
@@ -332,6 +371,25 @@ export class FarmV3Adapter {
           return;
         }
 
+        // 🆕 Récompenser avec XP
+        const xpReward = FARM_XP_REWARDS.plant;
+        const leveledUp = GameState.addXP(xpReward);
+
+        // 🆕 Mettre à jour les stats
+        this.farmStats.totalActionsPerformed++;
+        this.farmStats.cropsPlanted++;
+
+        // 🆕 Émettre événement
+        EventBus.emit(GameEvents.FARM_CROP_PLANTED, {
+          cropId: this.selectedCropId,
+          plotId: this.activePlotId,
+          xpReward,
+          leveledUp
+        });
+
+        // 🆕 Jouer son
+        AudioManager.play('plant');
+
         if (this.farmScene) {
           this.farmScene.clearPlants();
           this.farmScene.plantCrop(this.selectedCropId, 49);
@@ -339,7 +397,19 @@ export class FarmV3Adapter {
         }
 
         console.log('✅ Plantation réussie');
-        this.showToast(`🌱 ${this.selectedCropId.toUpperCase()} planté !`, 'success');
+
+        // Notification avec XP
+        const cropNames = {
+          'maize': 'Maïs',
+          'cowpea': 'Niébé',
+          'rice': 'Riz',
+          'cassava': 'Manioc',
+          'cacao': 'Cacao',
+          'cotton': 'Coton'
+        };
+        const cropName = cropNames[this.selectedCropId] || this.selectedCropId.toUpperCase();
+        this.showToast(`🌱 ${cropName} planté • +${xpReward} XP`, 'success');
+
         this.updateUI();
         return;
       }
@@ -351,13 +421,58 @@ export class FarmV3Adapter {
       console.log(`💰 Ressources après action:`, this.farmGame.resourceManager.resources);
 
       if (result.success) {
-        this.showToast(`✅ Action "${actionId}" effectuée`, 'success');
+        // 🆕 Récompenser avec XP
+        const xpReward = FARM_XP_REWARDS[actionId] || 5;
+        const leveledUp = GameState.addXP(xpReward);
+
+        // 🆕 Mettre à jour les stats
+        this.farmStats.totalActionsPerformed++;
+        if (actionId === 'harvest') {
+          this.farmStats.cropsHarvested++;
+        }
+
+        // 🆕 Émettre événement spécifique selon l'action
+        const eventMap = {
+          'water': GameEvents.FARM_CROP_WATERED,
+          'harvest': GameEvents.FARM_CROP_HARVESTED,
+          'plow': 'farm:plot:plowed',
+          'fertilize_npk': 'farm:fertilizer:applied',
+          'fertilize_organic': 'farm:fertilizer:applied',
+          'weed': 'farm:weeding:done',
+          'spray_pesticide_natural': 'farm:pesticide:applied'
+        };
+
+        const eventName = eventMap[actionId];
+        if (eventName) {
+          EventBus.emit(eventName, {
+            actionId,
+            plotId: this.activePlotId,
+            xpReward,
+            leveledUp
+          });
+        }
+
+        // 🆕 Jouer son
+        AudioManager.play(actionId.split('_')[0]); // 'fertilize_npk' -> 'fertilize'
+
+        // Afficher notification de succès
+        const actionNames = {
+          'plow': 'Labour',
+          'water': 'Arrosage',
+          'fertilize_npk': 'Fertilisation NPK',
+          'fertilize_organic': 'Compost',
+          'weed': 'Désherbage',
+          'spray_pesticide_natural': 'Pesticide naturel',
+          'harvest': 'Récolte'
+        };
+
+        this.showToast(`✅ ${actionNames[actionId] || actionId} effectué • +${xpReward} XP`, 'success');
 
         // Si action terminera dans X jours
         if (result.completionDay) {
           const daysRemaining = result.completionDay - this.farmGame.timeSimulation.currentDay;
           if (daysRemaining > 0) {
-            this.showToast(`⏰ Terminera dans ${daysRemaining} jour(s)`, 'info');
+            this.showToast(`⏰ Terminera dans ${daysRemaining} jour(s)`, 'info', 2000);
           }
         }
 
@@ -835,6 +950,19 @@ export class FarmV3Adapter {
     // Débloquer le poulailler
     this.farmGame.livestockManager.unlockCoop();
 
+    // 🆕 Récompenser avec XP
+    const xpReward = FARM_XP_REWARDS.unlock_plot;
+    GameState.addXP(xpReward);
+
+    // 🆕 Émettre événement
+    EventBus.emit('farm:coop:unlocked', {
+      cost,
+      xpReward
+    });
+
+    // 🆕 Jouer son de succès
+    AudioManager.play('success');
+
     // Mettre à jour l'affichage
     const livestockContent = document.getElementById('livestock-content');
     if (livestockContent) {
@@ -1081,6 +1209,17 @@ export class FarmV3Adapter {
     const result = this.farmGame.marketSystem.buy(category, item, qty);
 
     if (result.success) {
+      // 🆕 Émettre événement
+      EventBus.emit('farm:market:bought', {
+        category,
+        item,
+        quantity: qty,
+        cost: result.cost
+      });
+
+      // 🆕 Jouer son
+      AudioManager.play('click');
+
       this.showToast(`✅ Acheté ${qty}x ${item} pour ${result.cost}💰`, 'success');
       this.updateResourcesDisplay();
       this.updateInventoryDisplay();
@@ -1110,6 +1249,20 @@ export class FarmV3Adapter {
     const result = this.farmGame.marketSystem.sell(category, item, qty);
 
     if (result.success) {
+      // 🆕 Tracker l'argent gagné
+      this.farmStats.moneyEarned += result.revenue;
+
+      // 🆕 Émettre événement
+      EventBus.emit('farm:market:sold', {
+        category,
+        item,
+        quantity: qty,
+        revenue: result.revenue
+      });
+
+      // 🆕 Jouer son de succès
+      AudioManager.play('coin');
+
       this.showToast(`✅ Vendu ${qty}t ${item} pour ${result.revenue}💰`, 'success');
       this.updateResourcesDisplay();
       this.updateInventoryDisplay();
@@ -1120,25 +1273,50 @@ export class FarmV3Adapter {
   }
 
   /**
-   * Afficher un toast
+   * Afficher un toast (🆕 Utilise NotificationSystem)
    */
-  showToast(message, type = 'info') {
-    // Réutiliser le système de toast de l'app principale
-    if (this.app && this.app.showToast) {
-      this.app.showToast(message, type);
-    } else {
-      console.log(`[${type.toUpperCase()}] ${message}`);
-    }
+  showToast(message, type = 'info', duration = 3000) {
+    // Mapper les types de toast vers NotificationSystem
+    const typeMap = {
+      'info': 'info',
+      'success': 'success',
+      'warning': 'warning',
+      'error': 'error'
+    };
+
+    const notifType = typeMap[type] || 'info';
+
+    NotificationSystem.toast({
+      type: notifType,
+      message: message,
+      duration: duration
+    });
   }
 
   /**
-   * Quitter le mode Ferme
+   * Quitter le mode Ferme (🆕 Avec statistiques et événements)
    */
   exitFarmMode() {
     // Sauvegarder avant de quitter
     if (this.farmGame) {
       this.farmGame.save(1);
     }
+
+    // 🆕 Afficher résumé de session
+    if (this.farmStats.totalActionsPerformed > 0) {
+      NotificationSystem.toast({
+        type: 'info',
+        title: 'Session Ferme Terminée',
+        message: `${this.farmStats.totalActionsPerformed} actions • ${this.farmStats.cropsPlanted} plantées • ${this.farmStats.cropsHarvested} récoltées`,
+        duration: 5000
+      });
+    }
+
+    // 🆕 Émettre événement de sortie
+    EventBus.emit('farm:exited', {
+      stats: this.farmStats,
+      sessionDuration: Date.now() - (this.sessionStartTime || Date.now())
+    });
 
     // Retourner à l'écran de jeu
     this.app.showScreen('game');
