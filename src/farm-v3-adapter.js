@@ -13,6 +13,8 @@ import EventBus, { GameEvents } from './core/EventBus.js';
 import GameState from './core/GameStateManager.js';
 import NotificationSystem from './ui/NotificationSystem.js';
 import AudioManager from './audio/AudioManager.js';
+import FarmTutorial from './ui/FarmTutorial.js';
+import ActionTooltips from './ui/ActionTooltips.js';
 
 // 🆕 XP Rewards for farm actions
 const FARM_XP_REWARDS = {
@@ -102,6 +104,12 @@ export class FarmV3Adapter {
       this.setupEventListeners();
       this.setupKeyboardShortcuts();
 
+      // 🆕 Initialiser les tooltips d'actions
+      ActionTooltips.injectStyles();
+      setTimeout(() => {
+        ActionTooltips.init();
+      }, 500); // Délai pour que les boutons soient rendus
+
       // Initialiser scène 3D
       this.init3DScene();
 
@@ -119,6 +127,24 @@ export class FarmV3Adapter {
         hasNASAData: !!nasaData,
         location: nasaData.location
       });
+
+      // 🆕 Démarrer le tutoriel si première visite
+      setTimeout(() => {
+        const hasCompletedTutorial = GameState.get('tutorial.farmCompleted');
+        if (!hasCompletedTutorial) {
+          console.log('📚 Première visite - Démarrage du tutoriel');
+          FarmTutorial.start();
+        } else {
+          // Afficher astuce raccourcis
+          NotificationSystem.toast({
+            type: 'info',
+            icon: '⌨️',
+            title: 'Astuce',
+            message: 'Utilisez les raccourcis clavier : L=Labour, S=Planter, W=Arroser, etc.',
+            duration: 4000
+          });
+        }
+      }, 1000); // Délai pour laisser l'UI se charger
 
     } catch (error) {
       console.error('❌ Erreur initialisation Mode Ferme:', error);
@@ -756,6 +782,48 @@ export class FarmV3Adapter {
         btn.title = reason;
       }
     });
+
+    // 🆕 Marquer l'action recommandée selon l'état du sol
+    this.highlightRecommendedActions(plot);
+  }
+
+  /**
+   * Highlight les actions recommandées (🆕)
+   */
+  highlightRecommendedActions(plot) {
+    if (!plot) return;
+
+    // Retirer tous les highlights
+    document.querySelectorAll('.action-btn').forEach(btn => {
+      btn.classList.remove('action-recommended');
+    });
+
+    // Ajouter highlights selon les besoins
+    let recommendedAction = null;
+
+    if (!plot.isPlowed && !plot.isPlanted) {
+      recommendedAction = 'plow';
+    } else if (plot.isPlowed && !plot.isPlanted) {
+      recommendedAction = 'plant';
+    } else if (plot.isPlanted) {
+      // Priorités pour parcelles plantées
+      if (plot.soilMoisture < 30) {
+        recommendedAction = 'water';
+      } else if (plot.weedLevel > 40) {
+        recommendedAction = 'weed';
+      } else if (plot.npkLevel < 50) {
+        recommendedAction = 'fertilize_npk';
+      } else if (plot.growthStage === 'mature') {
+        recommendedAction = 'harvest';
+      }
+    }
+
+    if (recommendedAction) {
+      const btn = document.querySelector(`[data-action="${recommendedAction}"]`);
+      if (btn && !btn.disabled) {
+        btn.classList.add('action-recommended');
+      }
+    }
   }
 
   /**
