@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/src/styles/tutorial.css">
     <link rel="stylesheet" href="/src/styles/location.css">
     <link rel="stylesheet" href="/src/styles/farm-v3.css">
+    <link rel="stylesheet" href="/src/styles/game-over.css">
 </head>
 <body style="background: radial-gradient(ellipse at center, #B8E6F5 0%, #87CEEB 50%, #A8D5A3 100%);">
     <!-- ========== ÉCRAN D'ACCUEIL ========== -->
@@ -1312,6 +1313,118 @@
             <div class="simulation-preview">
                 <p id="simulation-phase">Phase: Germination</p>
                 <p id="simulation-ndvi">NDVI: 0.00</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== ÉCRAN GAME OVER ========== -->
+    <div id="screen-game-over" class="screen">
+        <div class="game-over-container">
+            <!-- Animation de fond -->
+            <div class="game-over-bg-animation"></div>
+
+            <!-- Icône principale -->
+            <div class="game-over-icon">
+                <div class="heart-break-animation">💔</div>
+            </div>
+
+            <!-- Titre -->
+            <h1 class="game-over-title">Plus de Vies!</h1>
+            <p class="game-over-subtitle">Vos vies sont épuisées, mais ne vous découragez pas!</p>
+
+            <!-- Statistiques de session -->
+            <div class="game-over-stats">
+                <div class="stat-card-go">
+                    <div class="stat-icon-go">🎮</div>
+                    <div class="stat-value-go" id="go-games-played">0</div>
+                    <div class="stat-label-go">Parties jouées</div>
+                </div>
+                <div class="stat-card-go">
+                    <div class="stat-icon-go">⭐</div>
+                    <div class="stat-value-go" id="go-total-stars">0</div>
+                    <div class="stat-label-go">Étoiles gagnées</div>
+                </div>
+                <div class="stat-card-go">
+                    <div class="stat-icon-go">💰</div>
+                    <div class="stat-value-go" id="go-coins-earned">0</div>
+                    <div class="stat-label-go">Pièces gagnées</div>
+                </div>
+            </div>
+
+            <!-- Info régénération -->
+            <div class="lives-regen-info">
+                <div class="lives-display">
+                    <span class="hearts-display" id="go-hearts-display">🖤🖤🖤🖤🖤</span>
+                </div>
+                <div class="regen-message">
+                    <p>💚 Vos vies se régénèrent automatiquement!</p>
+                    <p class="regen-time">Prochaine vie dans: <strong id="go-next-life-timer">--:--</strong></p>
+                    <p class="regen-detail">Une vie toutes les 30 minutes • Reset complet à minuit</p>
+                </div>
+            </div>
+
+            <!-- Options -->
+            <div class="game-over-options">
+                <!-- Option 1: Attendre -->
+                <div class="go-option-card">
+                    <div class="option-icon">⏰</div>
+                    <h3>Attendre la Régénération</h3>
+                    <p>Vos vies se régénèrent naturellement toutes les 30 minutes</p>
+                    <button class="btn-secondary btn-large" id="btn-go-wait">
+                        Revenir au Menu
+                    </button>
+                </div>
+
+                <!-- Option 2: Retry avec coins -->
+                <div class="go-option-card premium">
+                    <div class="option-badge">POPULAIRE</div>
+                    <div class="option-icon">🔄</div>
+                    <h3>Retry Immédiat</h3>
+                    <p>Utilisez vos pièces pour continuer à jouer sans attendre</p>
+                    <div class="cost-display">
+                        <span class="cost-value" id="go-retry-cost">50</span>
+                        <span class="cost-currency">💰</span>
+                    </div>
+                    <div class="balance-display">
+                        Votre solde: <strong id="go-coin-balance">0</strong> 💰
+                    </div>
+                    <button class="btn-primary btn-large" id="btn-go-retry">
+                        <span class="icon">🚀</span>
+                        <span class="text">Continuer à Jouer</span>
+                    </button>
+                    <p class="not-enough-coins" id="go-not-enough" style="display: none;">
+                        ⚠️ Pièces insuffisantes
+                    </p>
+                </div>
+
+                <!-- Option 3: Revenir plus tard (future: regarder pub) -->
+                <div class="go-option-card future">
+                    <div class="option-badge coming-soon">BIENTÔT</div>
+                    <div class="option-icon">📺</div>
+                    <h3>Regarder une Vidéo</h3>
+                    <p>Gagnez une vie instantanément en regardant une courte vidéo</p>
+                    <button class="btn-tertiary btn-large" disabled>
+                        Bientôt Disponible
+                    </button>
+                </div>
+            </div>
+
+            <!-- Encouragement -->
+            <div class="game-over-encouragement">
+                <p class="encouragement-text" id="go-encouragement">
+                    "Chaque agriculteur connaît des difficultés. Continuez à apprendre et vous deviendrez un maître!"
+                </p>
+                <p class="encouragement-tip" id="go-tip"></p>
+            </div>
+
+            <!-- Actions secondaires -->
+            <div class="game-over-secondary-actions">
+                <button class="btn-link" id="btn-go-view-profile">
+                    📊 Voir Mon Profil
+                </button>
+                <button class="btn-link" id="btn-go-knowledge-cards">
+                    📚 Apprendre Plus
+                </button>
             </div>
         </div>
     </div>

@@ -18,6 +18,15 @@ import { I18nManager } from './i18n/I18nManager.js';
 import { FarmV3Adapter } from './farm-v3-adapter.js';
 import apiService from './services/api.js';
 
+// 🆕 NEW CORE SYSTEMS - AAA Game Architecture
+import GameState from './core/GameStateManager.js';
+import EventBus, { GameEvents } from './core/EventBus.js';
+import NotificationSystem from './ui/NotificationSystem.js';
+import AudioManager from './audio/AudioManager.js';
+import GameOverScreen from './ui/GameOverScreen.js';
+import LivesWidget from './ui/LivesWidget.js';
+import XPBar from './ui/XPBar.js';
+
 // Configuration API
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://ilerise.onrender.com/api';
 
@@ -56,7 +65,8 @@ class IleRiseApp {
       results: document.getElementById('screen-results'),
       profile: document.getElementById('screen-profile'),
       knowledge: document.getElementById('screen-knowledge'),
-      auth: document.getElementById('screen-auth')
+      auth: document.getElementById('screen-auth'),
+      gameOver: document.getElementById('screen-game-over') // 🆕 NEW
     };
 
     // Auth state
@@ -71,6 +81,11 @@ class IleRiseApp {
 
     // Confirmation callback
     this.confirmCallback = null;
+
+    // 🆕 NEW CORE SYSTEMS
+    this.gameOverScreen = null;
+    this.livesWidget = null;
+    this.xpBar = null;
   }
 
   /**
@@ -81,6 +96,21 @@ class IleRiseApp {
     this.showLoading(true);
 
     try {
+      // 🆕 INITIALIZE CORE SYSTEMS FIRST
+      console.log('🎮 Initializing core game systems...');
+
+      // Load saved game state
+      GameState.load();
+
+      // Initialize notification system
+      NotificationSystem.init();
+
+      // Initialize audio manager
+      await AudioManager.init();
+
+      // Initialize lives system
+      await this.engine.livesSystem.initialize();
+
       // Charger données NASA
       await this.engine.loadNASAData();
 
@@ -104,8 +134,18 @@ class IleRiseApp {
         console.log('📍 Localité sauvegardée:', this.currentLocation.city);
       }
 
-      // Vérifier vies
+      // Vérifier vies (now handled by livesSystem.initialize())
       this.engine.checkLives();
+
+      // 🆕 Initialize Game Over Screen
+      this.gameOverScreen = new GameOverScreen(this.engine.livesSystem, this);
+      console.log('💀 Game Over screen initialized');
+
+      // 🆕 Initialize Lives Widget (on home screen header)
+      this.initializeLivesWidget();
+
+      // 🆕 Initialize XP Bar (bottom of screen)
+      this.initializeXPBar();
 
       // Initialiser tutoriel
       this.tutorial = new TutorialSystem();
@@ -118,6 +158,9 @@ class IleRiseApp {
 
       // Attacher événements
       this.attachEventListeners();
+
+      // 🆕 Setup core event listeners
+      this.setupCoreEventListeners();
 
       // Écouter changement de langue
       window.addEventListener('languagechange', (e) => {
@@ -136,6 +179,9 @@ class IleRiseApp {
         // 🆕 Synchroniser le profil depuis le backend
         await this.syncProfileFromBackend();
 
+        // 🆕 Update streak on login
+        GameState.updateStreak();
+
         this.showScreen('home');
       } else {
         // Rediriger vers authentification
@@ -143,7 +189,10 @@ class IleRiseApp {
         this.showAuth();
       }
 
-      console.log('✅ IleRise initialisé');
+      // 🆕 Emit game ready event
+      EventBus.emit(GameEvents.GAME_READY);
+
+      console.log('✅ IleRise initialisé with AAA systems!');
     } catch (error) {
       console.error('❌ Erreur initialisation:', error);
       this.showMessage(
@@ -632,35 +681,33 @@ class IleRiseApp {
   async startLevel(cropId, levelId) {
     console.log('🎯 startLevel appelé:', cropId, levelId);
 
+    // 🆕 Check lives with new system
+    const hasLives = await this.checkLivesBeforeStart();
+    if (!hasLives) {
+      console.log('❌ No lives available - Game Over screen shown');
+      return;
+    }
+
     // Vérifier et utiliser une vie
     const livesState = this.engine.getLivesUI();
     console.log('❤️ Vies disponibles:', livesState.current, '/', livesState.max);
 
-    if (livesState.current <= 0) {
-      const message = livesState.timeUntilNext
-        ? `Revenez dans ${livesState.timeUntilNext} ou attendez demain.`
-        : 'Revenez demain ou attendez la recharge des vies.';
-
-      this.showMessage(
-        'Plus de vies',
-        message,
-        'warning'
-      );
-      return;
-    }
-
     // Consommer une vie pour démarrer la partie
     const lifeUsed = await this.engine.useLife();
     if (!lifeUsed) {
-      this.showMessage(
-        'Erreur',
-        'Pas assez de vies. Attendez la régénération ou achetez des vies.',
-        'error'
-      );
+      // Show Game Over screen instead of simple message
+      await this.gameOverScreen.show();
       return;
     }
 
     console.log('✅ Vie utilisée, vies restantes:', this.engine.checkLives());
+
+    // 🆕 Emit life change event
+    EventBus.emit(GameEvents.PLAYER_LIVES_CHANGED, {
+      old: livesState.current,
+      new: livesState.current - 1,
+      delta: -1
+    });
 
     this.currentCrop = cropId;
     this.currentLevel = levelId;
@@ -953,8 +1000,15 @@ class IleRiseApp {
     this.engine.startGame(levelKey, this.currentCrop, this.currentLevel);
     console.log('🎮 Partie démarrée:', levelKey);
 
-    // Consommer vie
-    await this.engine.useLife();
+    // 🆕 Emit GAME_START event
+    EventBus.emit(GameEvents.GAME_START, {
+      mode: 'simulation',
+      crop: this.currentCrop,
+      level: this.currentLevel
+    });
+
+    // Consommer vie (already done in startLevel, but kept for safety)
+    // await this.engine.useLife();
 
     // Afficher indicateur progression
     const progressOverlay = document.getElementById('simulation-progress');
@@ -1221,6 +1275,24 @@ class IleRiseApp {
 
     console.log('🎬 Affichage écran résultats...');
     this.showScreen('results');
+
+    // 🆕 Emit game end event with results
+    const gameEndData = {
+      won: isSuccess,
+      score: results.score,
+      stars: results.stars,
+      coins: coinsEarned,
+      crop: this.currentCrop,
+      level: this.currentLevel
+    };
+
+    EventBus.emit(GameEvents.GAME_END, gameEndData);
+
+    if (isSuccess) {
+      EventBus.emit(GameEvents.GAME_WIN, gameEndData);
+    } else {
+      EventBus.emit(GameEvents.GAME_LOSE, gameEndData);
+    }
 
     console.log('✅ showResults() terminé');
   }
@@ -2928,6 +3000,148 @@ class IleRiseApp {
       if (locationNameEl) {
         locationNameEl.textContent = this.currentLocation.city;
       }
+    }
+  }
+
+  // 🆕 =============== NEW AAA METHODS ===============
+
+  /**
+   * Initialize Lives Widget
+   */
+  initializeLivesWidget() {
+    // Find a container for the lives widget (home screen header)
+    const homeHeader = this.screens.home?.querySelector('.home-container');
+
+    if (homeHeader) {
+      // Create a container for the widget
+      const widgetContainer = document.createElement('div');
+      widgetContainer.id = 'lives-widget-container';
+      widgetContainer.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 1000;';
+
+      // Insert at the beginning of body so it's always visible
+      document.body.insertBefore(widgetContainer, document.body.firstChild);
+
+      this.livesWidget = new LivesWidget(this.engine.livesSystem, widgetContainer);
+      console.log('💚 Lives widget initialized');
+    } else {
+      console.warn('⚠️ Could not find container for lives widget');
+    }
+  }
+
+  /**
+   * Initialize XP Bar
+   */
+  initializeXPBar() {
+    // Create container for XP bar
+    const xpContainer = document.createElement('div');
+    xpContainer.id = 'xp-bar-container';
+
+    // Insert into body
+    document.body.appendChild(xpContainer);
+
+    this.xpBar = new XPBar(xpContainer);
+    console.log('⭐ XP Bar initialized');
+  }
+
+  /**
+   * Setup core event listeners for the new systems
+   */
+  setupCoreEventListeners() {
+    // Listen for screen changes to emit events
+    EventBus.on(GameEvents.SCREEN_CHANGE, (data) => {
+      console.log('📺 Screen changed to:', data.screen);
+
+      // Play appropriate music
+      // AudioManager.handleScreenChange(data.screen); // Already auto-handled
+    });
+
+    // Listen for game start
+    EventBus.on(GameEvents.GAME_START, (data) => {
+      console.log('🎮 Game started:', data);
+      GameState.startGame(data.mode || 'simulation', data.level, data.crop);
+    });
+
+    // Listen for game end
+    EventBus.on(GameEvents.GAME_END, (data) => {
+      console.log('🏁 Game ended:', data);
+      GameState.endGame(data);
+    });
+
+    // Listen for player actions that should give XP
+    EventBus.on(GameEvents.GAME_WIN, (data) => {
+      const xpReward = data.stars * 50; // 50 XP per star
+      const leveledUp = GameState.addXP(xpReward);
+
+      NotificationSystem.success(`+${xpReward} XP`, 'Expérience Gagnée!');
+
+      if (leveledUp) {
+        const newLevel = GameState.get('player.level');
+        NotificationSystem.toast({
+          type: 'achievement',
+          icon: '🎉',
+          title: 'Niveau Supérieur!',
+          message: `Vous êtes maintenant niveau ${newLevel}!`,
+          duration: 5000
+        });
+
+        // Reward coins for leveling up
+        const coinsReward = newLevel * 10;
+        GameState.addCoins(coinsReward, 'level_up');
+        EventBus.emit(GameEvents.PLAYER_COINS_CHANGED, {
+          old: GameState.get('player.coins') - coinsReward,
+          new: GameState.get('player.coins'),
+          delta: coinsReward
+        });
+      }
+    });
+
+    console.log('🎧 Core event listeners setup complete');
+  }
+
+  /**
+   * Check if player has lives before starting a game
+   * @returns {boolean} true if has lives, false otherwise
+   */
+  async checkLivesBeforeStart() {
+    const hasLives = this.engine.livesSystem.hasLives();
+
+    if (!hasLives) {
+      // Show Game Over screen
+      await this.gameOverScreen.show();
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Override showScreen to emit events and handle transitions
+   */
+  showScreen(screenName) {
+    const previousScreen = Object.keys(this.screens).find(
+      key => this.screens[key]?.classList.contains('active')
+    );
+
+    // Hide all screens
+    Object.values(this.screens).forEach(screen => {
+      if (screen) screen.classList.remove('active');
+    });
+
+    // Show requested screen
+    const targetScreen = this.screens[screenName];
+    if (targetScreen) {
+      targetScreen.classList.add('active');
+
+      // Emit screen change event
+      EventBus.emit(GameEvents.SCREEN_CHANGE, {
+        from: previousScreen,
+        to: screenName,
+        screen: screenName
+      });
+
+      console.log(`📺 Screen: ${previousScreen || 'none'} → ${screenName}`);
+    } else {
+      console.error(`❌ Screen '${screenName}' not found`);
     }
   }
 }

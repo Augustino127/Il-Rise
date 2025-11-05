@@ -1,0 +1,479 @@
+/**
+ * game-over.css
+ * Styles pour l'écran Game Over
+ * Design inspiré des meilleurs jeux mobiles (Candy Crush, Clash of Clans, etc.)
+ */
+
+/* Container principal */
+.game-over-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  text-align: center;
+  position: relative;
+  animation: gameOverFadeIn 0.5s ease;
+}
+
+/* Animation de fond */
+.game-over-bg-animation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg,
+    rgba(156, 39, 176, 0.1) 0%,
+    rgba(233, 30, 99, 0.1) 100%);
+  z-index: -1;
+  animation: pulseBackground 3s ease-in-out infinite;
+}
+
+@keyframes pulseBackground {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
+}
+
+/* Icône principale avec animation */
+.game-over-icon {
+  margin-bottom: 30px;
+}
+
+.heart-break-animation {
+  font-size: 120px;
+  animation: heartBreak 1s ease-in-out;
+  display: inline-block;
+}
+
+@keyframes heartBreak {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(10deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Titre */
+.game-over-title {
+  font-size: 48px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 10px;
+  animation: titleSlideIn 0.6s ease 0.3s both;
+}
+
+.game-over-subtitle {
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 40px;
+  animation: titleSlideIn 0.6s ease 0.4s both;
+}
+
+@keyframes titleSlideIn {
+  from {
+    transform: translateY(-30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Statistiques de session */
+.game-over-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+  animation: statsSlideUp 0.6s ease 0.5s both;
+}
+
+.stat-card-go {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.stat-card-go:hover {
+  transform: translateY(-5px);
+}
+
+.stat-icon-go {
+  font-size: 36px;
+  margin-bottom: 10px;
+}
+
+.stat-value-go {
+  font-size: 32px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.stat-label-go {
+  font-size: 13px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+@keyframes statsSlideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Info régénération des vies */
+.lives-regen-info {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 40px;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+  animation: regenInfoPop 0.6s ease 0.6s both;
+}
+
+.lives-display {
+  margin-bottom: 15px;
+}
+
+.hearts-display {
+  font-size: 48px;
+  letter-spacing: 8px;
+  animation: heartsFloat 2s ease-in-out infinite;
+}
+
+@keyframes heartsFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.regen-message p {
+  margin: 8px 0;
+  font-size: 16px;
+}
+
+.regen-time {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.regen-time strong {
+  font-size: 28px;
+  color: #FFD700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.regen-detail {
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+@keyframes regenInfoPop {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Options de continuer */
+.game-over-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 40px;
+  animation: optionsSlideIn 0.6s ease 0.7s both;
+}
+
+.go-option-card {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.go-option-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+}
+
+.go-option-card.premium {
+  border: 3px solid #FFD700;
+  background: linear-gradient(135deg, #FFF9E6 0%, #FFFFFF 100%);
+}
+
+.go-option-card.future {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.option-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.option-badge.coming-soon {
+  background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+  color: #666;
+}
+
+.option-icon {
+  font-size: 64px;
+  margin-bottom: 15px;
+}
+
+.go-option-card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.go-option-card p {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+/* Affichage du coût */
+.cost-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 20px 0 10px;
+}
+
+.cost-value {
+  font-size: 36px;
+  font-weight: 800;
+  color: #FFD700;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.cost-currency {
+  font-size: 36px;
+}
+
+.balance-display {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.balance-display strong {
+  color: #FFD700;
+  font-size: 18px;
+}
+
+.not-enough-coins {
+  color: #f44336;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+@keyframes optionsSlideIn {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Encouragement */
+.game-over-encouragement {
+  background: #f5f5f5;
+  border-left: 4px solid #4CAF50;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 30px;
+  animation: encouragementFade 0.6s ease 0.8s both;
+}
+
+.encouragement-text {
+  font-size: 16px;
+  font-style: italic;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.encouragement-tip {
+  font-size: 14px;
+  color: #4CAF50;
+  font-weight: 600;
+}
+
+@keyframes encouragementFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Actions secondaires */
+.game-over-secondary-actions {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  animation: secondaryActionsFade 0.6s ease 0.9s both;
+}
+
+.btn-link {
+  background: none;
+  border: none;
+  color: #667eea;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  padding: 8px 16px;
+}
+
+.btn-link:hover {
+  color: #764ba2;
+  transform: scale(1.05);
+}
+
+@keyframes secondaryActionsFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Animation d'entrée globale */
+@keyframes gameOverFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .game-over-container {
+    padding: 20px 15px;
+  }
+
+  .game-over-title {
+    font-size: 36px;
+  }
+
+  .heart-break-animation {
+    font-size: 80px;
+  }
+
+  .game-over-stats {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .stat-card-go {
+    padding: 15px 10px;
+  }
+
+  .stat-icon-go {
+    font-size: 28px;
+  }
+
+  .stat-value-go {
+    font-size: 24px;
+  }
+
+  .stat-label-go {
+    font-size: 11px;
+  }
+
+  .lives-regen-info {
+    padding: 20px;
+  }
+
+  .hearts-display {
+    font-size: 32px;
+    letter-spacing: 4px;
+  }
+
+  .game-over-options {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .go-option-card {
+    padding: 20px;
+  }
+
+  .option-icon {
+    font-size: 48px;
+  }
+
+  .game-over-secondary-actions {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
+
+/* Animations pour mobiles (plus douces) */
+@media (prefers-reduced-motion: reduce) {
+  .game-over-container,
+  .heart-break-animation,
+  .game-over-title,
+  .game-over-subtitle,
+  .game-over-stats,
+  .lives-regen-info,
+  .game-over-options,
+  .game-over-encouragement,
+  .game-over-secondary-actions {
+    animation: none;
+  }
+
+  .hearts-display {
+    animation: none;
+  }
+}
