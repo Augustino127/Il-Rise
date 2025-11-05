@@ -57,7 +57,7 @@ export class GameEngine {
     console.log(`🆕 Nouveau joueur, initialisation des données`);
     return {
       name: 'Néo',
-      coins: 0,
+      coins: 500, // 🆕 Donner des pièces de départ pour pouvoir jouer (était 0)
       lives: 5,
       livesResetTime: Date.now(),
       unlockedCrops: ['maize'],
