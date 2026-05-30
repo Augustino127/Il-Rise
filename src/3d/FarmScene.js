@@ -83,8 +83,30 @@ export class FarmScene {
     // Effets visuels
     this.effects = new VisualEffects(this.scene);
 
+    // Pré-compiler les shaders des particules pour éviter le gel à la première action
+    this._warmupShaders();
+
     // Démarrer animation
     this.animate();
+  }
+
+  /**
+   * Crée et supprime immédiatement un objet de chaque type utilisé
+   * pour forcer la compilation des shaders WebGL avant le gameplay
+   */
+  _warmupShaders() {
+    // Points (bursts de particules)
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array([0,0,0]), 3));
+    const mat = new THREE.PointsMaterial({ color: 0xffffff, transparent: true, opacity: 0 });
+    const pts = new THREE.Points(geo, mat);
+    this.scene.add(pts);
+    // Rendre une frame invisible pour compiler le shader
+    this.renderer.render(this.scene, this.camera);
+    // Nettoyer immédiatement
+    this.scene.remove(pts);
+    geo.dispose();
+    mat.dispose();
   }
 
   /**
@@ -596,22 +618,24 @@ export class FarmScene {
     }
 
     if (actionId === 'harvest') {
-      // Effacer les plants récoltés avec animation puis dispose GPU
+      // Un seul RAF pour shrink tous les plants ensemble, puis dispose
       const plantsToDispose = [...this.plants];
       this.plants = [];
-      plantsToDispose.forEach((p, i) => {
-        setTimeout(() => {
-          const shrink = () => {
+      const shrinkAll = () => {
+        let allDone = true;
+        for (const p of plantsToDispose) {
+          if (p.scale.x > 0.01) {
             p.scale.multiplyScalar(0.88);
-            if (p.scale.x > 0.01) {
-              requestAnimationFrame(shrink);
-            } else {
-              this._dispose(p); // libère géométries + matériaux
-            }
-          };
-          shrink();
-        }, i * 15);
-      });
+            allDone = false;
+          }
+        }
+        if (!allDone) {
+          requestAnimationFrame(shrinkAll);
+        } else {
+          plantsToDispose.forEach(p => this._dispose(p));
+        }
+      };
+      requestAnimationFrame(shrinkAll);
     }
 
     // Burst doré de complétion
@@ -750,7 +774,6 @@ export class FarmScene {
 
     if (this.renderer) {
       this.renderer.dispose();
-      this.renderer.forceContextLoss?.();
       if (this.container.contains(this.renderer.domElement)) {
         this.container.removeChild(this.renderer.domElement);
       }
