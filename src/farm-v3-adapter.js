@@ -229,6 +229,9 @@ export class FarmV3Adapter {
           const cropName = e.target.options[e.target.selectedIndex].text;
           this.showToast(`🌾 ${cropName} sélectionné`, 'info');
           console.log(`🌾 Culture sélectionnée: ${cropId}`);
+
+          // 🆕 CORRECTIF : Mettre à jour la disponibilité des actions après sélection
+          this.updateActionsAvailability();
         }
       });
       console.log('✅ Sélecteur de culture configuré');
