@@ -2459,10 +2459,12 @@ class IleRiseApp {
     this.engine.player = this.engine.loadPlayerData();
     console.log('📦 Données joueur rechargées pour:', user.email || 'guest');
 
-    // 💚 Initialiser le système de vies avec synchronisation backend
-    if (token) {
-      await this.engine.livesSystem.initialize();
+    // 💚 Initialiser le système de vies TOUJOURS (invités ET authentifiés)
+    await this.engine.livesSystem.initialize();
+    console.log('✅ Système de vies initialisé');
 
+    // Backend sync uniquement pour utilisateurs authentifiés
+    if (token) {
       // 🔄 Charger la progression depuis le backend
       try {
         await this.engine.progressManager.loadFromBackend();
@@ -2477,6 +2479,9 @@ class IleRiseApp {
       } catch (error) {
         console.warn('⚠️ Impossible de synchroniser les pièces:', error.message);
       }
+    } else {
+      // Mode invité - Vies illimitées confirmées
+      console.log('👤 Mode invité activé - Vies illimitées disponibles');
     }
 
     // Mettre à jour l'UI
@@ -2500,6 +2505,11 @@ class IleRiseApp {
       // Mode invité - pas de validation de token
       if (isGuest === 'true') {
         console.log('👤 Mode invité - Authentification locale seulement');
+
+        // 💚 Initialiser le système de vies pour les invités aussi
+        await this.engine.livesSystem.initialize();
+        console.log('✅ Système de vies initialisé (mode invité)');
+
         return true;
       }
 
