@@ -85,35 +85,35 @@ export class AudioManager {
    * Pré-charger les sons essentiels
    */
   async preloadSounds() {
-    // Définir les sons du jeu
+    // Définir les sons du jeu (.wav générés synthétiquement)
     const soundDefinitions = {
-      // UI Sounds
-      'click': { url: '/assets/audio/ui/click.mp3', volume: 0.3 },
-      'hover': { url: '/assets/audio/ui/hover.mp3', volume: 0.2 },
-      'success': { url: '/assets/audio/ui/success.mp3', volume: 0.5 },
-      'error': { url: '/assets/audio/ui/error.mp3', volume: 0.5 },
-      'notification': { url: '/assets/audio/ui/notification.mp3', volume: 0.4 },
+      // UI
+      'click':        { url: '/assets/audio/ui/click.wav',        volume: 0.35 },
+      'hover':        { url: '/assets/audio/ui/hover.wav',        volume: 0.15 },
+      'success':      { url: '/assets/audio/ui/success.wav',      volume: 0.5  },
+      'error':        { url: '/assets/audio/ui/error.wav',        volume: 0.5  },
+      'notification': { url: '/assets/audio/ui/notification.wav', volume: 0.4  },
 
-      // Game Sounds
-      'coin': { url: '/assets/audio/game/coin.mp3', volume: 0.6, pool: true },
-      'xp': { url: '/assets/audio/game/xp.mp3', volume: 0.5 },
-      'levelUp': { url: '/assets/audio/game/level-up.mp3', volume: 0.7 },
-      'achievement': { url: '/assets/audio/game/achievement.mp3', volume: 0.7 },
+      // Game
+      'coin':        { url: '/assets/audio/game/coin.wav',        volume: 0.6  },
+      'xp':          { url: '/assets/audio/game/xp.wav',          volume: 0.45 },
+      'levelUp':     { url: '/assets/audio/game/level-up.wav',    volume: 0.7  },
+      'achievement': { url: '/assets/audio/game/achievement.wav', volume: 0.65 },
 
-      // Farm Sounds
-      'plant': { url: '/assets/audio/farm/plant.mp3', volume: 0.5 },
-      'water': { url: '/assets/audio/farm/water.mp3', volume: 0.5 },
-      'harvest': { url: '/assets/audio/farm/harvest.mp3', volume: 0.6 },
-      'fertilize': { url: '/assets/audio/farm/fertilize.mp3', volume: 0.5 },
+      // Farm
+      'plow':      { url: '/assets/audio/farm/plow.wav',      volume: 0.55 },
+      'plant':     { url: '/assets/audio/farm/plant.wav',     volume: 0.5  },
+      'water':     { url: '/assets/audio/farm/water.wav',     volume: 0.5  },
+      'harvest':   { url: '/assets/audio/farm/harvest.wav',   volume: 0.6  },
+      'fertilize': { url: '/assets/audio/farm/fertilize.wav', volume: 0.45 },
+      'weed':      { url: '/assets/audio/farm/weed.wav',      volume: 0.45 },
+      'spray':     { url: '/assets/audio/farm/spray.wav',     volume: 0.4  },
 
-      // Ambiance
-      'birds': { url: '/assets/audio/ambient/birds.mp3', volume: 0.3, loop: true },
-      'wind': { url: '/assets/audio/ambient/wind.mp3', volume: 0.2, loop: true },
-      'rain': { url: '/assets/audio/ambient/rain.mp3', volume: 0.4, loop: true }
+      // Ambiance (loop)
+      'birds': { url: '/assets/audio/ambient/birds.wav', volume: 0.25, loop: true },
+      'wind':  { url: '/assets/audio/ambient/wind.wav',  volume: 0.2,  loop: true },
+      'rain':  { url: '/assets/audio/ambient/rain.wav',  volume: 0.35, loop: true },
     };
-
-    // Note: Les fichiers audio n'existent pas encore, on créera des placeholders
-    // Pour l'instant, le système est prêt à les charger
 
     for (const [name, def] of Object.entries(soundDefinitions)) {
       this.registerSound(name, def);
@@ -255,7 +255,7 @@ export class AudioManager {
 
     // Créer la nouvelle musique
     const music = new Audio();
-    music.src = `/assets/audio/music/${musicName}.mp3`;
+    music.src = `/assets/audio/music/${musicName}.wav`;
     music.loop = true;
     music.volume = 0;
 
