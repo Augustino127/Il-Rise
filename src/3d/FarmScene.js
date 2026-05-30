@@ -280,12 +280,28 @@ export class FarmScene {
   }
 
   /**
-   * Nettoyer plants existants
+   * Libère un objet Three.js et tous ses enfants (géométries + matériaux)
+   */
+  _dispose(obj) {
+    if (!obj) return;
+    obj.traverse(child => {
+      if (child.geometry)  { child.geometry.dispose(); }
+      if (child.material)  {
+        if (Array.isArray(child.material)) {
+          child.material.forEach(m => m.dispose());
+        } else {
+          child.material.dispose();
+        }
+      }
+    });
+    this.scene.remove(obj);
+  }
+
+  /**
+   * Nettoyer plants existants + libérer GPU
    */
   clearPlants() {
-    this.plants.forEach(plant => {
-      this.scene.remove(plant);
-    });
+    this.plants.forEach(plant => this._dispose(plant));
     this.plants = [];
   }
 
@@ -580,18 +596,22 @@ export class FarmScene {
     }
 
     if (actionId === 'harvest') {
-      // Effacer les plants récoltés avec une animation
-      this.plants.forEach((p, i) => {
+      // Effacer les plants récoltés avec animation puis dispose GPU
+      const plantsToDispose = [...this.plants];
+      this.plants = [];
+      plantsToDispose.forEach((p, i) => {
         setTimeout(() => {
           const shrink = () => {
             p.scale.multiplyScalar(0.88);
-            if (p.scale.x > 0.01) requestAnimationFrame(shrink);
-            else this.scene.remove(p);
+            if (p.scale.x > 0.01) {
+              requestAnimationFrame(shrink);
+            } else {
+              this._dispose(p); // libère géométries + matériaux
+            }
           };
           shrink();
         }, i * 15);
       });
-      this.plants = [];
     }
 
     // Burst doré de complétion
@@ -666,6 +686,8 @@ export class FarmScene {
       burst.material.opacity = Math.max(0, 1 - t);
 
       if (t >= 1) {
+        burst.geometry?.dispose();
+        burst.material?.dispose();
         this.scene.remove(burst);
         this._activeEffects.splice(i, 1);
       }
@@ -693,13 +715,45 @@ export class FarmScene {
   dispose() {
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
+      this.animationId = null;
     }
 
+    // Libérer toutes les plantes
     this.clearPlants();
+
+    // Libérer les particules en cours
+    this._activeEffects.forEach(b => {
+      b.geometry?.dispose();
+      b.material?.dispose();
+      this.scene.remove(b);
+    });
+    this._activeEffects = [];
+
+    // Libérer les effets visuels (pluie)
+    if (this.effects) {
+      this.effects.stopRain();
+      this.effects.waterIndicators?.forEach(i => {
+        i.geometry?.dispose(); i.material?.dispose();
+        this.scene.remove(i);
+      });
+    }
+
+    // Libérer toutes les géométries/matériaux encore dans la scène
+    this.scene.traverse(obj => {
+      if (obj.geometry) obj.geometry.dispose();
+      if (obj.material) {
+        Array.isArray(obj.material)
+          ? obj.material.forEach(m => m.dispose())
+          : obj.material.dispose();
+      }
+    });
 
     if (this.renderer) {
       this.renderer.dispose();
-      this.container.removeChild(this.renderer.domElement);
+      this.renderer.forceContextLoss?.();
+      if (this.container.contains(this.renderer.domElement)) {
+        this.container.removeChild(this.renderer.domElement);
+      }
     }
 
     window.removeEventListener('resize', () => this.onWindowResize());

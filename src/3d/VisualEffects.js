@@ -19,7 +19,10 @@ export class VisualEffects {
    */
   createRainEffect(intensity = 0.5) {
     if (this.weatherParticles) {
+      this.weatherParticles.geometry?.dispose();
+      this.weatherParticles.material?.dispose();
       this.scene.remove(this.weatherParticles);
+      this.weatherParticles = null;
     }
 
     const particleCount = Math.floor(intensity * 600); // 600 max au lieu de 2000
@@ -70,6 +73,8 @@ export class VisualEffects {
    */
   stopRain() {
     if (this.weatherParticles) {
+      this.weatherParticles.geometry?.dispose();
+      this.weatherParticles.material?.dispose();
       this.scene.remove(this.weatherParticles);
       this.weatherParticles = null;
     }
