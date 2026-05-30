@@ -5,18 +5,6 @@
  * NASA Space Apps Challenge 2025
  */
 
-// Import différé pour éviter toute dépendance circulaire au moment du parse
-let _EventBus = null;
-let _GameEvents = null;
-async function getEventBus() {
-  if (!_EventBus) {
-    const mod = await import('./EventBus.js');
-    _EventBus = mod.default;
-    _GameEvents = mod.GameEvents;
-  }
-  return { EventBus: _EventBus, GameEvents: _GameEvents };
-}
-
 export class GameStateManager {
   static instance = null;
 
@@ -465,19 +453,13 @@ export class GameStateManager {
       'player.xpToNextLevel': xpToNext,
     });
 
-    // Émettre sur EventBus pour que XPBar et autres composants réagissent
-    getEventBus().then(({ EventBus, GameEvents }) => {
-      EventBus.emit(GameEvents.PLAYER_XP_GAINED, { amount, newXP, newLevel });
-      if (leveledUp) {
-        EventBus.emit(GameEvents.PLAYER_LEVEL_UP, { oldLevel: currentLevel, newLevel });
-      }
-    });
-
     if (leveledUp) {
       this.notify('player.levelUp', { oldLevel: currentLevel, newLevel });
     }
 
-    return leveledUp;
+    // Retourne { leveledUp, newLevel, newXP, amount } pour que les appelants
+    // puissent émettre les événements EventBus eux-mêmes (pas de dépendance ici)
+    return { leveledUp, newLevel, newXP, amount };
   }
 
   // Calculer XP nécessaire pour level suivant

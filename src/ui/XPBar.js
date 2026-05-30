@@ -289,8 +289,8 @@ export class XPBar {
       this._showLevelUpToast(data?.newLevel);
     });
 
-    // Listen for XP gain — aussi abonné au notify interne via GameState.subscribe si dispo
-    GameState.subscribe?.('player.*', () => this.update());
+    // Mise à jour périodique légère comme filet de sécurité (1x/5s)
+    setInterval(() => this.update(), 5000);
   }
 
   update() {

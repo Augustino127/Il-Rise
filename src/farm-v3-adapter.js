@@ -18,6 +18,27 @@ import AudioManager from './audio/AudioManager.js';
 import FarmTutorial from './ui/FarmTutorial.js';
 import ActionTooltips from './ui/ActionTooltips.js';
 
+/**
+ * Ajoute de l'XP et émet les événements EventBus appropriés.
+ * Centralise l'émission ici pour garder GameStateManager sans dépendance.
+ */
+function awardXP(amount) {
+  const result = GameState.addXP(amount);
+  // addXP retourne maintenant un objet {leveledUp, newLevel, newXP, amount}
+  // ou un boolean (ancien code) — on gère les deux
+  if (result && typeof result === 'object') {
+    // Différé d'un tick pour ne pas bloquer le thread de rendu
+    setTimeout(() => {
+      EventBus.emit(GameEvents.PLAYER_XP_GAINED, { amount: result.amount, newXP: result.newXP });
+      if (result.leveledUp) {
+        EventBus.emit(GameEvents.PLAYER_LEVEL_UP, { newLevel: result.newLevel });
+      }
+    }, 0);
+    return result.leveledUp;
+  }
+  return !!result;
+}
+
 // 🆕 XP Rewards for farm actions
 const FARM_XP_REWARDS = {
   plow: 5,
@@ -203,7 +224,7 @@ export class FarmV3Adapter {
           const harvestResult = this.farmGame.plotManager.harvestPlot(action.plot);
           if (harvestResult.success) {
             const xpReward = FARM_XP_REWARDS.harvest;
-            GameState.addXP(xpReward);
+            awardXP(xpReward);
             this.farmStats.cropsHarvested++;
             this.farmStats.moneyEarned += harvestResult.revenue || 0;
             EventBus.emit('farm:crop:harvested', { plotId: action.plot, yield: harvestResult.yield });
@@ -471,7 +492,7 @@ export class FarmV3Adapter {
 
         // 🆕 Récompenser avec XP
         const xpReward = FARM_XP_REWARDS.plant;
-        const leveledUp = GameState.addXP(xpReward);
+        const leveledUp = awardXP(xpReward);
 
         // 🆕 Mettre à jour les stats
         this.farmStats.totalActionsPerformed++;
@@ -529,7 +550,7 @@ export class FarmV3Adapter {
       if (result.success) {
         // 🆕 Récompenser avec XP
         const xpReward = FARM_XP_REWARDS[actionId] || 5;
-        const leveledUp = GameState.addXP(xpReward);
+        const leveledUp = awardXP(xpReward);
 
         // 🆕 Mettre à jour les stats
         this.farmStats.totalActionsPerformed++;
@@ -1211,7 +1232,7 @@ export class FarmV3Adapter {
 
     if (success) {
       const xpReward = FARM_XP_REWARDS.unlock_plot;
-      GameState.addXP(xpReward);
+      awardXP(xpReward);
       AudioManager.play('success');
       this.updatePlotsDisplay();
       this.updateResourcesDisplay();
@@ -1248,7 +1269,7 @@ export class FarmV3Adapter {
 
     // 🆕 Récompenser avec XP
     const xpReward = FARM_XP_REWARDS.unlock_plot;
-    GameState.addXP(xpReward);
+    awardXP(xpReward);
 
     // 🆕 Émettre événement
     EventBus.emit('farm:coop:unlocked', { cost, xpReward });

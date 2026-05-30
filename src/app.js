@@ -3088,12 +3088,19 @@ class IleRiseApp {
     // Listen for player actions that should give XP
     EventBus.on(GameEvents.GAME_WIN, (data) => {
       const xpReward = data.stars * 50; // 50 XP per star
-      const leveledUp = GameState.addXP(xpReward);
+      const xpResult = GameState.addXP(xpReward);
+      const leveledUp = xpResult?.leveledUp ?? !!xpResult;
+
+      // Émettre différé pour éviter la cascade synchrone
+      setTimeout(() => {
+        EventBus.emit(GameEvents.PLAYER_XP_GAINED, { amount: xpReward });
+        if (leveledUp) EventBus.emit(GameEvents.PLAYER_LEVEL_UP, { newLevel: xpResult?.newLevel ?? GameState.get('player.level') });
+      }, 0);
 
       NotificationSystem.success(`+${xpReward} XP`, 'Expérience Gagnée!');
 
       if (leveledUp) {
-        const newLevel = GameState.get('player.level');
+        const newLevel = xpResult?.newLevel ?? GameState.get('player.level');
         NotificationSystem.toast({
           type: 'achievement',
           icon: '🎉',
