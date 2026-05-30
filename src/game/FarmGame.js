@@ -18,6 +18,7 @@ import { PlotManager } from './PlotManager.js';
 import { FarmActionSystem } from './FarmActionSystem.js';
 import { LivestockManager } from './LivestockManager.js';
 import { MarketSystem } from './MarketSystem.js';
+import { GameConditionsEngine } from './GameConditionsEngine.js';
 import apiService from '../services/api.js';
 
 export class FarmGame {
@@ -35,6 +36,7 @@ export class FarmGame {
     this.actionSystem = new FarmActionSystem(this.resourceManager);
     this.livestockManager = new LivestockManager(this.resourceManager, this.timeSimulation);
     this.marketSystem = new MarketSystem(this.resourceManager, this.timeSimulation);
+    this.conditionsEngine = new GameConditionsEngine();
 
     // État du jeu
     this.isInitialized = false;
@@ -44,8 +46,9 @@ export class FarmGame {
     this.onDayChangeCallback = null;
     this.onResourceChangeCallback = null;
     this.onActionCompleteCallback = null;
-    this.onSyncErrorCallback = null; // Callback pour afficher les erreurs de sync
-    this.onNotificationCallback = null; // Callback pour afficher les notifications générales
+    this.onSyncErrorCallback = null;
+    this.onNotificationCallback = null;
+    this.onConditionEventCallback = null; // Callback événement surprise
 
     // Synchronisation backend
     this.useBackendSync = apiService.isAuthenticated();
@@ -140,6 +143,30 @@ export class FarmGame {
    */
   handleDayChange(day) {
     console.log(`📅 Nouveau jour: ${day}`);
+
+    // ── Conditions du jour (météo + événements surprises) ──
+    this.conditionsEngine.onEventStart = (event) => {
+      console.log(`🎲 Événement surprise: ${event.title}`);
+      if (this.onConditionEventCallback) this.onConditionEventCallback(event, 'start');
+    };
+    this.conditionsEngine.onEventEnd = (event) => {
+      if (this.onConditionEventCallback) this.onConditionEventCallback(event, 'end');
+    };
+
+    const conditions = this.conditionsEngine.tick(day);
+
+    // Appliquer les conditions sur chaque parcelle
+    const rain   = conditions.rainfall;
+    const evap   = conditions.evaporation;
+    this.plotManager.plots.forEach(plot => {
+      if (!plot.unlocked) return;
+      // Évaporation naturelle
+      plot.soilMoisture = Math.max(0, plot.soilMoisture - evap);
+      // Pluie naturelle
+      if (rain > 0) plot.soilMoisture = Math.min(100, plot.soilMoisture + rain);
+      // Impact de l'événement actif
+      this.conditionsEngine.applyEventToPlot(plot);
+    });
 
     // Mettre à jour toutes les parcelles
     this.plotManager.updateAllPlots(day);

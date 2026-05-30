@@ -6,6 +6,19 @@
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { VisualEffects } from './VisualEffects.js';
+
+// Config des effets par action
+const ACTION_EFFECTS = {
+  plow:                   { color: 0x8B4513, label: '🚜 Labourage', sky: 0x87CEEB, soil: 0x4A3728 },
+  plant:                  { color: 0x44ff44, label: '🌱 Plantation', sky: 0x87CEEB, soil: null },
+  water:                  { color: 0x4da6ff, label: '💧 Arrosage',   sky: 0xaaddff, soil: 0x3a2a1e },
+  fertilize_npk:          { color: 0xffaa44, label: '🧪 NPK',        sky: 0x87CEEB, soil: null },
+  fertilize_organic:      { color: 0xa0522d, label: '💩 Compost',    sky: 0x87CEEB, soil: null },
+  weed:                   { color: 0x32cd32, label: '🌿 Désherbage', sky: 0x87CEEB, soil: null },
+  spray_pesticide_natural:{ color: 0x9b59b6, label: '🪲 Pesticide',  sky: 0x87CEEB, soil: null },
+  harvest:                { color: 0xFFD700, label: '🌾 Récolte',    sky: 0x87CEEB, soil: null },
+};
 
 export class FarmScene {
   constructor(container) {
@@ -17,6 +30,9 @@ export class FarmScene {
     this.plants = [];
     this.animationId = null;
     this.cropType = null;
+    this.effects = null;
+    this.groundMesh = null;
+    this._activeEffects = []; // particules en cours
 
     this.init();
   }
@@ -63,6 +79,9 @@ export class FarmScene {
 
     // Gestion resize
     window.addEventListener('resize', () => this.onWindowResize());
+
+    // Effets visuels
+    this.effects = new VisualEffects(this.scene);
 
     // Démarrer animation
     this.animate();
@@ -112,6 +131,7 @@ export class FarmScene {
     ground.rotation.x = -Math.PI / 2;
     ground.receiveShadow = true;
     this.scene.add(ground);
+    this.groundMesh = ground;
 
     // Grille légère pour référence
     const gridHelper = new THREE.GridHelper(30, 20, 0x444444, 0x333333);
@@ -491,17 +511,165 @@ export class FarmScene {
   }
 
   /**
+   * Lancer l'effet visuel d'une action qui démarre
+   */
+  showActionStart(actionId) {
+    const cfg = ACTION_EFFECTS[actionId];
+    if (!cfg) return;
+
+    // Changer ciel selon action
+    if (cfg.sky) this.scene.background = new THREE.Color(cfg.sky);
+
+    // Assombrir sol si nécessaire
+    if (cfg.soil && this.groundMesh) {
+      this.groundMesh.material.color.setHex(cfg.soil);
+    }
+
+    switch (actionId) {
+      case 'water':
+        this.effects.createRainEffect(0.6);
+        if (this.groundMesh) this.effects.updateSoilMoisture(70, this.groundMesh);
+        break;
+
+      case 'plow':
+        this._burstParticles(new THREE.Vector3(0, 0.2, 0), 0x8B4513, 40);
+        // Sol retourné directement — pas de RAF supplémentaire
+        if (this.groundMesh) {
+          this.groundMesh.material.color.setHex(0x3a2010);
+        }
+        break;
+
+      case 'plant':
+        this._burstParticles(new THREE.Vector3(0, 0.5, 0), 0x44ff44, 30);
+        break;
+
+      case 'fertilize_npk':
+        this._burstParticles(new THREE.Vector3(0, 0.3, 0), 0xffaa44, 25);
+        break;
+
+      case 'fertilize_organic':
+        this._burstParticles(new THREE.Vector3(0, 0.3, 0), 0xa0522d, 25);
+        break;
+
+      case 'weed':
+        this._burstParticles(new THREE.Vector3(0, 0.2, 0), 0x32cd32, 20);
+        break;
+
+      case 'spray_pesticide_natural':
+        this._burstParticles(new THREE.Vector3(0, 1, 0), 0x9b59b6, 25);
+        break;
+
+      case 'harvest':
+        this._burstParticles(new THREE.Vector3(0, 1, 0), 0xFFD700, 40);
+        break;
+    }
+  }
+
+  /**
+   * Afficher l'effet de fin d'action
+   */
+  showActionComplete(actionId) {
+    const cfg = ACTION_EFFECTS[actionId];
+
+    // Remettre ciel normal
+    this.scene.background = new THREE.Color(0x87CEEB);
+
+    if (actionId === 'water') {
+      this.effects.stopRain();
+      if (this.groundMesh) this.effects.updateSoilMoisture(65, this.groundMesh);
+    }
+
+    if (actionId === 'harvest') {
+      // Effacer les plants récoltés avec une animation
+      this.plants.forEach((p, i) => {
+        setTimeout(() => {
+          const shrink = () => {
+            p.scale.multiplyScalar(0.88);
+            if (p.scale.x > 0.01) requestAnimationFrame(shrink);
+            else this.scene.remove(p);
+          };
+          shrink();
+        }, i * 15);
+      });
+      this.plants = [];
+    }
+
+    // Burst doré de complétion
+    const color = cfg ? cfg.color : 0xffffff;
+    this._burstParticles(new THREE.Vector3(0, 2, 0), color, 30, true);
+
+    if (actionId === 'plant') {
+      this.showSuccess();
+    }
+  }
+
+  /**
+   * Émettre un burst de particules
+   */
+  _burstParticles(origin, color, count = 40, rise = false) {
+    const geo = new THREE.BufferGeometry();
+    const pos = new Float32Array(count * 3);
+    const vel = [];
+
+    for (let i = 0; i < count; i++) {
+      pos[i * 3]     = origin.x + (Math.random() - 0.5) * 2;
+      pos[i * 3 + 1] = origin.y;
+      pos[i * 3 + 2] = origin.z + (Math.random() - 0.5) * 2;
+      vel.push({
+        x: (Math.random() - 0.5) * 0.12,
+        y: rise ? Math.random() * 0.15 : (Math.random() - 0.3) * 0.1,
+        z: (Math.random() - 0.5) * 0.12,
+      });
+    }
+
+    geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+
+    const mat = new THREE.PointsMaterial({ color, size: 0.18, transparent: true, opacity: 1 });
+    const burst = new THREE.Points(geo, mat);
+    burst.userData = { vel, life: 0, maxLife: 1.5 };
+    this.scene.add(burst);
+    this._activeEffects.push(burst);
+  }
+
+  /**
    * Boucle animation
    */
   animate() {
     this.animationId = requestAnimationFrame(() => this.animate());
 
-    // Animation légère des plants (vent)
     const time = Date.now() * 0.001;
+    const delta = 0.016; // ~60fps
+
+    // Vent sur les plants
     this.plants.forEach((plant, index) => {
-      const offset = index * 0.5;
-      plant.rotation.z = Math.sin(time + offset) * 0.02;
+      plant.rotation.z = Math.sin(time + index * 0.5) * 0.02;
     });
+
+    // Pluie
+    if (this.effects) this.effects.animateRain();
+
+    // Particules burst
+    for (let i = this._activeEffects.length - 1; i >= 0; i--) {
+      const burst = this._activeEffects[i];
+      burst.userData.life += delta;
+      const t = burst.userData.life / burst.userData.maxLife;
+
+      const pos = burst.geometry.attributes.position.array;
+      const vel = burst.userData.vel;
+      for (let j = 0; j < vel.length; j++) {
+        pos[j * 3]     += vel[j].x;
+        pos[j * 3 + 1] += vel[j].y;
+        pos[j * 3 + 2] += vel[j].z;
+        vel[j].y -= 0.004; // gravité légère
+      }
+      burst.geometry.attributes.position.needsUpdate = true;
+      burst.material.opacity = Math.max(0, 1 - t);
+
+      if (t >= 1) {
+        this.scene.remove(burst);
+        this._activeEffects.splice(i, 1);
+      }
+    }
 
     this.controls.update();
     this.renderer.render(this.scene, this.camera);

@@ -526,9 +526,56 @@ export class FarmTutorial {
    * Passer le tutoriel
    */
   skip() {
-    if (confirm('Voulez-vous vraiment passer le tutoriel ? Vous pourrez le relancer depuis les paramètres.')) {
+    this._confirmSkip();
+  }
+
+  _confirmSkip() {
+    // Supprimer modal existant
+    document.getElementById('_tutorial-confirm-modal')?.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = '_tutorial-confirm-modal';
+    overlay.style.cssText = `
+      position:fixed; inset:0; z-index:99999;
+      background:rgba(0,0,0,0.6); backdrop-filter:blur(4px);
+      display:flex; align-items:center; justify-content:center;
+    `;
+    overlay.innerHTML = `
+      <div style="
+        background:#1a2530; border:1px solid rgba(255,255,255,0.12);
+        border-radius:16px; padding:28px 32px; max-width:360px;
+        color:#f0f0f0; text-align:center;
+        box-shadow:0 20px 60px rgba(0,0,0,0.5);
+        animation: popIn .25s cubic-bezier(0.34,1.56,0.64,1);
+      ">
+        <div style="font-size:2.5rem; margin-bottom:12px;">🎓</div>
+        <h3 style="margin:0 0 10px; font-size:1.1rem;">Passer le tutoriel ?</h3>
+        <p style="margin:0 0 22px; font-size:.85rem; opacity:.65; line-height:1.5;">
+          Tu pourras le relancer depuis les paramètres à tout moment.
+        </p>
+        <div style="display:flex; gap:10px;">
+          <button id="_tuto-cancel" style="
+            flex:1; padding:10px; border:1px solid rgba(255,255,255,0.15);
+            border-radius:8px; background:transparent; color:#f0f0f0; cursor:pointer;
+          ">Continuer</button>
+          <button id="_tuto-skip" style="
+            flex:1; padding:10px; border:none; border-radius:8px;
+            background:linear-gradient(135deg,#e53935,#b71c1c);
+            color:white; cursor:pointer; font-weight:700;
+          ">Passer</button>
+        </div>
+      </div>
+      <style>@keyframes popIn{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}</style>
+    `;
+
+    document.body.appendChild(overlay);
+
+    overlay.querySelector('#_tuto-cancel').addEventListener('click', () => overlay.remove());
+    overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+    overlay.querySelector('#_tuto-skip').addEventListener('click', () => {
+      overlay.remove();
       this.complete(true);
-    }
+    });
   }
 
   /**

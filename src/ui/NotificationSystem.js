@@ -87,10 +87,11 @@ export class NotificationSystem {
 
       /* Toast individuel */
       .toast {
-        background: white;
+        background: #1e2a2e;
+        color: #f0f0f0;
         border-radius: 12px;
         padding: 16px 20px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
         display: flex;
         align-items: center;
         gap: 12px;
@@ -116,18 +117,22 @@ export class NotificationSystem {
       /* Types de toast */
       .toast.success {
         border-left: 4px solid #4CAF50;
+        background: #162218;
       }
 
       .toast.error {
         border-left: 4px solid #f44336;
+        background: #221616;
       }
 
       .toast.warning {
         border-left: 4px solid #ff9800;
+        background: #221c10;
       }
 
       .toast.info {
         border-left: 4px solid #2196F3;
+        background: #111c22;
       }
 
       .toast.achievement {
@@ -189,6 +194,7 @@ export class NotificationSystem {
       .toast-close {
         background: none;
         border: none;
+        color: #f0f0f0;
         font-size: 20px;
         cursor: pointer;
         opacity: 0.5;

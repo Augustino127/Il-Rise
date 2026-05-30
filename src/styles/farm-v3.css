@@ -20,6 +20,160 @@
     --shadow-hover: 0 4px 12px rgba(0,0,0,0.15);
 }
 
+/* Conteneur principal — nécessaire pour les overlays absolus */
+#screen-farm-v3 { position: relative; }
+
+/* ========== ÉVÉNEMENT SURPRISE — ALERTE ========== */
+#event-alert-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    background: rgba(0,0,0,0);
+    transition: background 0.3s;
+}
+
+#event-alert-overlay.visible {
+    background: rgba(0,0,0,0.55);
+    pointer-events: all;
+}
+
+#event-alert-overlay.hidden {
+    display: none;
+}
+
+.event-alert-box {
+    background: #1a1a2e;
+    border: 2px solid #fff;
+    border-radius: 20px;
+    padding: 28px 36px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    max-width: 480px;
+    animation: eventPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    color: white;
+}
+
+@keyframes eventPop {
+    0%   { transform: scale(0.5); opacity: 0; }
+    70%  { transform: scale(1.06); }
+    100% { transform: scale(1);   opacity: 1; }
+}
+
+.event-alert-icon {
+    font-size: 3.5rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.event-alert-content { flex: 1; }
+
+.event-alert-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin: 0 0 6px;
+}
+
+.event-alert-desc {
+    font-size: 0.9rem;
+    opacity: 0.85;
+    margin: 0 0 10px;
+    line-height: 1.5;
+}
+
+.event-alert-duration {
+    font-size: 0.78rem;
+    opacity: 0.6;
+    background: rgba(255,255,255,0.1);
+    padding: 3px 10px;
+    border-radius: 10px;
+}
+
+/* ========== OVERLAY FEEDBACK ACTION ========== */
+.action-overlay {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.action-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%) translateY(8px);
+}
+
+.action-overlay-inner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 40px;
+    padding: 10px 18px;
+    color: white;
+    white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+
+.action-overlay-icon {
+    font-size: 1.4rem;
+    line-height: 1;
+}
+
+.action-overlay-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 120px;
+}
+
+.action-overlay-label {
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+}
+
+.action-overlay-bar {
+    height: 5px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.action-overlay-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4fc3f7, #82cc68);
+    border-radius: 4px;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.action-overlay-fill.complete {
+    background: linear-gradient(90deg, #82cc68, #FFD700);
+    width: 100% !important;
+}
+
+.action-overlay-status {
+    font-size: 0.72rem;
+    opacity: 0.7;
+}
+
+@keyframes overlayPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+.action-overlay.in-progress .action-overlay-inner {
+    animation: overlayPulse 1.5s ease-in-out infinite;
+}
+
 /* ========== HEADER ========== */
 .farm-header {
     display: flex;
@@ -71,9 +225,23 @@
     font-weight: bold;
 }
 
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 .resources-bar {
     display: flex;
-    gap: 20px;
+    gap: 10px;
+}
+
+#player-stats-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-left: 1px solid rgba(255,255,255,0.2);
+    padding-left: 12px;
 }
 
 .resource-item {

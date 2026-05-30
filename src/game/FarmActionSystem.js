@@ -43,7 +43,7 @@ export class FarmActionSystem {
         category: 'preparation',
         get duration() { return adjustActionDuration(2); }, // 2 jours normaux, 0.2 jours pour invités
         cost: { money: 20 },
-        effect: { soilQuality: +10, weedLevel: -30 },
+        effect: { soilQuality: +10, weedLevel: -30, isPlowed: true },
         unlockLevel: 1,
         description: { fr: 'Retourner la terre pour améliorer la structure du sol' }
       },
@@ -389,6 +389,9 @@ export class FarmActionSystem {
         plot.daysSincePlant = 0;
         plot.isPlanted = true;
         changes.plantCount = value;
+      } else if (key === 'isPlowed') {
+        plot.isPlowed = value;
+        changes.isPlowed = value;
       } else if (key === 'harvestYield') {
         // Sera calculé par le moteur de simulation
         changes.harvestYield = 'calculated';

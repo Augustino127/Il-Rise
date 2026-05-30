@@ -5,8 +5,10 @@
  * 🆕 INTEGRATED WITH AAA SYSTEMS
  */
 
+import * as THREE from 'three';
 import { FarmGame } from './game/FarmGame.js';
 import { FarmScene } from './3d/FarmScene.js';
+import apiService from './services/api.js';
 
 // 🆕 Import AAA Systems
 import EventBus, { GameEvents } from './core/EventBus.js';
@@ -86,8 +88,9 @@ export class FarmV3Adapter {
         location: locationData.city
       };
 
-      // Créer instance FarmGame
-      this.farmGame = new FarmGame(nasaData, 1);
+      // Créer instance FarmGame avec le vrai niveau du joueur
+      const playerLevel = this.app.currentUser?.level || this.app.engine?.player?.level || 1;
+      this.farmGame = new FarmGame(nasaData, playerLevel);
 
       // Configurer callbacks
       this.setupCallbacks();
@@ -161,6 +164,29 @@ export class FarmV3Adapter {
       this.updatePlotsDisplay();
       this.updateSoilDisplay();
       this.updateEventsDisplay();
+      this.updateConditionsDisplay();
+    };
+
+    // Événement surprise — alerte dramatique
+    this.farmGame.onConditionEventCallback = (event, phase) => {
+      if (phase === 'start') {
+        this.showEventAlert(event);
+        this.updateSoilDisplay(); // sol réagit immédiatement
+        if (this.farmScene) {
+          // Changer le ciel selon l'événement
+          if (event.sky) this.farmScene.scene.background = new THREE.Color(event.sky);
+          if (event.sceneEffect === 'storm' || event.sceneEffect === 'rain') {
+            this.farmScene.effects.createRainEffect(event.id === 'storm' ? 1.0 : 0.5);
+          }
+        }
+      } else {
+        // Fin d'événement — retour à la normale
+        if (this.farmScene) {
+          this.farmScene.scene.background = new THREE.Color(0x87CEEB);
+          this.farmScene.effects.stopRain();
+        }
+        this.showToast(`${event.icon} ${event.title} terminé — conditions normales`, 'info');
+      }
     };
 
     this.farmGame.onResourceChangeCallback = (resources) => {
@@ -170,7 +196,50 @@ export class FarmV3Adapter {
     };
 
     this.farmGame.onActionCompleteCallback = (action, changes) => {
-      this.showToast(`✅ ${action.action.name.fr} terminé`);
+      // Pour la récolte, déclencher la collecte réelle via PlotManager
+      if (action.id === 'harvest') {
+        const plot = this.farmGame.plotManager.getPlot(action.plot);
+        if (plot && plot.isPlanted) {
+          const harvestResult = this.farmGame.plotManager.harvestPlot(action.plot);
+          if (harvestResult.success) {
+            const xpReward = FARM_XP_REWARDS.harvest;
+            GameState.addXP(xpReward);
+            this.farmStats.cropsHarvested++;
+            this.farmStats.moneyEarned += harvestResult.revenue || 0;
+            EventBus.emit('farm:crop:harvested', { plotId: action.plot, yield: harvestResult.yield });
+            AudioManager.play('harvest');
+            if (this.farmScene) this.farmScene.showActionComplete('harvest');
+            this.completeActionOverlay('harvest');
+            this.showToast(`🌾 Récolte: ${(harvestResult.yield || 0).toFixed(2)}t • +${xpReward} XP`, 'success');
+
+            // Sync backend si authentifié
+            if (apiService.isAuthenticated()) {
+              apiService.recordHarvest(
+                harvestResult.cropId,
+                harvestResult.yield,
+                harvestResult.revenue
+              ).catch(err => console.warn('⚠️ Sync récolte échouée:', err));
+            }
+          } else {
+            this.showToast(`❌ Récolte échouée: ${harvestResult.error}`, 'error');
+          }
+        }
+      } else {
+        // Effet 3D de complétion
+        if (this.farmScene) this.farmScene.showActionComplete(action.id);
+        this.completeActionOverlay(action.id);
+
+        this.showToast(`✅ ${action.action.name.fr} terminé`);
+
+        // Logger l'action sur le backend si authentifié
+        if (apiService.isAuthenticated()) {
+          apiService.logFarmAction(action.id, {
+            plotId: action.plot,
+            day: action.endDay,
+            changes
+          }).catch(err => console.warn('⚠️ Log action échoué:', err));
+        }
+      }
       this.updateUI();
     };
 
@@ -419,11 +488,19 @@ export class FarmV3Adapter {
         // 🆕 Jouer son
         AudioManager.play('plant');
 
-        if (this.farmScene) {
-          this.farmScene.clearPlants();
-          this.farmScene.plantCrop(this.selectedCropId, 49);
-          this.farmScene.animateGrowth(2000);
-        }
+        setTimeout(() => {
+          try {
+            if (this.farmScene) {
+              this.farmScene.clearPlants();
+              this.farmScene.plantCrop(this.selectedCropId, 49);
+              this.farmScene.animateGrowth(2000);
+              this.farmScene.showActionStart('plant');
+            }
+            this.showActionOverlay('plant', 0);
+          } catch(e) {
+            console.warn('⚠️ Effet visuel plantation échoué:', e.message);
+          }
+        }, 0);
 
         console.log('✅ Plantation réussie');
 
@@ -482,7 +559,20 @@ export class FarmV3Adapter {
         }
 
         // 🆕 Jouer son
-        AudioManager.play(actionId.split('_')[0]); // 'fertilize_npk' -> 'fertilize'
+        AudioManager.play(actionId.split('_')[0]);
+
+        // Effet 3D + overlay — différé pour ne pas bloquer le thread
+        const durationDays = result.completionDay
+          ? result.completionDay - this.farmGame.timeSimulation.currentDay
+          : 0;
+        setTimeout(() => {
+          try {
+            if (this.farmScene) this.farmScene.showActionStart(actionId);
+            this.showActionOverlay(actionId, durationDays);
+          } catch(e) {
+            console.warn('⚠️ Effet visuel échoué:', e.message);
+          }
+        }, 0);
 
         // Afficher notification de succès
         const actionNames = {
@@ -523,7 +613,7 @@ export class FarmV3Adapter {
   selectPlot(plotId) {
     const plot = this.farmGame.plotManager.getPlot(plotId);
     if (!plot || !plot.unlocked) {
-      this.showToast('Parcelle verrouillée', 'warning');
+      this.showUnlockPlotModal(plotId, plot);
       return;
     }
 
@@ -646,6 +736,52 @@ export class FarmV3Adapter {
 
     if (this.farmScene) {
       this.farmScene.updatePlantConditions(plot.soilMoisture, plot.npkLevel, plot.ph);
+      // Sol 3D : couleur selon humidité + événement actif
+      this._updateGroundColor(plot.soilMoisture);
+    }
+
+    // Colorer les barres selon les seuils
+    this._colorSoilBars(plot);
+  }
+
+  /** Met à jour la couleur du sol 3D selon humidité + événement */
+  _updateGroundColor(moisture) {
+    if (!this.farmScene?.groundMesh) return;
+    const event = this.farmGame.conditionsEngine?.activeEvent;
+
+    let targetColor;
+    if (event?.id === 'drought') {
+      // Sol fissuré, très sec, beige
+      targetColor = new THREE.Color(0xC4A265);
+    } else if (event?.id === 'storm' || event?.id === 'heavy_rain') {
+      // Sol gorgé d'eau, presque noir
+      targetColor = new THREE.Color(0x2A1A0A);
+    } else {
+      // Gradation normale : sec (beige) → humide (brun foncé)
+      const dry = new THREE.Color(0x9E7A4A);
+      const wet = new THREE.Color(0x3A1E08);
+      targetColor = dry.clone().lerp(wet, moisture / 100);
+    }
+
+    // Transition douce
+    this.farmScene.groundMesh.material.color.lerp(targetColor, 0.08);
+  }
+
+  /** Colore les barres de sol selon les seuils critique/optimal */
+  _colorSoilBars(plot) {
+    const bars = {
+      'soil-moisture-fill': { val: plot.soilMoisture, low: 20, high: 80 },
+      'soil-npk-fill':      { val: (plot.npkLevel / 150) * 100, low: 20, high: 90 },
+      'soil-weed-fill':     { val: plot.weedLevel, low: -1, high: 40, invert: true },
+    };
+    for (const [id, cfg] of Object.entries(bars)) {
+      const el = document.getElementById(id);
+      if (!el) continue;
+      const bad = cfg.invert ? cfg.val > cfg.high : cfg.val < cfg.low;
+      const good = cfg.invert ? cfg.val <= cfg.low + 10 : cfg.val >= cfg.high * 0.7;
+      el.style.background = bad  ? 'linear-gradient(90deg,#e74c3c,#c0392b)'
+                          : good ? 'linear-gradient(90deg,#27ae60,#2ecc71)'
+                          :        'linear-gradient(90deg,#f39c12,#e67e22)';
     }
   }
 
@@ -999,37 +1135,123 @@ export class FarmV3Adapter {
   }
 
   /**
-   * Débloquer le poulailler
+   * Afficher le modal de débloquage d'une parcelle
    */
-  unlockCoop() {
-    const cost = 100;
-    const resources = this.farmGame.resourceManager.resources;
-
-    if (resources.money < cost) {
-      this.showToast('❌ Pas assez d\'argent (100💰 requis)', 'error');
+  showUnlockPlotModal(plotId, plot) {
+    if (!plot) {
+      this.showToast('Parcelle introuvable', 'error');
       return;
     }
 
-    if (this.farmGame.livestockManager.coopUnlocked) {
+    const cost = plot.unlockCost || 0;
+    const level = plot.unlockLevel || 1;
+    const playerMoney = Math.floor(this.farmGame.resourceManager.resources.money || 0);
+    const playerLevel = this.app.currentUser?.level || this.app.engine?.player?.level || 1;
+
+    // Remplir le modal existant (modal-unlock) avec les infos de la parcelle
+    const modal = document.getElementById('modal-unlock');
+    if (!modal) {
+      this.showToast(`Parcelle ${plotId} nécessite niveau ${level} et ${cost}💰`, 'warning');
+      return;
+    }
+
+    const h2 = modal.querySelector('h2');
+    if (h2) h2.textContent = `🔒 Parcelle ${plotId} Verrouillée`;
+
+    const icon = document.getElementById('unlock-crop-emoji');
+    if (icon) icon.textContent = '🌱';
+
+    const name = document.getElementById('unlock-crop-name');
+    if (name) name.textContent = `Parcelle ${plotId} (Niv. ${level} requis)`;
+
+    const costEl = document.getElementById('unlock-cost');
+    if (costEl) costEl.textContent = cost;
+
+    const balanceEl = document.getElementById('unlock-balance');
+    if (balanceEl) balanceEl.textContent = playerMoney;
+
+    // Stocker l'action de confirmation
+    this._pendingPlotUnlock = { plotId, cost, level };
+
+    // Afficher le modal et remplacer le handler du bouton confirmer
+    modal.classList.add('active');
+
+    const btnConfirm = document.getElementById('btn-confirm-unlock');
+    const btnCancel = document.getElementById('btn-cancel-unlock');
+
+    // Cloner pour supprimer les anciens listeners
+    const newConfirm = btnConfirm.cloneNode(true);
+    const newCancel = btnCancel.cloneNode(true);
+    btnConfirm.parentNode.replaceChild(newConfirm, btnConfirm);
+    btnCancel.parentNode.replaceChild(newCancel, btnCancel);
+
+    newCancel.addEventListener('click', () => {
+      modal.classList.remove('active');
+      this._pendingPlotUnlock = null;
+    });
+
+    newConfirm.addEventListener('click', () => {
+      modal.classList.remove('active');
+      if (this._pendingPlotUnlock) {
+        this.doUnlockPlot(this._pendingPlotUnlock.plotId);
+        this._pendingPlotUnlock = null;
+      }
+    });
+  }
+
+  /**
+   * Effectuer le débloquage d'une parcelle
+   */
+  doUnlockPlot(plotId) {
+    const plot = this.farmGame.plotManager.getPlot(plotId);
+    if (!plot) return;
+
+    const playerLevel = this.app.currentUser?.level || this.app.engine?.player?.level || 1;
+    const success = this.farmGame.plotManager.unlockPlot(plotId, playerLevel);
+
+    if (success) {
+      const xpReward = FARM_XP_REWARDS.unlock_plot;
+      GameState.addXP(xpReward);
+      AudioManager.play('success');
+      this.updatePlotsDisplay();
+      this.updateResourcesDisplay();
+      this.showToast(`✅ Parcelle ${plotId} débloquée ! +${xpReward} XP`, 'success');
+    } else {
+      const plot2 = this.farmGame.plotManager.getPlot(plotId);
+      const money = Math.floor(this.farmGame.resourceManager.resources.money || 0);
+      if (money < (plot2?.unlockCost || 0)) {
+        this.showToast(`❌ Pas assez d'argent (${plot2?.unlockCost || '?'}💰 requis)`, 'error');
+      } else {
+        this.showToast(`❌ Niveau ${plot2?.unlockLevel || '?'} requis`, 'error');
+      }
+    }
+  }
+
+  /**
+   * Débloquer le poulailler
+   */
+  unlockCoop() {
+    const coop = this.farmGame.livestockManager.infrastructure.chickenCoop;
+    const cost = coop.upgradeCost?.[0] ?? 100;
+
+    if (coop.unlocked) {
       this.showToast('⚠️ Poulailler déjà débloqué', 'warning');
       return;
     }
 
-    // Débiter l'argent
-    this.farmGame.resourceManager.spend('money', cost);
-
-    // Débloquer le poulailler
-    this.farmGame.livestockManager.unlockCoop();
+    // unlockChickenCoop gère lui-même la validation argent + débit
+    const success = this.farmGame.livestockManager.unlockChickenCoop();
+    if (!success) {
+      this.showToast(`❌ Pas assez d'argent (${cost}💰 requis)`, 'error');
+      return;
+    }
 
     // 🆕 Récompenser avec XP
     const xpReward = FARM_XP_REWARDS.unlock_plot;
     GameState.addXP(xpReward);
 
     // 🆕 Émettre événement
-    EventBus.emit('farm:coop:unlocked', {
-      cost,
-      xpReward
-    });
+    EventBus.emit('farm:coop:unlocked', { cost, xpReward });
 
     // 🆕 Jouer son de succès
     AudioManager.play('success');
@@ -1071,27 +1293,26 @@ export class FarmV3Adapter {
    * Acheter une poule
    */
   buyChicken() {
-    const cost = 50;
-    const resources = this.farmGame.resourceManager.resources;
+    // buyChickens gère lui-même la validation argent + débit
+    const success = this.farmGame.livestockManager.buyChickens(1);
 
-    if (resources.money < cost) {
-      this.showToast('❌ Pas assez d\'argent (50💰)', 'error');
+    if (!success) {
+      const chickens = this.farmGame.livestockManager.animals.chickens;
+      if (chickens.count >= chickens.maxCount) {
+        this.showToast('❌ Poulailler plein', 'error');
+      } else {
+        this.showToast('❌ Pas assez d\'argent (50💰)', 'error');
+      }
       return;
     }
-
-    this.farmGame.resourceManager.spend('money', cost);
-    this.farmGame.livestockManager.addChicken();
 
     // Mettre à jour l'affichage
     const chickenCount = document.getElementById('chicken-count');
     const eggsPerDay = document.getElementById('eggs-per-day');
+    const chickens = this.farmGame.livestockManager.animals.chickens;
 
-    if (chickenCount) {
-      chickenCount.textContent = this.farmGame.livestockManager.livestock.chicken.count;
-    }
-    if (eggsPerDay) {
-      eggsPerDay.textContent = this.farmGame.livestockManager.livestock.chicken.count * 0.8;
-    }
+    if (chickenCount) chickenCount.textContent = chickens.count;
+    if (eggsPerDay) eggsPerDay.textContent = (chickens.count * 0.8).toFixed(1);
 
     this.showToast('🐔 Poule ajoutée !', 'success');
     this.updateResourcesDisplay();
@@ -1270,34 +1491,30 @@ export class FarmV3Adapter {
    * Acheter un article au marché
    */
   buyMarketItem(category, item, price) {
-    // Demander la quantité
-    const quantity = prompt(`Combien de ${item} voulez-vous acheter ?\n(Prix: ${price}💰 par unité)`);
-    if (!quantity || isNaN(quantity) || parseInt(quantity) <= 0) {
-      return;
-    }
+    const playerMoney = Math.floor(this.farmGame.resourceManager.resources.money || 0);
+    const maxAffordable = price > 0 ? Math.floor(playerMoney / price) : 999;
 
-    const qty = parseInt(quantity);
-    const result = this.farmGame.marketSystem.buy(category, item, qty);
-
-    if (result.success) {
-      // 🆕 Émettre événement
-      EventBus.emit('farm:market:bought', {
-        category,
-        item,
-        quantity: qty,
-        cost: result.cost
-      });
-
-      // 🆕 Jouer son
-      AudioManager.play('click');
-
-      this.showToast(`✅ Acheté ${qty}x ${item} pour ${result.cost}💰`, 'success');
-      this.updateResourcesDisplay();
-      this.updateInventoryDisplay();
-      this.renderMarketUI();
-    } else {
-      this.showToast(`❌ ${result.error}`, 'error');
-    }
+    this._showInputModal({
+      title: `Acheter — ${item}`,
+      desc: `Prix : <strong>${price}💰</strong> / unité &nbsp;·&nbsp; Solde : <strong>${playerMoney}💰</strong>`,
+      placeholder: '1',
+      max: maxAffordable,
+      unit: 'unités',
+      onConfirm: (qty) => {
+        qty = Math.floor(qty);
+        const result = this.farmGame.marketSystem.buy(category, item, qty);
+        if (result.success) {
+          EventBus.emit('farm:market:bought', { category, item, quantity: qty, cost: result.cost });
+          AudioManager.play('click');
+          this.showToast(`✅ Acheté ${qty}× ${item} pour ${result.cost}💰`, 'success');
+          this.updateResourcesDisplay();
+          this.updateInventoryDisplay();
+          this.renderMarketUI();
+        } else {
+          this.showToast(`❌ ${result.error}`, 'error');
+        }
+      }
+    });
   }
 
   /**
@@ -1311,37 +1528,270 @@ export class FarmV3Adapter {
       return;
     }
 
-    const quantity = prompt(`Combien de ${item} voulez-vous vendre ?\n(Prix: ${price}💰 par tonne)\nDisponible: ${available.toFixed(2)}t`);
-    if (!quantity || isNaN(quantity) || parseFloat(quantity) <= 0) {
-      return;
+    const availableStr = typeof available === 'number' && !isNaN(available)
+      ? available.toFixed(2) : '0';
+
+    this._showInputModal({
+      title: `Vendre — ${item}`,
+      desc: `Prix : <strong>${price}💰</strong> / tonne &nbsp;·&nbsp; Stock : <strong>${availableStr}t</strong>`,
+      placeholder: availableStr,
+      max: available,
+      unit: 't',
+      onConfirm: (qty) => {
+        const result = this.farmGame.marketSystem.sell(category, item, qty);
+        if (result.success) {
+          this.farmStats.moneyEarned += result.revenue;
+          EventBus.emit('farm:market:sold', { category, item, quantity: qty, revenue: result.revenue });
+          AudioManager.play('coin');
+          this.showToast(`✅ Vendu ${qty}t ${item} pour ${result.revenue}💰`, 'success');
+          this.updateResourcesDisplay();
+          this.updateInventoryDisplay();
+          this.renderMarketUI();
+        } else {
+          this.showToast(`❌ ${result.error}`, 'error');
+        }
+      }
+    });
+  }
+
+  // ─── Conditions météo & Événements ───────────────────────────────────────
+
+  /**
+   * Afficher l'alerte d'un événement surprise — prend tout l'écran pendant 3s
+   */
+  showEventAlert(event) {
+    // Créer l'overlay d'alerte
+    let alert = document.getElementById('event-alert-overlay');
+    if (!alert) {
+      alert = document.createElement('div');
+      alert.id = 'event-alert-overlay';
+      document.getElementById('screen-farm-v3')?.appendChild(alert);
     }
 
-    const qty = parseFloat(quantity);
-    const result = this.farmGame.marketSystem.sell(category, item, qty);
+    alert.innerHTML = `
+      <div class="event-alert-box" style="border-color: ${event.color}; box-shadow: 0 0 40px ${event.color}66;">
+        <div class="event-alert-icon">${event.icon}</div>
+        <div class="event-alert-content">
+          <h2 class="event-alert-title">${event.title}</h2>
+          <p class="event-alert-desc">${event.desc}</p>
+          <span class="event-alert-duration">Durée : ${event.duration} jour(s)</span>
+        </div>
+      </div>
+    `;
 
-    if (result.success) {
-      // 🆕 Tracker l'argent gagné
-      this.farmStats.moneyEarned += result.revenue;
+    alert.classList.remove('hidden');
+    alert.classList.add('visible');
 
-      // 🆕 Émettre événement
-      EventBus.emit('farm:market:sold', {
-        category,
-        item,
-        quantity: qty,
-        revenue: result.revenue
-      });
+    // Disparaît après 4s
+    setTimeout(() => {
+      alert.classList.remove('visible');
+      alert.classList.add('hidden');
+    }, 4000);
 
-      // 🆕 Jouer son de succès
-      AudioManager.play('coin');
+    // Toast persistant
+    this.showToast(`${event.icon} ${event.title} — ${event.desc}`, 'warning', 6000);
+  }
 
-      this.showToast(`✅ Vendu ${qty}t ${item} pour ${result.revenue}💰`, 'success');
-      this.updateResourcesDisplay();
-      this.updateInventoryDisplay();
-      this.renderMarketUI();
-    } else {
-      this.showToast(`❌ ${result.error}`, 'error');
+  /**
+   * Mettre à jour l'affichage des conditions courantes dans le header
+   */
+  updateConditionsDisplay() {
+    const conditions = this.farmGame.conditionsEngine.getCurrentConditions();
+    if (!conditions) return;
+
+    // Icône météo + saison dans le header
+    const weatherIcon = document.getElementById('weather-icon');
+    const seasonBadge = document.getElementById('display-season');
+
+    if (weatherIcon) {
+      weatherIcon.textContent = conditions.activeEvent
+        ? conditions.activeEvent.icon
+        : conditions.season.icon;
+    }
+    if (seasonBadge) {
+      seasonBadge.textContent = conditions.activeEvent
+        ? conditions.activeEvent.title.replace(' !', '')
+        : conditions.season.name;
+      seasonBadge.style.background = conditions.activeEvent
+        ? `${conditions.activeEvent.color}99`
+        : 'rgba(255,255,255,0.3)';
     }
   }
+
+  // ─── Action Overlay ──────────────────────────────────────────────────────
+
+  _overlayMeta = {
+    plow:                    { icon: '🚜', label: 'Labourage' },
+    plant:                   { icon: '🌱', label: 'Plantation' },
+    water:                   { icon: '💧', label: 'Arrosage' },
+    fertilize_npk:           { icon: '🧪', label: 'Fertilisation NPK' },
+    fertilize_organic:       { icon: '💩', label: 'Compost' },
+    weed:                    { icon: '🌿', label: 'Désherbage' },
+    spray_pesticide_natural: { icon: '🪲', label: 'Pesticide' },
+    harvest:                 { icon: '🌾', label: 'Récolte' },
+  };
+
+  /**
+   * Afficher l'overlay "action en cours" sur le canvas 3D
+   * @param {string} actionId
+   * @param {number} durationDays - durée en jours de simulation (0 = instantané)
+   */
+  showActionOverlay(actionId, durationDays = 0) {
+    const overlay = document.getElementById('action-overlay');
+    const iconEl  = document.getElementById('action-overlay-icon');
+    const labelEl = document.getElementById('action-overlay-label');
+    const fillEl  = document.getElementById('action-overlay-fill');
+    const statusEl= document.getElementById('action-overlay-status');
+    if (!overlay) return;
+
+    const meta = this._overlayMeta[actionId] || { icon: '⚙️', label: actionId };
+    if (iconEl)  iconEl.textContent  = meta.icon;
+    if (labelEl) labelEl.textContent = meta.label;
+    if (fillEl)  { fillEl.classList.remove('complete'); fillEl.style.width = '10%'; }
+    if (statusEl) statusEl.textContent = durationDays > 0
+      ? `Durée : ${durationDays.toFixed(1)} jour(s)`
+      : 'En cours...';
+
+    overlay.classList.remove('hidden');
+    overlay.classList.add('in-progress');
+
+    // Si durée connue, animer la barre sur la durée réelle
+    if (durationDays > 0 && fillEl) {
+      const speed = this.farmGame?.timeSimulation?.speed;
+      // Garde contre speed=0 ou NaN → fallback 2000ms/jour
+      const msPerDay = (speed && isFinite(speed) && speed > 0)
+        ? (1000 / speed)
+        : 2000;
+      const totalMs = Math.min(durationDays * msPerDay, 30000); // max 30s
+      const start = Date.now();
+      let rafId;
+      const tick = () => {
+        const elapsed = Date.now() - start;
+        const pct = Math.min(90, (elapsed / totalMs) * 90);
+        fillEl.style.width = pct + '%';
+        if (pct < 90 && elapsed < totalMs + 500) {
+          rafId = requestAnimationFrame(tick);
+        }
+      };
+      rafId = requestAnimationFrame(tick);
+      // Nettoyage de sécurité après totalMs + 1s
+      setTimeout(() => cancelAnimationFrame(rafId), totalMs + 1000);
+    }
+  }
+
+  /**
+   * Passer l'overlay en état "terminé", puis le masquer
+   */
+  completeActionOverlay(actionId) {
+    const overlay = document.getElementById('action-overlay');
+    const fillEl  = document.getElementById('action-overlay-fill');
+    const statusEl= document.getElementById('action-overlay-status');
+    if (!overlay) return;
+
+    overlay.classList.remove('in-progress');
+    if (fillEl) fillEl.classList.add('complete');
+    if (statusEl) statusEl.textContent = '✅ Terminé !';
+
+    // Masquer après 2s
+    setTimeout(() => {
+      if (overlay) overlay.classList.add('hidden');
+      if (fillEl) fillEl.classList.remove('complete');
+    }, 2000);
+  }
+
+  // ─── Modal de saisie (remplace prompt natif) ─────────────────────────────
+
+  /**
+   * Affiche un modal avec champ de saisie numérique — remplace window.prompt()
+   * @param {Object} cfg - { title, desc, placeholder, max, unit, onConfirm }
+   */
+  _showInputModal({ title, desc, placeholder = '1', max = null, unit = '', onConfirm }) {
+    // Supprimer modal existant s'il y en a un
+    document.getElementById('_farm-input-modal')?.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = '_farm-input-modal';
+    overlay.style.cssText = `
+      position:fixed; inset:0; z-index:9999;
+      background:rgba(0,0,0,0.65); backdrop-filter:blur(4px);
+      display:flex; align-items:center; justify-content:center;
+      animation: fadeIn .2s ease;
+    `;
+
+    overlay.innerHTML = `
+      <div style="
+        background:#1a2530; border:1px solid rgba(255,255,255,0.12);
+        border-radius:16px; padding:28px 32px; min-width:320px; max-width:400px;
+        color:#f0f0f0; box-shadow:0 20px 60px rgba(0,0,0,0.5);
+        animation: popIn .25s cubic-bezier(0.34,1.56,0.64,1);
+      ">
+        <h3 style="margin:0 0 8px; font-size:1.1rem; font-weight:700;">${title}</h3>
+        <p style="margin:0 0 18px; font-size:.85rem; opacity:.7; line-height:1.5;">${desc}</p>
+        <div style="display:flex; gap:10px; align-items:center; margin-bottom:20px;">
+          <input id="_farm-input-qty" type="number" min="0.01"
+            ${max ? `max="${max}"` : ''}
+            step="${unit === 't' ? '0.1' : '1'}"
+            placeholder="${placeholder}"
+            style="
+              flex:1; background:#0d1a20; border:1px solid rgba(255,255,255,0.2);
+              border-radius:8px; padding:10px 14px; color:#f0f0f0;
+              font-size:1rem; outline:none;
+            "
+          />
+          <span style="opacity:.6; font-size:.9rem;">${unit}</span>
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button id="_farm-input-cancel" style="
+            flex:1; padding:10px; border:1px solid rgba(255,255,255,0.15);
+            border-radius:8px; background:transparent; color:#f0f0f0;
+            cursor:pointer; font-size:.9rem;
+          ">Annuler</button>
+          <button id="_farm-input-ok" style="
+            flex:1; padding:10px; border:none; border-radius:8px;
+            background:linear-gradient(135deg,#66bb6a,#2e7d32);
+            color:white; cursor:pointer; font-weight:700; font-size:.9rem;
+          ">Confirmer</button>
+        </div>
+      </div>
+      <style>
+        @keyframes popIn { from{transform:scale(.8);opacity:0} to{transform:scale(1);opacity:1} }
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        #_farm-input-qty:focus { border-color:rgba(102,187,106,.6); }
+      </style>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const input = overlay.querySelector('#_farm-input-qty');
+    const ok    = overlay.querySelector('#_farm-input-ok');
+    const cancel= overlay.querySelector('#_farm-input-cancel');
+
+    // Focus auto
+    setTimeout(() => input.focus(), 50);
+
+    const close = () => overlay.remove();
+
+    cancel.addEventListener('click', close);
+    overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+
+    const submit = () => {
+      const val = parseFloat(input.value);
+      if (!val || isNaN(val) || val <= 0) {
+        input.style.borderColor = '#f44336';
+        return;
+      }
+      close();
+      onConfirm(val);
+    };
+
+    ok.addEventListener('click', submit);
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter') submit();
+      if (e.key === 'Escape') close();
+    });
+  }
+
+  // ─── Toast ───────────────────────────────────────────────────────────────
 
   /**
    * Afficher un toast (🆕 Utilise NotificationSystem)
@@ -1389,8 +1839,8 @@ export class FarmV3Adapter {
       sessionDuration: Date.now() - (this.sessionStartTime || Date.now())
     });
 
-    // Retourner à l'écran de jeu
-    this.app.showScreen('game');
+    // Retourner à l'accueil
+    this.app.showScreen('home');
   }
 
   /**

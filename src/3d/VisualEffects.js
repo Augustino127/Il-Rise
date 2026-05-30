@@ -22,7 +22,7 @@ export class VisualEffects {
       this.scene.remove(this.weatherParticles);
     }
 
-    const particleCount = Math.floor(intensity * 2000);
+    const particleCount = Math.floor(intensity * 600); // 600 max au lieu de 2000
     const particles = new THREE.BufferGeometry();
     const positions = new Float32Array(particleCount * 3);
 

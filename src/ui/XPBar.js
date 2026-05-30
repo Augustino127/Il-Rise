@@ -65,56 +65,50 @@ export class XPBar {
     style.id = 'xp-bar-styles';
     style.textContent = `
       .xp-bar {
-        position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 999;
+        position: relative;
         user-select: none;
-        pointer-events: none;
       }
 
       .xp-bar-content {
-        background: rgba(0, 0, 0, 0.85);
-        backdrop-filter: blur(10px);
-        border-radius: 50px;
-        padding: 12px 24px;
+        background: rgba(0, 0, 0, 0.35);
+        backdrop-filter: blur(6px);
+        border-radius: 30px;
+        padding: 6px 14px;
         display: flex;
         align-items: center;
-        gap: 16px;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-        border: 2px solid rgba(255,255,255,0.1);
-        min-width: 300px;
+        gap: 10px;
+        border: 1px solid rgba(255,255,255,0.15);
+        min-width: 180px;
       }
 
       .xp-level-badge {
         background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-        width: 50px;
-        height: 50px;
+        width: 34px;
+        height: 34px;
         border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+        box-shadow: 0 2px 8px rgba(255, 215, 0, 0.5);
         position: relative;
+        flex-shrink: 0;
         animation: levelPulse 2s ease-in-out infinite;
       }
 
       .xp-level-badge::before {
         content: 'LVL';
         position: absolute;
-        top: -8px;
-        font-size: 9px;
+        top: -7px;
+        font-size: 8px;
         font-weight: 700;
         color: #FFD700;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        text-shadow: 0 1px 3px rgba(0,0,0,0.6);
       }
 
       .level-number {
-        font-size: 24px;
+        font-size: 16px;
         font-weight: 800;
         color: #000;
-        text-shadow: 0 2px 4px rgba(255,255,255,0.3);
       }
 
       @keyframes levelPulse {
@@ -137,11 +131,11 @@ export class XPBar {
 
       .xp-text {
         color: white;
-        font-size: 14px;
+        font-size: 11px;
         font-weight: 600;
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: 3px;
       }
 
       .current-xp {
@@ -167,9 +161,9 @@ export class XPBar {
       }
 
       .xp-progress-bar {
-        height: 10px;
-        background: rgba(255,255,255,0.1);
-        border-radius: 10px;
+        height: 6px;
+        background: rgba(255,255,255,0.15);
+        border-radius: 6px;
         overflow: hidden;
         position: relative;
       }
@@ -292,7 +286,11 @@ export class XPBar {
     EventBus.on(GameEvents.PLAYER_LEVEL_UP, (data) => {
       this.animateLevelUp();
       this.update();
+      this._showLevelUpToast(data?.newLevel);
     });
+
+    // Listen for XP gain — aussi abonné au notify interne via GameState.subscribe si dispo
+    GameState.subscribe?.('player.*', () => this.update());
   }
 
   update() {
@@ -321,11 +319,48 @@ export class XPBar {
 
   animateLevelUp() {
     const content = this.bar.querySelector('.xp-bar-content');
-    content.classList.add('level-up');
+    if (content) {
+      content.classList.add('level-up');
+      setTimeout(() => content.classList.remove('level-up'), 1000);
+    }
+  }
+
+  _showLevelUpToast(newLevel) {
+    // Créer un toast de level-up visible partout
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.5);
+      background: linear-gradient(135deg, #FFD700, #FFA500);
+      color: #000;
+      padding: 20px 36px;
+      border-radius: 50px;
+      font-size: 1.3rem;
+      font-weight: 900;
+      z-index: 99999;
+      box-shadow: 0 0 60px rgba(255,215,0,0.6);
+      pointer-events: none;
+      text-align: center;
+      letter-spacing: 0.02em;
+      transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease;
+      opacity: 0;
+    `;
+    toast.innerHTML = `⭐ NIVEAU ${newLevel || ''}`;
+    document.body.appendChild(toast);
+
+    // Animer
+    requestAnimationFrame(() => {
+      toast.style.transform = 'translate(-50%, -50%) scale(1)';
+      toast.style.opacity = '1';
+    });
 
     setTimeout(() => {
-      content.classList.remove('level-up');
-    }, 1000);
+      toast.style.transform = 'translate(-50%, -60%) scale(1.1)';
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 400);
+    }, 1800);
   }
 
   show() {

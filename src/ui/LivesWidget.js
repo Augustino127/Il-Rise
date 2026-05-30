@@ -107,27 +107,27 @@ export class LivesWidget {
       }
 
       .lives-widget-content {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: rgba(0, 0, 0, 0.35);
+        backdrop-filter: blur(6px);
         color: white;
-        padding: 12px 20px;
+        padding: 6px 12px;
         border-radius: 30px;
         display: flex;
         align-items: center;
-        gap: 12px;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        gap: 6px;
+        border: 1px solid rgba(255,255,255,0.15);
         transition: all 0.3s ease;
       }
 
       .lives-widget:hover .lives-widget-content {
-        transform: translateY(-2px);
-        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        background: rgba(0, 0, 0, 0.5);
       }
 
       .lives-hearts {
-        font-size: 24px;
+        font-size: 16px;
         line-height: 1;
         display: flex;
-        gap: 4px;
+        gap: 2px;
       }
 
       .heart {
@@ -174,7 +174,7 @@ export class LivesWidget {
       }
 
       .lives-count {
-        font-size: 18px;
+        font-size: 13px;
         font-weight: 700;
         line-height: 1;
       }
@@ -185,7 +185,8 @@ export class LivesWidget {
       }
 
       .lives-regen-timer {
-        font-size: 12px;
+        display: none;
+        font-size: 11px;
         opacity: 0.9;
         display: flex;
         align-items: center;

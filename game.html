@@ -15,56 +15,75 @@
 <body style="background: radial-gradient(ellipse at center, #B8E6F5 0%, #87CEEB 50%, #A8D5A3 100%);">
     <!-- ========== ÉCRAN D'ACCUEIL ========== -->
     <div id="screen-home" class="screen active">
-        <div class="home-container">
-            <div class="logo-container">
-                <div class="logo-icon">🌍</div>
-                <h1 class="logo-title">IleRise</h1>
-                <p class="logo-subtitle">AgroData Explorer</p>
+        <div class="home-wrapper">
+
+            <!-- Header compact -->
+            <div class="home-header">
+                <div class="home-logo">
+                    <span class="home-logo-icon">🌍</span>
+                </div>
+                <div class="home-header-actions">
+                    <div class="home-player-bar">
+                        <span class="home-stat">❤️ <strong id="home-lives">5</strong></span>
+                        <span class="home-stat">💰 <strong id="home-coins">0</strong></span>
+                    </div>
+                    <button class="home-btn-icon" id="btn-profile" title="Mon Profil">👤</button>
+                    <button class="home-btn-icon" id="btn-logout" title="Se déconnecter">🚪</button>
+                </div>
             </div>
 
-            <div class="hero-text">
-                <p class="hero-message" data-i18n="home.heroMessage">
-                    Sauvez AgriVerse avec les données NASA
+            <!-- Hero -->
+            <div class="home-hero">
+                <h1 class="home-hero-title">IleRise</h1>
+                <p class="home-hero-sub">AgroData Explorer</p>
+            </div>
+
+            <!-- Deux modes -->
+            <div class="home-modes">
+
+                <div class="mode-card mode-simulation" id="mode-card-simulation">
+                    <div class="mode-card-icon" style="font-family: 'Segoe UI Emoji', 'Apple Color Emoji', sans-serif;">🎮</div>
+                    <div class="mode-card-body">
+                        <h2 class="mode-card-title">Simulation Rapide</h2>
+                        <p class="mode-card-desc">Teste tes choix agricoles sur une saison entière. Ajuste l'eau, les engrais, le pH — et vois le résultat en 5 minutes.</p>
+                        <ul class="mode-card-features">
+                            <li>⏱️ 5 min par partie</li>
+                            <li>📊 Score & étoiles</li>
+                            <li>🛰️ Données NASA en direct</li>
+                        </ul>
+                    </div>
+                    <button class="mode-card-btn btn-simulation" id="btn-start">
+                        Jouer →
+                    </button>
+                </div>
+
+                <div class="home-modes-divider"><span></span>OU<span></span></div>
+
+                <div class="mode-card mode-farm" id="mode-card-farm">
+                    <div class="mode-card-icon" style="font-family: 'Segoe UI Emoji', 'Apple Color Emoji', sans-serif;">🌾</div>
+                    <div class="mode-card-body">
+                        <h2 class="mode-card-title">Ferme Interactive</h2>
+                        <p class="mode-card-desc">Gère ta ferme jour après jour. Laboure, plante, arrose, récolte. Vends au marché, élève des animaux, débloque de nouvelles parcelles.</p>
+                        <ul class="mode-card-features">
+                            <li>🗺️ 4 parcelles à débloquer</li>
+                            <li>🐔 Élevage & marché</li>
+                            <li>📈 Progression libre</li>
+                        </ul>
+                    </div>
+                    <button class="mode-card-btn btn-farm" id="btn-go-farm">
+                        Cultiver →
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- Pied de page -->
+            <div class="home-footer">
+                <p>🛰️ Powered by NASA Earth Data &nbsp;·&nbsp;
+                   <button class="home-link" id="btn-tutorial">🎓 Tutoriel</button>
                 </p>
             </div>
 
-            <div class="player-stats">
-                <div class="stat-item">
-                    <span class="stat-icon">❤️</span>
-                    <span class="stat-value" id="home-lives">5</span>
-                    <span class="stat-label" data-i18n="home.lives">Vies</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-icon">💰</span>
-                    <span class="stat-value" id="home-coins">0</span>
-                    <span class="stat-label" data-i18n="home.coins">Pièces</span>
-                </div>
-            </div>
-
-            <div class="home-menu-buttons">
-                <button class="btn-primary btn-large" id="btn-start" data-i18n="home.btnStart">
-                    🚀 Commencer
-                </button>
-
-                <button class="btn-secondary" id="btn-tutorial" data-i18n="home.btnTutorial">
-                    🎓 Tutoriel Interactif
-                </button>
-
-                <button class="btn-secondary" id="btn-profile" data-i18n="home.btnProfile">
-                    👤 Mon Profil
-                </button>
-
-                <button class="btn-secondary" id="btn-logout" data-i18n="home.btnLogout">
-                    🚪 Se déconnecter
-                </button>
-            </div>
-
-            <!-- Sélecteur de langue sur l'écran d'accueil -->
-            <div id="language-switcher-home" class="language-switcher-home"></div>
-
-            <div class="nasa-credit">
-                <p>🛰️ Powered by NASA Earth Data</p>
-            </div>
         </div>
     </div>
 
@@ -472,6 +491,7 @@
                         <span class="resource-value" id="display-water">1000L</span>
                     </div>
                 </div>
+                <div id="player-stats-bar"></div>
             </div>
         </div>
 
@@ -606,8 +626,21 @@
                     </div>
 
                     <!-- Visualisation parcelle 3D -->
-                    <div class="card plot-visual">
+                    <div class="card plot-visual" style="position:relative;">
                         <div class="plot-field-3d" id="farm-scene-container"></div>
+                        <!-- Overlay feedback d'action -->
+                        <div id="action-overlay" class="action-overlay hidden">
+                            <div class="action-overlay-inner">
+                                <span class="action-overlay-icon" id="action-overlay-icon">🚜</span>
+                                <div class="action-overlay-info">
+                                    <span class="action-overlay-label" id="action-overlay-label">Labourage</span>
+                                    <div class="action-overlay-bar">
+                                        <div class="action-overlay-fill" id="action-overlay-fill"></div>
+                                    </div>
+                                    <span class="action-overlay-status" id="action-overlay-status">En cours...</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- État du sol -->

@@ -425,14 +425,23 @@ export class PlotManager {
       `Récolte parcelle ${plotId}`
     );
 
+    const cropId = plot.crop.id;
+    const cropName = plot.crop.name.fr;
+
+    // Prix de marché estimé (base: 150💰/tonne pour le maïs)
+    const basePrices = { maize: 150, cowpea: 200, rice: 180, cassava: 100, cacao: 2500, cotton: 300 };
+    const revenue = actualYield * (basePrices[cropId] || 150);
+
     // Réinitialiser la parcelle
     this.resetPlot(plot);
 
-    console.log(`🌾 Récolte: ${actualYield.toFixed(2)} tonnes de ${plot.crop.name.fr}`);
+    console.log(`🌾 Récolte: ${actualYield.toFixed(2)} tonnes de ${cropName}`);
 
     return {
       success: true,
       yield: actualYield,
+      cropId,
+      revenue,
       results
     };
   }

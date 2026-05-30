@@ -275,10 +275,19 @@ class IleRiseApp {
     }
 
     // Ancien bouton (pour compatibilité)
+    // ── Mode Simulation (nouveau bouton accueil) ──
     const btnStart = document.getElementById('btn-start');
     if (btnStart) {
       btnStart.addEventListener('click', () => {
-        this.showCropSelection();
+        this.showLocationSelection();
+      });
+    }
+
+    // ── Mode Ferme (nouveau bouton accueil) ──
+    const btnGoFarm = document.getElementById('btn-go-farm');
+    if (btnGoFarm) {
+      btnGoFarm.addEventListener('click', () => {
+        this.switchToFarmMode();
       });
     }
 
@@ -345,9 +354,9 @@ class IleRiseApp {
       });
     }
 
-    // Sélection culture
+    // Sélection culture → retour à la localité (flux simulation)
     document.getElementById('btn-back-crop').addEventListener('click', () => {
-      this.showScreen('home');
+      this.showLocationSelection();
     });
 
     // Bouton cartes éducatives
@@ -3019,22 +3028,15 @@ class IleRiseApp {
    * Initialize Lives Widget
    */
   initializeLivesWidget() {
-    // Find a container for the lives widget (home screen header)
-    const homeHeader = this.screens.home?.querySelector('.home-container');
-
-    if (homeHeader) {
-      // Create a container for the widget
+    const statsBar = document.getElementById('player-stats-bar');
+    if (statsBar) {
       const widgetContainer = document.createElement('div');
       widgetContainer.id = 'lives-widget-container';
-      widgetContainer.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 1000;';
-
-      // Insert at the beginning of body so it's always visible
-      document.body.insertBefore(widgetContainer, document.body.firstChild);
-
+      statsBar.appendChild(widgetContainer);
       this.livesWidget = new LivesWidget(this.engine.livesSystem, widgetContainer);
       console.log('💚 Lives widget initialized');
     } else {
-      console.warn('⚠️ Could not find container for lives widget');
+      console.warn('⚠️ Could not find #player-stats-bar for lives widget');
     }
   }
 
@@ -3042,15 +3044,21 @@ class IleRiseApp {
    * Initialize XP Bar
    */
   initializeXPBar() {
-    // Create container for XP bar
-    const xpContainer = document.createElement('div');
-    xpContainer.id = 'xp-bar-container';
-
-    // Insert into body
-    document.body.appendChild(xpContainer);
-
-    this.xpBar = new XPBar(xpContainer);
-    console.log('⭐ XP Bar initialized');
+    const statsBar = document.getElementById('player-stats-bar');
+    if (statsBar) {
+      const xpContainer = document.createElement('div');
+      xpContainer.id = 'xp-bar-container';
+      statsBar.appendChild(xpContainer);
+      this.xpBar = new XPBar(xpContainer);
+      console.log('⭐ XP Bar initialized');
+    } else {
+      // Fallback si le slot n'est pas encore dans le DOM (autres écrans)
+      const xpContainer = document.createElement('div');
+      xpContainer.id = 'xp-bar-container';
+      document.body.appendChild(xpContainer);
+      this.xpBar = new XPBar(xpContainer);
+      console.log('⭐ XP Bar initialized (fallback)');
+    }
   }
 
   /**
